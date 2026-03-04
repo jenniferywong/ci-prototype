@@ -1,21 +1,34 @@
-const SHEETS_URL =
-  'https://script.google.com/macros/s/AKfycbxpoqML6yUaVbdCln3YtnDMJKI9EpeqobsZaJG-QqS1yfR6KT3uBywOBjqv7pU_q5Jq/exec';
-
 export async function POST(request) {
+  const data = await request.json();
   try {
-    const body = await request.json();
-    console.log('[log] forwarding step:', body.step, '| session:', body.sessionId);
-
-    const res = await fetch(SHEETS_URL, {
+    const response = await fetch('https://api.airtable.com/v0/app6oW0VNSXnFIQBx/tblRF4h263KOiisOM', {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(body),
+      headers: {
+        'Authorization': `Bearer ${process.env.AIRTABLE_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fields: {
+          'Timestamp': data.timestamp || new Date().toISOString(),
+          'User Type': data.user_type || '',
+          'Session ID': data.sessionId || '',
+          'Step': data.step || '',
+          'User Input': data.userInput || '',
+          'AI Response': data.aiResponse || '',
+          'Iteration Number': String(data.iterationNumber || ''),
+          'Topic': data.topic || '',
+          'Subject Detected': data.subjectDetected || '',
+          'Scaffold Strategy Recommended': data.scaffoldStrategy || '',
+          'Custom Scaffolds Added': data.customScaffoldsAdded || '',
+          'Adjustment Request': data.adjustmentRequest || ''
+        }
+      })
     });
-
-    console.log('[log] sheets status:', res.status);
+    const result = await response.json();
+    console.log('[airtable]', response.status, JSON.stringify(result).slice(0, 100));
     return Response.json({ ok: true });
-  } catch (err) {
-    console.error('[log] error:', err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+  } catch(err) {
+    console.error('[airtable error]', err.message);
+    return Response.json({ ok: false });
   }
 }

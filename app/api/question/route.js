@@ -21,7 +21,7 @@ export async function POST(request) {
       max_tokens: 250,
       messages: [{
         role: 'user',
-        content: `A teacher teaching "${topic}" says students are struggling with "${hardestThing}". Generate ONE specific follow-up question to understand the struggle better. Make it concrete and specific to this exact topic — reference the actual subject matter, not generic terms. Return JSON only, no markdown backticks: { "question": string, "options": [string, string, string] }`,
+        content: `A teacher teaching "${topic}" says students are struggling with "${hardestThing}". Generate ONE specific follow-up question to understand the struggle better. Make it concrete and specific to this exact topic — reference the actual subject matter, not generic terms. IMPORTANT: phrase the question and all answer options from the teacher's perspective about their students — use "they", "them", "your students" instead of "you" or "I". For example: "When your students see a fraction divided by another fraction, do they..." or "Do they tend to..." not "When you see..." or "I always...". Return JSON only, no markdown backticks: { "question": string, "options": [string, string, string] }`,
       }],
     });
 

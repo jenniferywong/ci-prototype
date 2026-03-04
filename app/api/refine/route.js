@@ -40,14 +40,11 @@ export async function POST(request) {
   console.log('[refine] adjustment:', adjustment);
   console.log('[refine] previousQuiz questions:', previousQuiz.questions.length, '| Q1:', previousQuiz.questions[0]?.question?.slice(0, 80));
 
-  const system = `You are Brisk, an AI assistant for K-12 teachers. You modify existing quizzes based on teacher requests. Return JSON only, no markdown backticks: { "title": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string, "hint": string}] }`;
+  const system = `You are Brisk, an AI assistant for K-12 teachers. You modify existing quizzes based on teacher requests. Preserve the warmupLabel field from the existing quiz. Return JSON only, no markdown backticks: { "title": string, "warmupLabel": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string, "hint": string}] }`;
 
   const userContent = `IMPORTANT: Do not generate a new quiz. Modify the existing quiz below.
-Requested change: ${adjustment}
-Apply this change throughout. If hints requested, add a "hint" field to every question with a short, student-friendly hint (1–2 sentences).
-If simpler language requested, rewrite every question stem with easier vocabulary.
-If shorter questions requested, shorten every question stem.
-Make the change to EVERY question — do not leave any unchanged.
+Apply ONLY this specific change: "${adjustment}"
+Do not add anything else. Do not add hints unless explicitly asked. Do not change anything that was not requested. Apply the change to every question.
 
 Existing quiz to modify:
 ${JSON.stringify(previousQuiz, null, 2)}

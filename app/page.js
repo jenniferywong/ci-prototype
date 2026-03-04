@@ -7,30 +7,57 @@ function genUUID() {
 }
 
 function logStep(sessionId, step, userInput, aiResponse, extras = {}) {
-  const payload = {
-    timestamp: new Date().toISOString(), sessionId, step,
-    userInput: userInput || '', aiResponse: aiResponse || '',
-    iterationNumber: extras.iterationNumber ?? null,
-    topic: extras.topic || '', subjectDetected: extras.subjectDetected || '',
-    scaffoldStrategy: extras.scaffoldStrategy || '', customScaffolds: extras.customScaffolds || '',
-    adjustmentRequest: extras.adjustmentRequest || '',
-  };
-  console.log('LOGGING:', step, { userInput: userInput?.slice?.(0, 80) });
-  fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    .catch(err => console.warn('[LOG error]', err));
+  console.log('SENDING LOG:', step, { userInput: userInput?.slice?.(0, 80) });
+  fetch('/api/log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: sessionId,
+      user_type: extras.user_type || '',
+      step: step,
+      userInput: userInput || '',
+      aiResponse: aiResponse || '',
+      iterationNumber: extras.iterationNumber ?? '',
+      topic: extras.topic || '',
+      subjectDetected: extras.subjectDetected || '',
+      scaffoldStrategy: extras.scaffoldStrategy || '',
+      customScaffoldsAdded: extras.customScaffoldsAdded || '',
+      adjustmentRequest: extras.adjustmentRequest || '',
+      timestamp: new Date().toISOString(),
+    }),
+  });
 }
 
 function pickStrategy(subject, hardestThing, needs2Answer) {
   const s = (subject || '').toLowerCase();
   const combined = ((hardestThing || '') + ' ' + (needs2Answer || '')).toLowerCase();
+
+  // ── Check teacher's described student needs FIRST (cross-subject) ──
+  if (/\bell\b|ell student|english language learn|esl|second language|not fluent|limited english|bilingual|language support|language barrier/.test(combined))
+    return { name: 'Vocabulary Bank', desc: 'gives students key terms with definitions and sentence examples before they attempt questions — essential support for ELL students navigating academic language' };
+
+  if (/below grade|grade level|behind|struggling reader|low reader|reading level|can't read|cannot read|read at/.test(combined))
+    return { name: 'Concrete-Representational-Abstract (CRA)', desc: 'moves from physical objects to diagrams to symbols so students build genuine understanding step by step before working abstractly' };
+
+  if (/forget|can't remember|remember the steps|don't know the steps|steps|procedure|process|order of|sequence|keep mixing/.test(combined))
+    return { name: 'Worked Examples', desc: 'shows students a correct worked example and a common error side by side so they can see exactly where mistakes happen' };
+
+  if (/\bvocab\b|vocabulary|unfamiliar word|don't know the word|academic language|term|terminology|word wall/.test(combined))
+    return { name: '7 Steps Vocabulary', desc: "pre-teaches key terms so students aren't blocked by unfamiliar academic language before engaging with questions" };
+
+  if (/graphic organiz|organiz|structured note|note-taking|chunk|break.*down|overwhelm/.test(combined))
+    return { name: 'Graphic Organizer', desc: 'gives students a visual framework to organize information and see relationships clearly before answering questions' };
+
+  if (/word problem|story problem|context|real.world|application/.test(combined) && s.includes('math'))
+    return { name: 'Read-Draw-Write', desc: 'structures how students break down word problems into readable, visual, and written steps before solving' };
+
+  // ── Subject-based fallback ──────────────────────────────────
   if (s.includes('math')) {
-    if (/procedur|order|step|calculat|operation|comput/.test(combined)) return { name: 'Worked Examples', desc: 'shows students correct and incorrect examples side by side so they see exactly where the error happens' };
-    if (/concept|understand|why|abstract/.test(combined)) return { name: 'Concrete-Representational-Abstract (CRA)', desc: 'moves from physical objects to diagrams to symbols so students build real understanding before abstraction' };
-    if (/word problem|story problem/.test(combined)) return { name: 'Read-Draw-Write', desc: 'structures how students break down word problems before solving' };
+    if (/procedur|calculat|operation|comput|plug in|formula/.test(combined)) return { name: 'Worked Examples', desc: 'shows students correct and incorrect examples side by side so they see exactly where the error happens' };
+    if (/concept|understand|why|abstract|make sense/.test(combined)) return { name: 'Concrete-Representational-Abstract (CRA)', desc: 'moves from physical objects to diagrams to symbols so students build real understanding before abstraction' };
     return { name: 'Worked Examples', desc: 'shows students correct and incorrect examples side by side so they see exactly where the error happens' };
   }
   if (s.includes('ela') || s.includes('english') || s.includes('language') || s.includes('reading') || s.includes('writing') || s.includes('lit')) {
-    if (/vocab|fluency|word|unfamiliar|term/.test(combined)) return { name: '7 Steps Vocabulary', desc: "pre-teaches key terms so students aren't blocked by unfamiliar words" };
     if (/spot|identify|find|locat|recogni|where|when/.test(combined)) return { name: 'Frayer Model', desc: 'builds understanding through definition, examples, and non-examples' };
     if (/explain|analy|why|interpret|matter|effect|theme|author/.test(combined)) return { name: 'Semantic Mapping', desc: 'helps students see relationships between ideas' };
     return { name: '7 Steps Vocabulary', desc: "pre-teaches key terms so students aren't blocked by unfamiliar words" };
@@ -150,7 +177,7 @@ function PrefsHeader({ title, subtitle, onBack, onClose }) {
   );
 }
 
-function SubHeader({ onBack, label = 'Back' }) {
+function SubHeader({ onBack, label = 'Quiz' }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '6px 14px', borderBottom: `1px solid ${C.slate200}`, background: '#fff', flexShrink: 0 }}>
       <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.slate600, fontSize: 16, padding: '2px 6px 2px 0' }}>←</button>
@@ -342,17 +369,23 @@ function SectionLabel({ label, noBorder }) {
   return <div style={{ fontSize: 11, fontWeight: 700, color: C.slate400, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 14px 6px', borderTop: noBorder ? 'none' : `1px solid ${C.slate200}` }}>{label}</div>;
 }
 
-function CurriculumCard({ unit, title, loading }) {
+function CurriculumCard({ unit, title, loading, onSwap, url }) {
+  const openUrl = url ? () => window.open(url, '_blank', 'noopener,noreferrer') : null;
   return (
     <div style={{ background: '#fff', border: `1px solid ${C.slate200}`, borderRadius: 10, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
       <div style={{ width: 36, height: 36, background: '#fee2e2', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>📄</div>
-      <div style={{ flex: 1 }}>
+      <div
+        style={{ flex: 1, cursor: openUrl ? 'pointer' : 'default' }}
+        onClick={!loading ? openUrl : undefined}
+        title={url ? 'Open source page' : undefined}
+      >
         {loading
           ? <><div style={{ height: 12, background: C.slate200, borderRadius: 4, width: '55%', marginBottom: 6 }} /><div style={{ height: 10, background: C.slate100, borderRadius: 4, width: '75%' }} /></>
           : <><div style={{ fontWeight: 700, fontSize: 13, color: C.slate900 }}>{unit}</div><div style={{ fontSize: 12, color: C.slate600, marginTop: 2 }}>{title}</div></>}
       </div>
-      <div style={{ display: 'flex', gap: 8, color: C.slate400, fontSize: 16 }}>
-        <span style={{ cursor: 'pointer' }}>↻</span><span style={{ cursor: 'pointer' }}>↗</span>
+      <div style={{ display: 'flex', gap: 8, color: C.slate400, fontSize: 16, flexShrink: 0 }}>
+        {onSwap && <span onClick={!loading ? onSwap : undefined} style={{ cursor: loading ? 'default' : 'pointer' }} title="Try a different unit">⇄</span>}
+        <span onClick={!loading ? openUrl : undefined} style={{ cursor: openUrl && !loading ? 'pointer' : 'default' }} title={url ? 'Open source page' : undefined}>↗</span>
       </div>
     </div>
   );
@@ -532,7 +565,7 @@ function GoogleFormsPreview({ quiz, title }) {
         {/* Vocabulary warm-up — amber card */}
         {quiz?.warmup?.length > 0 && (
           <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '16px 24px', marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Vocabulary Warm-Up</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{quiz.warmupLabel || 'Warm-Up'}</div>
             {quiz.warmup.map((w, i) => (
               <div key={i} style={{ fontSize: 14, color: '#202124', marginBottom: 6, lineHeight: 1.5 }}>
                 <span style={{ fontWeight: 600 }}>{w.term}</span> — {w.definition}
@@ -642,7 +675,8 @@ const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multip
 
 export default function Home() {
   const [sessionId] = useState(() => genUUID());
-  const [screen, setScreen] = useState(0);
+  const [screen, setScreen] = useState('welcome');
+  const [userType, setUserType] = useState('Teacher');
   const [input, setInput] = useState('');
 
   const [topic, setTopic] = useState('');
@@ -687,6 +721,13 @@ export default function Home() {
   const [placeholderOpacity, setPlaceholderOpacity] = useState(1);
   const [needsInputFocused, setNeedsInputFocused] = useState(false);
 
+  // Dynamic rotating placeholder suggestions (Screen 6)
+  const [scaffoldSuggestions, setScaffoldSuggestions] = useState([]);
+  const [scaffoldPlaceholderIdx, setScaffoldPlaceholderIdx] = useState(0);
+  const [scaffoldPlaceholderOpacity, setScaffoldPlaceholderOpacity] = useState(1);
+  const [scaffoldInputFocused, setScaffoldInputFocused] = useState(false);
+  const [warmupAnswered, setWarmupAnswered] = useState('');
+
   const SCREEN_NAMES = {
     0: 'page-context', 1: 'topic', 2: 'curriculum-card', 3: 'needs-1', 4: 'needs-2',
     5: 'scaffolds-loading', 6: 'scaffold-recommendation',
@@ -695,7 +736,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    logStep(sessionId, 'page_loaded', '', '');
+    logStep(sessionId, 'page_loaded', '', '', { user_type: userType });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -722,7 +763,7 @@ export default function Home() {
   }, [pageUrl]);
 
   function go(next, userInput = '', aiResponse = '') {
-    logStep(sessionId, SCREEN_NAMES[next] || `screen_${next}`, userInput, aiResponse);
+    logStep(sessionId, SCREEN_NAMES[next] || `screen_${next}`, userInput, aiResponse, { user_type: userType });
     setScreen(next);
     setInput('');
     if (typeof next === 'number') {
@@ -736,7 +777,7 @@ export default function Home() {
   }
 
   function handleClose() {
-    setScreen(0); setTopic(''); setCurriculumCard(null); setCardLoading(false);
+    setScreen('welcome'); setTopic(''); setCurriculumCard(null); setCardLoading(false);
     setHardestThing(''); setFluencyAnswer(''); setNeeds2Data(null);
     setNeeds2Loading(false); setNeeds2Answer(''); setStrategy(null);
     setQuizLoading(false); setApiError(''); setDetectedSubject('');
@@ -746,6 +787,7 @@ export default function Home() {
     setPageUrl(''); setPageContext(null); setPageContextLoading(false);
     setNeedsSuggestions([]); setNeedsSuggestionsLoading(false);
     setPlaceholderIdx(0); setPlaceholderOpacity(1); setNeedsInputFocused(false);
+    setWarmupAnswered('');
     setPanelPos(null);
     currentQuizRef.current = null;
   }
@@ -797,7 +839,7 @@ export default function Home() {
     const classData = CLASSES.find(c => c.id === (detectedClassId || selectedClass));
     if (classData) setPrefs(p => ({ ...p, grade: classData.grade }));
     setCardLoading(true); setCurriculumCard(null);
-    logStep(sessionId, 'page_context_selected', t, '', { topic: t, subjectDetected: ds });
+    logStep(sessionId, 'page_context_selected', t, '', { topic: t, subjectDetected: ds, user_type: userType });
     setMaxScreenReached(prev => Math.max(prev, 2));
     setScreen(2); setInput('');
     try {
@@ -824,7 +866,7 @@ export default function Home() {
     if (classData) setPrefs(p => ({ ...p, grade: classData.grade }));
     setCardLoading(true);
     setCurriculumCard(null);
-    logStep(sessionId, 'topic_submitted', t, '', { topic: t, subjectDetected: ds });
+    logStep(sessionId, 'topic_submitted', t, '', { topic: t, subjectDetected: ds, user_type: userType });
     go(2, t, "Got it — looks like you're on this unit.");
     try {
       const res = await fetch('/api/curriculum', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: t }) });
@@ -860,7 +902,7 @@ export default function Home() {
 
   function handleFluencySelect(opt) {
     setFluencyAnswer(opt);
-    logStep(sessionId, 'needs_fluency', opt, '', { topic, subjectDetected: detectedSubject });
+    logStep(sessionId, 'needs_fluency', opt, '', { topic, subjectDetected: detectedSubject, user_type: userType });
     go(4, opt, '');
   }
 
@@ -868,14 +910,27 @@ export default function Home() {
     setNeeds2Answer(opt);
     const s = pickStrategy(detectedSubject || curriculumCard?.subject || '', hardestThing, opt);
     setStrategy(s);
-    logStep(sessionId, 'needs_struggle', opt, '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: s?.name });
+    logStep(sessionId, 'needs_struggle', opt, '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: s?.name, user_type: userType });
     go(5, opt, "Checking your district's instructional strategies...");
   }
 
   function openEditPrefs() {
     if (scaffolds.length === 0 && strategy) setScaffolds([{ id: genUUID(), text: `${strategy.name} — ${strategy.desc}` }]);
-    logStep(sessionId, 'edit-preferences', '', '');
+    logStep(sessionId, 'edit-preferences', '', '', { user_type: userType });
     setScreen('7b');
+  }
+
+  async function handleSwapCurriculum() {
+    setCardLoading(true);
+    setCurriculumCard(null);
+    try {
+      const res = await fetch('/api/curriculum', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCurriculumCard(data);
+    } catch {
+      setCurriculumCard({ unit: 'Unit 2, Lesson 5', title: topic, subject: detectedSubject });
+    } finally { setCardLoading(false); }
   }
 
   function openStrategyGuide() {
@@ -908,6 +963,42 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, needsSuggestions, needsInputFocused, input]);
 
+  // Reset scaffold placeholder index when new suggestions arrive
+  useEffect(() => {
+    setScaffoldPlaceholderIdx(0);
+    setScaffoldPlaceholderOpacity(1);
+  }, [scaffoldSuggestions]);
+
+  // Cycle scaffold placeholder every 3 seconds on Screen 6
+  useEffect(() => {
+    if (screen !== 6 || scaffoldSuggestions.length === 0 || scaffoldInputFocused || input) return;
+    let swapTimeout;
+    const cycle = setInterval(() => {
+      setScaffoldPlaceholderOpacity(0);
+      swapTimeout = setTimeout(() => {
+        setScaffoldPlaceholderIdx(i => (i + 1) % scaffoldSuggestions.length);
+        setScaffoldPlaceholderOpacity(1);
+      }, 350);
+    }, 3000);
+    return () => { clearInterval(cycle); clearTimeout(swapTimeout); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, scaffoldSuggestions, scaffoldInputFocused, input]);
+
+  // Fetch scaffold suggestions when arriving on Screen 6
+  useEffect(() => {
+    if (screen !== 6 || !topic) return;
+    setScaffoldSuggestions([]);
+    const classData = CLASSES.find(c => c.id === selectedClass);
+    fetch('/api/suggest-scaffolds', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, subject: detectedSubject || classData?.subject || '', grade: prefs.grade, strategy: strategy?.name || '', fluencyAnswer, struggleAnswer: needs2Answer }),
+    })
+      .then(r => r.json())
+      .then(data => setScaffoldSuggestions(data.suggestions || []))
+      .catch(() => setScaffoldSuggestions([]));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
+
   // Fetch dynamic suggestion chips when arriving on Screen 2
   useEffect(() => {
     if (screen !== 2 || !topic) return;
@@ -930,7 +1021,7 @@ export default function Home() {
     if (screen !== 5) return;
     const t = setTimeout(() => {
       const s = strategy || { name: 'Scaffolded Notes', desc: '' };
-      logStep(sessionId, 'scaffold_shown', '', `${s.name}: ${s.desc}`, { topic, subjectDetected: detectedSubject, scaffoldStrategy: s.name });
+      logStep(sessionId, 'scaffold_shown', '', `${s.name}: ${s.desc}`, { topic, subjectDetected: detectedSubject, scaffoldStrategy: s.name, user_type: userType });
       go(6, '', `Your district has 3 core instructional strategies for ${subj}. ${s.name} is a strong fit.`);
     }, 1500);
     return () => clearTimeout(t);
@@ -945,7 +1036,7 @@ export default function Home() {
     const scaffoldTexts = scaffolds.map(s => s.text).filter(Boolean);
     fetch('/api/generate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '', pageContextBodyText: pageContext?.bodyText || '' }),
+      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffoldStrategy: strategy?.name || '', scaffoldStrategyDesc: strategy?.desc || '', teacherScaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '', pageContextBodyText: pageContext?.bodyText || '' }),
     })
       .then(r => r.json())
       .then(data => {
@@ -957,7 +1048,7 @@ export default function Home() {
         setVersions(prev => [...prev, newVersion]);
         setActiveVersionIdx(newIdx);
         const iterN = newIdx + 1;
-        logStep(sessionId, 'quiz_generated', '', data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), iterationNumber: iterN });
+        logStep(sessionId, 'quiz_generated', '', data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), iterationNumber: iterN, user_type: userType });
         setChatLog([
           { id: genUUID(), type: 'brisk', text: "Here's your quiz. Does anything need to change for your students?" },
           { id: genUUID(), type: 'version', versionIdx: newIdx },
@@ -1033,7 +1124,7 @@ export default function Home() {
         { id: genUUID(), type: 'version', versionIdx: newIdx },
       ]);
       const n = versions.length + 1;
-      logStep(sessionId, `iteration_${n}`, feedback, data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), adjustmentRequest: feedback, iterationNumber: n });
+      logStep(sessionId, `iteration_${n}`, feedback, data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), adjustmentRequest: feedback, iterationNumber: n, user_type: userType });
     } catch {
       setChatLog(prev => prev.map(m => m.id === updatingId
         ? { ...m, isUpdating: false, text: "Something went wrong — try again?", hasRetry: true }
@@ -1121,10 +1212,45 @@ export default function Home() {
               : null)
           : null}
 
+      {/* ── WELCOME SCREEN ── */}
+      {screen === 'welcome' && (
+        <>
+          <Header onClose={handleClose} />
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px 14px' }}>
+            <p style={{ fontSize: 13, color: C.slate700, lineHeight: 1.65, margin: '0 0 14px' }}>
+              Your district has uploaded their curriculum and instructional strategies to Brisk based on our latest Curriculum Intelligence feature. Now when you create resources in Brisk, they&apos;re automatically grounded in where your class is and what your district needs — no extra steps needed.
+            </p>
+            <p style={{ fontSize: 13, color: C.slate700, lineHeight: 1.65, margin: '0 0 22px', fontWeight: 600 }}>
+              You&apos;re about to create a quiz.
+            </p>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.slate400, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>I am a…</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+              {['Teacher', 'Brisk Employee', 'Other'].map(opt => (
+                <label key={opt} onClick={() => setUserType(opt)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${userType === opt ? C.slate900 : C.slate200}`, background: userType === opt ? C.slate100 : '#fff', transition: 'border-color 0.1s' }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${userType === opt ? C.slate900 : C.slate300}`, background: userType === opt ? C.slate900 : '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {userType === opt && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                  </div>
+                  <span style={{ fontSize: 13, color: C.slate900, fontWeight: userType === opt ? 600 : 400 }}>{opt}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                logStep(sessionId, 'welcome_screen', userType, '', { user_type: userType });
+                setScreen(0);
+              }}
+              style={{ width: '100%', background: C.slate900, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 0', fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              Let&apos;s go →
+            </button>
+          </div>
+        </>
+      )}
+
       {/* ── SCREEN 0 — Page Context ── */}
       {screen === 0 && (
         <>
           <Header onClose={handleClose} />
+          <SubHeader onBack={() => setScreen('welcome')} label="Quiz" />
           <div style={{ flex: 1, overflowY: 'auto', padding: '20px 14px' }}>
             <div style={{ fontWeight: 700, fontSize: 15, color: C.slate900, marginBottom: 4 }}>Simulate your current page</div>
             <div style={{ fontSize: 13, color: C.slate500, marginBottom: 14 }}>In the real Brisk extension, we&apos;d read the page you&apos;re on automatically. For this demo, paste a URL or upload a screenshot to simulate that.</div>
@@ -1229,16 +1355,16 @@ export default function Home() {
                   <span style={{ fontSize: 14 }}>{pageContext.type === 'screenshot' ? '🖼️' : '🌐'}</span>
                   <span style={{ fontSize: 12, color: C.slate600, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pageContext.title}</span>
                 </div>
-                <CurriculumCard unit={unit} title={cardTitle} loading={cardLoading} />
-                <div style={{ marginTop: 8 }}>Got it — I can see this page. Let me tailor the quiz to it.</div>
+                <CurriculumCard unit={unit} title={cardTitle} loading={cardLoading} onSwap={handleSwapCurriculum} url={pageContext?.url || ''} />
+                <div style={{ marginTop: 8 }}>Got it — based on where your class is in the curriculum, here&apos;s the unit and lesson I&apos;ll ground this quiz in.</div>
                 <InlineClassPicker value={selectedClass} onChange={v => { setSelectedClass(v); setClassOverridden(true); const cd = CLASSES.find(c => c.id === v); if (cd) setPrefs(p => ({ ...p, grade: cd.grade })); }} />
               </BriskBubble>
             ) : (
               <>
                 <TeacherBubble>{topic}</TeacherBubble>
                 <BriskBubble>
-                  <CurriculumCard unit={unit} title={cardTitle} loading={cardLoading} />
-                  <div style={{ marginTop: 8 }}>Got it — looks like you&apos;re on this unit.</div>
+                  <CurriculumCard unit={unit} title={cardTitle} loading={cardLoading} onSwap={handleSwapCurriculum} url={''} />
+                  <div style={{ marginTop: 8 }}>Got it — based on where your class is in the curriculum, here&apos;s the unit and lesson I&apos;ll ground this quiz in.</div>
                   <InlineClassPicker value={selectedClass} onChange={v => { setSelectedClass(v); setClassOverridden(true); const cd = CLASSES.find(c => c.id === v); if (cd) setPrefs(p => ({ ...p, grade: cd.grade })); }} />
                 </BriskBubble>
               </>
@@ -1246,7 +1372,7 @@ export default function Home() {
             <BriskBubble>What are your students&apos; needs or circumstances right now? Are they struggling with anything specific?</BriskBubble>
           </ChatScroll>
           <TextInput
-            placeholder="Describe your students' situation…"
+            placeholder="e.g. They don't understand how to…"
             animatedPlaceholder={needsSuggestions.length > 0 ? needsSuggestions[placeholderIdx] : undefined}
             animatedPlaceholderOpacity={placeholderOpacity}
             value={input} onChange={setInput} onSubmit={handleHardestThingSubmit} disabled={cardLoading}
@@ -1272,7 +1398,7 @@ export default function Home() {
               <OtherChoiceRow onSubmit={handleFluencySelect} />
             </div>
           </ChatScroll>
-          <NavButtons onBack={() => go(2)} onSkip={() => { setFluencyAnswer('skipped'); logStep(sessionId, 'needs_fluency', 'skipped', '', { topic, subjectDetected: detectedSubject }); go(4, 'skipped', ''); }} />
+          <NavButtons onBack={() => go(2)} onSkip={() => { setFluencyAnswer('skipped'); logStep(sessionId, 'needs_fluency', 'skipped', '', { topic, subjectDetected: detectedSubject, user_type: userType }); go(4, 'skipped', ''); }} />
         </>
       )}
 
@@ -1302,7 +1428,7 @@ export default function Home() {
             setNeeds2Answer('skipped');
             const s = pickStrategy(detectedSubject || curriculumCard?.subject || '', hardestThing, '');
             setStrategy(s);
-            logStep(sessionId, 'needs_struggle', 'skipped', '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: s?.name });
+            logStep(sessionId, 'needs_struggle', 'skipped', '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: s?.name, user_type: userType });
             go(5, 'skipped', '');
           }} />
         </>
@@ -1328,13 +1454,35 @@ export default function Home() {
               <StrategyCard name={strat.name} onClick={openStrategyGuide} />
             </BriskBubble>
             <BriskBubble>Want me to open with a warm-up using this approach?</BriskBubble>
+            {!warmupAnswered && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {['Yes', 'No'].map(opt => (
+                  <ChoiceRow key={opt} label={opt} selected={false} onClick={() => setWarmupAnswered(opt)} />
+                ))}
+              </div>
+            )}
+            {warmupAnswered && (
+              <>
+                <TeacherBubble>{warmupAnswered}</TeacherBubble>
+                <BriskBubble>Any other scaffolds you&apos;d like me to include? Type one below or skip to continue.</BriskBubble>
+              </>
+            )}
           </ChatScroll>
-          <TextInput placeholder="Add more details to make adjustments" value={input} onChange={setInput}
-            onSubmit={() => {
-              if (!input.trim()) return;
-              logStep(sessionId, 'scaffold_custom', input.trim(), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strat?.name, adjustmentRequest: input.trim() });
-              go(7, input.trim(), "Here's what I'll build…");
-            }} />
+          {!!warmupAnswered && (
+            <TextInput
+              placeholder="e.g. sentence frames, word bank, graphic organizer"
+              value={input} onChange={setInput}
+              animatedPlaceholder={scaffoldSuggestions.length > 0 ? scaffoldSuggestions[scaffoldPlaceholderIdx] : undefined}
+              animatedPlaceholderOpacity={scaffoldPlaceholderOpacity}
+              onFocus={() => setScaffoldInputFocused(true)}
+              onBlur={() => setScaffoldInputFocused(false)}
+              onSubmit={() => {
+                if (!input.trim()) return;
+                setScaffolds(s => [...s, { id: genUUID(), text: input.trim() }]);
+                logStep(sessionId, 'scaffold_custom_chat', input.trim(), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strat?.name, customScaffoldsAdded: input.trim(), user_type: userType });
+                go(7, input.trim(), "Here's what I'll build…");
+              }} />
+          )}
         </>
       )}
 
@@ -1388,7 +1536,7 @@ export default function Home() {
           </div>
           <div style={{ borderTop: `1px solid ${C.slate200}`, padding: '10px 14px', display: 'flex', justifyContent: 'flex-end', background: '#fff', flexShrink: 0 }}>
             <button onClick={() => {
-              logStep(sessionId, 'preferences_saved', JSON.stringify(prefs), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name });
+              logStep(sessionId, 'preferences_saved', JSON.stringify(prefs), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, user_type: userType });
               go(7, '', 'Preferences saved.');
             }} style={{ background: C.slate900, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 22px', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Save</button>
           </div>
@@ -1404,7 +1552,7 @@ export default function Home() {
               <div key={s.id} style={{ padding: '6px 14px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <textarea value={s.text} onChange={e => updateScaffold(s.id, e.target.value)}
                   placeholder="Describe a scaffold or strategy (e.g. sentence frames, graphic organizer, visual supports)"
-                  rows={2} style={{ flex: 1, border: `1px solid ${C.slate200}`, borderRadius: 8, padding: '8px 10px', fontFamily: 'inherit', fontSize: 13, resize: 'none', outline: 'none', color: C.slate900, lineHeight: 1.5 }} />
+                  rows={4} style={{ flex: 1, border: `1px solid ${C.slate200}`, borderRadius: 8, padding: '8px 10px', fontFamily: 'inherit', fontSize: 13, resize: 'none', outline: 'none', color: C.slate900, lineHeight: 1.5, minHeight: 88 }} />
                 <button onClick={() => removeScaffold(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.slate400, fontSize: 18, padding: '8px 2px', lineHeight: 1, flexShrink: 0 }}>✕</button>
               </div>
             ))}
@@ -1416,7 +1564,7 @@ export default function Home() {
           </div>
           <div style={{ borderTop: `1px solid ${C.slate200}`, padding: '10px 14px', display: 'flex', justifyContent: 'flex-end', background: '#fff', flexShrink: 0 }}>
             <button onClick={() => {
-              logStep(sessionId, 'scaffolds_added', JSON.stringify(scaffolds.map(s => s.text)), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffolds.map(s => s.text).filter(Boolean).join('; ') });
+              logStep(sessionId, 'scaffold_custom_editor', scaffolds.map(s => s.text).filter(Boolean).join('; '), '', { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffoldsAdded: scaffolds.map(s => s.text).filter(Boolean).join('; '), user_type: userType });
               setScreen('7b');
             }} style={{ background: C.slate900, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 22px', fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Done</button>
           </div>
@@ -1442,6 +1590,9 @@ export default function Home() {
             {topic && <div><span style={{ color: C.slate500 }}>Topic:</span> {topic}</div>}
             {hardestThing && <div><span style={{ color: C.slate500 }}>Struggle:</span> {hardestThing}</div>}
             {strat?.name && <div><span style={{ color: C.slate500 }}>Scaffold:</span> {strat.name}</div>}
+            {activeScaffolds.map((s, i) => (
+              <div key={i}><span style={{ color: C.slate500 }}>+ </span>{s.text.split(' — ')[0]}</div>
+            ))}
           </div>
         </div>
       )}
