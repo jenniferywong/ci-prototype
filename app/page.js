@@ -135,7 +135,7 @@ const C = {
 // ── UI primitives ──────────────────────────────────────────────
 
 function BriskLogo({ size = 28 }) {
-  return <div style={{ width: size, height: size, borderRadius: '50%', background: `linear-gradient(135deg,${C.green},${C.greenDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff', fontWeight: 700, fontSize: size * 0.44 }}>B</div>;
+  return <div style={{ width: size, height: size, borderRadius: '50%', background: `linear-gradient(135deg,${C.green},${C.greenDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff', fontWeight: 700, fontSize: size * 0.5 }}>⚡</div>;
 }
 
 function Header({ onClose }) {
@@ -687,6 +687,7 @@ export default function Home() {
   const [needs2Data, setNeeds2Data] = useState(null);
   const [needs2Loading, setNeeds2Loading] = useState(false);
   const [needs2Answer, setNeeds2Answer] = useState('');
+  const [needs2Selections, setNeeds2Selections] = useState([]);
   const [strategy, setStrategy] = useState(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -779,7 +780,7 @@ export default function Home() {
   function handleClose() {
     setScreen('welcome'); setTopic(''); setCurriculumCard(null); setCardLoading(false);
     setHardestThing(''); setFluencyAnswer(''); setNeeds2Data(null);
-    setNeeds2Loading(false); setNeeds2Answer(''); setStrategy(null);
+    setNeeds2Loading(false); setNeeds2Answer(''); setNeeds2Selections([]); setStrategy(null);
     setQuizLoading(false); setApiError(''); setDetectedSubject('');
     setScaffolds([]); setPrefs(DEFAULT_PREFS); setInput('');
     setVersions([]); setActiveVersionIdx(0); setChatLog([]); setMaxScreenReached(0);
@@ -1418,14 +1419,25 @@ export default function Home() {
                   <BriskBubble>{needs2Data.question}</BriskBubble>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {needs2Data.options.map(opt => (
-                      <ChoiceRow key={opt} label={opt} selected={needs2Answer === opt} onClick={() => handleNeeds2Select(opt)} />
+                      <ChoiceRow key={opt} label={opt} selected={needs2Selections.includes(opt)} onClick={() => {
+                        setNeeds2Selections(prev =>
+                          prev.includes(opt) ? prev.filter(x => x !== opt) : [...prev, opt]
+                        );
+                      }} />
                     ))}
                     <OtherChoiceRow onSubmit={handleNeeds2Select} />
+                    {needs2Selections.length > 0 && (
+                      <button onClick={() => handleNeeds2Select(needs2Selections.join('; '))}
+                        style={{ marginTop: 4, background: C.slate900, color: '#fff', border: 'none', borderRadius: 8, padding: '11px 14px', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                        Continue →
+                      </button>
+                    )}
                   </div>
                 </>
               ) : <BriskBubble>Loading question<LoadingDots /></BriskBubble>}
           </ChatScroll>
           <NavButtons onBack={() => go(3)} onSkip={() => {
+            setNeeds2Selections([]);
             setNeeds2Answer('skipped');
             const s = pickStrategy(detectedSubject || curriculumCard?.subject || '', hardestThing, '');
             setStrategy(s);
