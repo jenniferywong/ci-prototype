@@ -23,7 +23,7 @@ export async function POST(request) {
   const {
     topic, subject, grade, fluencyAnswer, struggleAnswer,
     hardestThing, scaffolds, questionType, numQuestions,
-    className, pageContextTitle, pageContextPreview,
+    className, pageContextTitle, pageContextPreview, pageContextBodyText,
   } = await request.json();
 
   console.log('[generate] params:', { topic, subject, grade, questionType, numQuestions, className });
@@ -36,10 +36,10 @@ export async function POST(request) {
   const nQ = numQuestions || 10;
   const classContext = className ? ` (${className})` : '';
   const pageCtx = pageContextTitle
-    ? ` The teacher is looking at this source: "${pageContextTitle}"${pageContextPreview ? ` — ${pageContextPreview.slice(0, 200)}` : ''}. Ground quiz questions in this specific material where possible.`
+    ? ` The teacher is looking at this source: "${pageContextTitle}"${pageContextPreview ? ` — ${pageContextPreview.slice(0, 200)}` : ''}.${pageContextBodyText ? ` Source content:\n\n${pageContextBodyText.slice(0, 3000)}` : ''} Ground quiz questions in this specific material where possible.`
     : '';
 
-  const systemPrompt = `You are Brisk, an AI assistant for K-12 teachers. Generate a ${nQ}-question ${qType} quiz about ${topic} for ${grade || '8th grade'} students studying ${subject}${classContext}. The students are struggling with: ${hardestThing}. Their specific challenge: ${struggleAnswer}. Reading/fluency support needed: ${fluencyAnswer}. Apply these scaffolds in the quiz design: ${scaffoldList}. Open with a warm-up section using the first scaffold strategy. Make questions rigorous — analysis and application, not just recall. For ${qType} questions include 4 options; for True/False include exactly ["True", "False"]; for Short Answer use an empty options array. Each question must include a one-sentence explanation of why the correct answer is right.${pageCtx} Return JSON only, no markdown backticks: { "title": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string}] }`;
+  const systemPrompt = `You are Brisk, an AI assistant for K-12 teachers. Generate a ${nQ}-question ${qType} quiz about ${topic} for ${grade || '8th grade'} students studying ${subject}${classContext}. The students are struggling with: ${hardestThing}. Their specific challenge: ${struggleAnswer}. Reading/fluency support needed: ${fluencyAnswer}. Apply these scaffolds in the quiz design: ${scaffoldList}. Open with a warm-up section using the first scaffold strategy. Make questions rigorous — analysis and application, not just recall. For ${qType} questions include 4 options; for True/False include exactly ["True", "False"]; for Short Answer use an empty options array. Each question must include a one-sentence explanation of why the correct answer is right.${pageCtx} The quiz title must be specific to the topic and what students are struggling with — for example "Dividing Fractions: Mastering the Reciprocal" or "Point of View in Summer of the Mariposas" or "Understanding Photosynthesis: Energy Transfer". Never use a website name, URL, domain name, or generic title. Return JSON only, no markdown backticks: { "title": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string}] }`;
 
   const client = new Anthropic({ apiKey: key });
 

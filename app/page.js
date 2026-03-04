@@ -191,27 +191,34 @@ function InlineClassPicker({ value, onChange }) {
   );
 }
 
-// Stage navigator breadcrumb — no checkmarks, visited stages clickable
+// Stage navigator breadcrumb
 const STEPS = ['Topic', 'Needs', 'Scaffolds', 'Create'];
 function Breadcrumb({ active, visited = [], onStepClick }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', padding: '9px 14px', background: '#fff', borderBottom: `1px solid ${C.slate200}`, gap: 4, flexShrink: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', padding: '8px 14px 0', background: '#fff', borderBottom: `1px solid ${C.slate200}`, gap: 2, flexShrink: 0 }}>
       {STEPS.map((s, i) => {
         const isActive = s === active;
-        const isVisited = visited.includes(s);
+        const isVisited = !isActive && visited.includes(s);
         return (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            {i > 0 && <span style={{ color: C.slate300, fontSize: 11, margin: '0 1px' }}>—</span>}
-            <span
-              onClick={() => isVisited && onStepClick?.(s)}
-              style={{
-                fontSize: 12,
-                fontWeight: isActive ? 700 : 400,
-                color: isActive ? C.slate900 : isVisited ? C.slate500 : C.slate300,
-                cursor: isVisited ? 'pointer' : 'default',
-                userSelect: 'none',
-              }}
-            >{s}</span>
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {i > 0 && <span style={{ color: '#e5e7eb', fontSize: 10, margin: '0 3px', paddingBottom: 8 }}>—</span>}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 0 }}>
+              <span
+                onClick={() => isVisited && onStepClick?.(s)}
+                onMouseEnter={e => { if (isVisited) e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={e => { if (isVisited) e.currentTarget.style.textDecoration = 'none'; }}
+                style={{
+                  fontSize: isActive ? 12.5 : 12,
+                  fontWeight: isActive ? 700 : 400,
+                  color: isActive ? '#0f172a' : isVisited ? '#6b7280' : '#d1d5db',
+                  cursor: isVisited ? 'pointer' : 'default',
+                  userSelect: 'none',
+                  paddingBottom: 6,
+                  display: 'block',
+                }}
+              >{s}</span>
+              <div style={{ height: 2, width: isActive ? '100%' : 0, background: '#0f172a', borderRadius: '1px 1px 0 0', transition: 'width 0.15s ease' }} />
+            </div>
           </div>
         );
       })}
@@ -236,12 +243,20 @@ function TeacherBubble({ children }) {
   );
 }
 
-function TextInput({ placeholder, value, onChange, onSubmit, disabled }) {
+function TextInput({ placeholder, value, onChange, onSubmit, disabled, animatedPlaceholder, animatedPlaceholderOpacity = 1, onFocus, onBlur }) {
   return (
     <div style={{ borderTop: `1px solid ${C.slate200}`, padding: '10px 12px', background: '#fff', display: 'flex', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-      <textarea rows={2} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} disabled={disabled}
-        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmit(); } }}
-        style={{ flex: 1, border: `1px solid ${C.slate200}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', resize: 'none', outline: 'none', color: C.slate900, lineHeight: 1.5, opacity: disabled ? 0.5 : 1 }} />
+      <div style={{ flex: 1, position: 'relative' }}>
+        <textarea rows={2} placeholder={animatedPlaceholder ? '' : placeholder} value={value} onChange={e => onChange(e.target.value)} disabled={disabled}
+          onFocus={onFocus} onBlur={onBlur}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmit(); } }}
+          style={{ width: '100%', border: `1px solid ${C.slate200}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', resize: 'none', outline: 'none', color: C.slate900, lineHeight: 1.5, opacity: disabled ? 0.5 : 1, boxSizing: 'border-box' }} />
+        {animatedPlaceholder && !value && (
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, pointerEvents: 'none', padding: '8px 10px', fontSize: 13, color: C.slate400, lineHeight: 1.5, opacity: animatedPlaceholderOpacity, transition: 'opacity 0.35s ease' }}>
+            {animatedPlaceholder}
+          </div>
+        )}
+      </div>
       <button onClick={onSubmit} disabled={!value.trim() || disabled}
         style={{ background: value.trim() && !disabled ? C.slate900 : C.slate200, color: value.trim() && !disabled ? '#fff' : C.slate400, border: 'none', borderRadius: 8, padding: '8px 14px', cursor: value.trim() && !disabled ? 'pointer' : 'default', fontFamily: 'inherit', fontWeight: 600, fontSize: 13 }}>→</button>
     </div>
@@ -529,10 +544,15 @@ function GoogleFormsPreview({ quiz, title }) {
         {/* Questions — plain cards with blank radio buttons */}
         {quiz?.questions?.map((q, i) => (
           <div key={i} style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8e8e8', padding: '18px 24px', marginBottom: 10 }}>
-            <div style={{ fontSize: 14, color: '#202124', lineHeight: 1.6, marginBottom: 14 }}>
+            <div style={{ fontSize: 14, color: '#202124', lineHeight: 1.6, marginBottom: q.hint ? 8 : 14 }}>
               <span style={{ fontWeight: 600, color: '#5f6368' }}>Q{i + 1}.&nbsp;</span>
               {q.question}
             </div>
+            {q.hint && (
+              <div style={{ fontSize: 13, color: '#888', fontStyle: 'italic', marginBottom: 12 }}>
+                💡 Hint: {q.hint}
+              </div>
+            )}
 
             {/* MC / TF — plain blank radio buttons */}
             {q.options?.length > 0 ? (
@@ -642,8 +662,12 @@ export default function Home() {
   const [versions, setVersions] = useState([]);
   const [activeVersionIdx, setActiveVersionIdx] = useState(0);
   const [chatLog, setChatLog] = useState([]);
+  const [maxScreenReached, setMaxScreenReached] = useState(0);
   const [panelPos, setPanelPos] = useState(null); // null = default bottom-right
   const panelRef = useRef(null);
+  const retryFeedbackRef = useRef('');
+  const retryQuizRef = useRef(null);
+  const currentQuizRef = useRef(null); // always holds the latest quiz, bypasses stale closure
 
   // Class picker
   const [selectedClass, setSelectedClass] = useState('');
@@ -655,6 +679,13 @@ export default function Home() {
   const [pageContext, setPageContext] = useState(null);
   const [pageContextLoading, setPageContextLoading] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Dynamic rotating placeholder suggestions (Screen 2)
+  const [needsSuggestions, setNeedsSuggestions] = useState([]);
+  const [needsSuggestionsLoading, setNeedsSuggestionsLoading] = useState(false);
+  const [placeholderIdx, setPlaceholderIdx] = useState(0);
+  const [placeholderOpacity, setPlaceholderOpacity] = useState(1);
+  const [needsInputFocused, setNeedsInputFocused] = useState(false);
 
   const SCREEN_NAMES = {
     0: 'page-context', 1: 'topic', 2: 'curriculum-card', 3: 'needs-1', 4: 'needs-2',
@@ -694,11 +725,14 @@ export default function Home() {
     logStep(sessionId, SCREEN_NAMES[next] || `screen_${next}`, userInput, aiResponse);
     setScreen(next);
     setInput('');
+    if (typeof next === 'number') {
+      setMaxScreenReached(prev => Math.max(prev, next));
+    }
   }
 
   function handleBreadcrumbNav(step) {
     const map = { Topic: 2, Needs: 3, Scaffolds: 6, Create: versions.length > 0 ? 9 : 7 };
-    if (map[step] !== undefined) setScreen(map[step]);
+    if (map[step] !== undefined) { setScreen(map[step]); setInput(''); }
   }
 
   function handleClose() {
@@ -707,10 +741,13 @@ export default function Home() {
     setNeeds2Loading(false); setNeeds2Answer(''); setStrategy(null);
     setQuizLoading(false); setApiError(''); setDetectedSubject('');
     setScaffolds([]); setPrefs(DEFAULT_PREFS); setInput('');
-    setVersions([]); setActiveVersionIdx(0); setChatLog([]);
+    setVersions([]); setActiveVersionIdx(0); setChatLog([]); setMaxScreenReached(0);
     setSelectedClass(''); setClassOverridden(false); setClassFlashing(false);
     setPageUrl(''); setPageContext(null); setPageContextLoading(false);
+    setNeedsSuggestions([]); setNeedsSuggestionsLoading(false);
+    setPlaceholderIdx(0); setPlaceholderOpacity(1); setNeedsInputFocused(false);
     setPanelPos(null);
+    currentQuizRef.current = null;
   }
 
   async function handleFetchPage(urlOverride) {
@@ -761,6 +798,7 @@ export default function Home() {
     if (classData) setPrefs(p => ({ ...p, grade: classData.grade }));
     setCardLoading(true); setCurriculumCard(null);
     logStep(sessionId, 'page_context_selected', t, '', { topic: t, subjectDetected: ds });
+    setMaxScreenReached(prev => Math.max(prev, 2));
     setScreen(2); setInput('');
     try {
       const res = await fetch('/api/curriculum', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: t }) });
@@ -849,6 +887,44 @@ export default function Home() {
   function removeScaffold(id) { setScaffolds(s => s.filter(x => x.id !== id)); }
   function updateScaffold(id, text) { setScaffolds(s => s.map(x => x.id === id ? { ...x, text } : x)); }
 
+  // Reset placeholder index when new suggestions arrive
+  useEffect(() => {
+    setPlaceholderIdx(0);
+    setPlaceholderOpacity(1);
+  }, [needsSuggestions]);
+
+  // Cycle rotating placeholder every 3 seconds
+  useEffect(() => {
+    if (screen !== 2 || needsSuggestions.length === 0 || needsInputFocused || input) return;
+    let swapTimeout;
+    const cycle = setInterval(() => {
+      setPlaceholderOpacity(0);
+      swapTimeout = setTimeout(() => {
+        setPlaceholderIdx(i => (i + 1) % needsSuggestions.length);
+        setPlaceholderOpacity(1);
+      }, 350);
+    }, 3000);
+    return () => { clearInterval(cycle); clearTimeout(swapTimeout); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, needsSuggestions, needsInputFocused, input]);
+
+  // Fetch dynamic suggestion chips when arriving on Screen 2
+  useEffect(() => {
+    if (screen !== 2 || !topic) return;
+    setNeedsSuggestionsLoading(true);
+    setNeedsSuggestions([]);
+    const classData = CLASSES.find(c => c.id === selectedClass);
+    fetch('/api/suggest-needs', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, subject: detectedSubject || classData?.subject || '', grade: prefs.grade }),
+    })
+      .then(r => r.json())
+      .then(data => setNeedsSuggestions(data.suggestions || []))
+      .catch(() => setNeedsSuggestions([]))
+      .finally(() => setNeedsSuggestionsLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
+
   // Screen 5 → 6 auto-advance
   useEffect(() => {
     if (screen !== 5) return;
@@ -869,21 +945,18 @@ export default function Home() {
     const scaffoldTexts = scaffolds.map(s => s.text).filter(Boolean);
     fetch('/api/generate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '' }),
+      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '', pageContextBodyText: pageContext?.bodyText || '' }),
     })
       .then(r => r.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
+        currentQuizRef.current = data;
         const subtitle = `${detectedSubject || curriculumCard?.subject || 'ELA'} • ${data.questions?.length || prefs.numQuestions} questions`;
         const newVersion = { id: genUUID(), quizData: data, subtitle };
-        let newIdx = 0;
-        setVersions(prev => {
-          const updated = [...prev, newVersion];
-          newIdx = updated.length - 1;
-          setActiveVersionIdx(newIdx);
-          return updated;
-        });
-        const iterN = versions.length + 1;
+        const newIdx = versions.length;
+        setVersions(prev => [...prev, newVersion]);
+        setActiveVersionIdx(newIdx);
+        const iterN = newIdx + 1;
         logStep(sessionId, 'quiz_generated', '', data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), iterationNumber: iterN });
         setChatLog([
           { id: genUUID(), type: 'brisk', text: "Here's your quiz. Does anything need to change for your students?" },
@@ -899,51 +972,74 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen]);
 
-  async function handleRefineSubmit() {
+  function handleRefineSubmit() {
     if (!input.trim() || quizLoading) return;
     const feedback = input.trim();
-    const updatingId = genUUID();
+    const latestQuiz = currentQuizRef.current;
+    console.log('[handleRefineSubmit] currentQuizRef.current Q1:', latestQuiz?.questions?.[0]?.question?.slice(0, 60) ?? 'NULL');
+    if (!latestQuiz) { console.error('[handleRefineSubmit] No quiz in ref — aborting'); return; }
     setInput('');
-    // Push teacher bubble + "Got it..." immediately, before API call
+    retryFeedbackRef.current = feedback;
+    retryQuizRef.current = latestQuiz;
+    const updatingId = genUUID();
     setChatLog(prev => [
       ...prev,
       { id: genUUID(), type: 'teacher', text: feedback },
       { id: updatingId, type: 'brisk', text: "Got it — updating your quiz…", isUpdating: true },
     ]);
+    doRefine(feedback, latestQuiz, updatingId);
+  }
+
+  async function doRefine(feedback, previousQuiz, updatingId) {
     setQuizLoading(true);
-    setApiError('');
-    const latestQuiz = versions[versions.length - 1]?.quizData;
+    // Reset bubble to loading state (handles retry)
+    setChatLog(prev => prev.map(m => m.id === updatingId
+      ? { ...m, text: "Got it — updating your quiz…", isUpdating: true, hasRetry: false }
+      : m
+    ));
     const scaffoldTexts = scaffolds.map(s => s.text).filter(Boolean);
+    const className = CLASSES.find(c => c.id === selectedClass)?.label || '';
     try {
       const res = await fetch('/api/refine', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quizData: latestQuiz, feedback, topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, scaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '' }),
+        body: JSON.stringify({
+          adjustment: feedback, previousQuiz, topic,
+          subject: detectedSubject || curriculumCard?.subject,
+          grade: prefs.grade, fluencyAnswer,
+          struggleAnswer: needs2Answer, hardestThing,
+          scaffoldStrategy: strategy?.name || '',
+          scaffolds: scaffoldTexts,
+          questionType: prefs.questionType, numQuestions: prefs.numQuestions,
+          className, pageContextTitle: pageContext?.title || '',
+          pageContextPreview: pageContext?.preview || '',
+          pageContextBodyText: pageContext?.bodyText || '',
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      currentQuizRef.current = data;
+      console.log('[doRefine] V_new title:', data.title, '| questions:', data.questions?.length);
+      console.log('[doRefine] V_prev Q1:', previousQuiz?.questions?.[0]?.question?.slice(0, 60));
+      console.log('[doRefine] V_new Q1:', data.questions?.[0]?.question?.slice(0, 60));
+      console.log('[doRefine] V_new Q1 hint:', data.questions?.[0]?.hint || '(no hint field)');
+      const identical = JSON.stringify(data) === JSON.stringify(previousQuiz);
+      if (identical) console.warn('[doRefine] WARNING: V_new is identical to V_prev!');
       const subtitle = `${detectedSubject || curriculumCard?.subject || 'ELA'} • ${data.questions?.length || prefs.numQuestions} questions`;
-      const n = versions.length + 1;
-      let newIdx = 0;
-      setVersions(prev => {
-        const updated = [...prev, { id: genUUID(), quizData: data, subtitle }];
-        newIdx = updated.length - 1;
-        setActiveVersionIdx(newIdx);
-        return updated;
-      });
-      // Mark "Got it..." as done, append version tile
+      const newIdx = versions.length;
+      setVersions(prev => [...prev, { id: genUUID(), quizData: data, subtitle }]);
+      setActiveVersionIdx(newIdx);
       setChatLog(prev => [
-        ...prev.map(m => m.id === updatingId ? { ...m, isUpdating: false } : m),
+        ...prev.map(m => m.id === updatingId ? { ...m, isUpdating: false, hasRetry: false } : m),
         { id: genUUID(), type: 'version', versionIdx: newIdx },
       ]);
+      const n = versions.length + 1;
       logStep(sessionId, `iteration_${n}`, feedback, data.title, { topic, subjectDetected: detectedSubject, scaffoldStrategy: strategy?.name, customScaffolds: scaffoldTexts.join('; '), adjustmentRequest: feedback, iterationNumber: n });
-    } catch (err) {
-      setApiError(err.message);
+    } catch {
       setChatLog(prev => prev.map(m => m.id === updatingId
-        ? { ...m, isUpdating: false, text: "Had trouble updating — try again?" }
+        ? { ...m, isUpdating: false, text: "Something went wrong — try again?", hasRetry: true }
         : m
       ));
-    }
-    finally { setQuizLoading(false); }
+    } finally { setQuizLoading(false); }
   }
 
   // ── Derived values ────────────────────────────────────────────
@@ -962,16 +1058,15 @@ export default function Home() {
   const isNumericScreen = typeof screen === 'number';
   const quizExists = versions.length > 0;
 
-  // Visited stages for breadcrumb (based on current screen)
-  function getVisited() {
-    const screenNum = typeof screen === 'number' ? screen : parseInt(screen) || 7;
+  // Visited stages for breadcrumb (based on max screen ever reached, not current)
+  const visitedSteps = (() => {
     const visited = [];
-    if (screenNum >= 3 || screen === '7b' || screen === '7c') visited.push('Topic');
-    if (screenNum >= 5) visited.push('Needs');
-    if (screenNum >= 7) visited.push('Scaffolds');
+    if (maxScreenReached >= 3) visited.push('Topic');
+    if (maxScreenReached >= 5) visited.push('Needs');
+    if (maxScreenReached >= 7) visited.push('Scaffolds');
+    if (versions.length > 0) visited.push('Create'); // always clickable once quiz exists
     return visited;
-  }
-  const visitedSteps = getVisited();
+  })();
 
   // ── Drag handler ─────────────────────────────────────────────
   function handlePanelMouseDown(e) {
@@ -1114,7 +1209,7 @@ export default function Home() {
       {screen === 1 && (
         <>
           <SubHeader onBack={() => setScreen(0)} label="Quiz" />
-          <Breadcrumb active="Topic" visited={[]} onStepClick={handleBreadcrumbNav} />
+          <Breadcrumb active="Topic" visited={visitedSteps} onStepClick={handleBreadcrumbNav} />
           <ChatScroll>
             <BriskBubble>What&apos;s your quiz about? Provide keywords to help me pull questions that fit where your students are right now.</BriskBubble>
           </ChatScroll>
@@ -1126,7 +1221,7 @@ export default function Home() {
       {screen === 2 && (
         <>
           <SubHeader onBack={() => go(1)} />
-          <Breadcrumb active="Topic" visited={[]} onStepClick={handleBreadcrumbNav} />
+          <Breadcrumb active="Topic" visited={visitedSteps} onStepClick={handleBreadcrumbNav} />
           <ChatScroll>
             {pageContext ? (
               <BriskBubble>
@@ -1150,7 +1245,14 @@ export default function Home() {
             )}
             <BriskBubble>What are your students&apos; needs or circumstances right now? Are they struggling with anything specific?</BriskBubble>
           </ChatScroll>
-          <TextInput placeholder="e.g. some students are below grade level, or struggling with a specific concept" value={input} onChange={setInput} onSubmit={handleHardestThingSubmit} disabled={cardLoading} />
+          <TextInput
+            placeholder="Describe your students' situation…"
+            animatedPlaceholder={needsSuggestions.length > 0 ? needsSuggestions[placeholderIdx] : undefined}
+            animatedPlaceholderOpacity={placeholderOpacity}
+            value={input} onChange={setInput} onSubmit={handleHardestThingSubmit} disabled={cardLoading}
+            onFocus={() => setNeedsInputFocused(true)}
+            onBlur={() => setNeedsInputFocused(false)}
+          />
         </>
       )}
 
@@ -1358,6 +1460,13 @@ export default function Home() {
                 return (
                   <BriskBubble key={entry.id}>
                     {entry.text}{entry.isUpdating && <LoadingDots />}
+                    {entry.hasRetry && (
+                      <button
+                        onClick={() => doRefine(retryFeedbackRef.current, retryQuizRef.current, entry.id)}
+                        style={{ display: 'block', marginTop: 8, background: C.slate900, color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        Retry
+                      </button>
+                    )}
                   </BriskBubble>
                 );
               }
