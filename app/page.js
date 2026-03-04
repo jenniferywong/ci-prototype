@@ -237,7 +237,7 @@ function Breadcrumb({ active, visited = [], onStepClick }) {
                 style={{
                   fontSize: isActive ? 12.5 : 12,
                   fontWeight: isActive ? 700 : 400,
-                  color: isActive ? '#0f172a' : isVisited ? '#6b7280' : '#d1d5db',
+                  color: isActive ? '#0f172a' : isVisited ? '#374151' : '#6b7280',
                   cursor: isVisited ? 'pointer' : 'default',
                   userSelect: 'none',
                   paddingBottom: 6,
@@ -1042,7 +1042,7 @@ export default function Home() {
       .then(data => {
         if (data.error) throw new Error(data.error);
         currentQuizRef.current = data;
-        const subtitle = `${detectedSubject || curriculumCard?.subject || 'ELA'} • ${data.questions?.length || prefs.numQuestions} questions`;
+        const subtitle = `${CLASSES.find(c => c.id === selectedClass)?.label || detectedSubject || curriculumCard?.subject || ''} • ${data.questions?.length || prefs.numQuestions} questions`;
         const newVersion = { id: genUUID(), quizData: data, subtitle };
         const newIdx = versions.length;
         setVersions(prev => [...prev, newVersion]);
@@ -1217,6 +1217,7 @@ export default function Home() {
         <>
           <Header onClose={handleClose} />
           <div style={{ flex: 1, overflowY: 'auto', padding: '20px 14px' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>Welcome</div>
             <p style={{ fontSize: 13, color: C.slate700, lineHeight: 1.65, margin: '0 0 14px' }}>
               Your district has uploaded their curriculum and instructional strategies to Brisk based on our latest Curriculum Intelligence feature. Now when you create resources in Brisk, they&apos;re automatically grounded in where your class is and what your district needs — no extra steps needed.
             </p>
