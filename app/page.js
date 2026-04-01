@@ -1163,51 +1163,171 @@ function GoogleFormsPreview({ quiz, title }) {
 // ── Google Doc-style preview ───────────────────────────────────
 function GoogleDocPreview({ quiz, title }) {
   return (
-    <div style={{ minHeight: '100%', background: '#f1f3f4', padding: '32px 28px 80px' }}>
-      <div style={{ maxWidth: 816, margin: '0 auto' }}>
-        {/* Doc toolbar mock */}
-        <div style={{ background: '#fff', borderRadius: '4px 4px 0 0', border: '1px solid #dadce0', borderBottom: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/icons/Docs.svg" width={24} height={24} alt="" style={{ display: 'block', flexShrink: 0 }} />
-          <div>
-            <div style={{ fontSize: 14, color: '#202124', fontWeight: 500 }}>{title || 'Document'}</div>
-            <div style={{ fontSize: 11, color: '#5f6368', marginTop: 1 }}>File  Edit  View  Insert  Format  Tools  Extensions  Help</div>
-          </div>
+    <div style={{ minHeight: '100%', background: '#f1f3f4', fontFamily: 'Arial, sans-serif' }}>
+      {/* App bar */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 10 }}>
+        <img src="/icons/Docs.svg" width={30} height={30} alt="" style={{ display: 'block', flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 16, color: '#202124', fontWeight: 400, fontFamily: 'Google Sans, Arial, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title || 'Untitled document'}</div>
+          <div style={{ fontSize: 11, color: '#5f6368', marginTop: 1, fontFamily: 'Google Sans, Arial, sans-serif' }}>File &nbsp; Edit &nbsp; View &nbsp; Insert &nbsp; Format &nbsp; Tools &nbsp; Extensions &nbsp; Help</div>
         </div>
-        {/* Doc page */}
-        <div style={{ background: '#fff', border: '1px solid #dadce0', padding: '72px 96px', minHeight: 500, fontFamily: 'Arial, sans-serif' }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#202124', marginBottom: 20, lineHeight: 1.4 }}>{title || 'Document'}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: '#1a73e8', color: '#fff', fontSize: 13, fontWeight: 500, padding: '7px 20px', borderRadius: 4, fontFamily: 'Google Sans, Arial, sans-serif' }}>Share</div>
+        </div>
+      </div>
+      {/* Toolbar strip */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '2px 16px', display: 'flex', alignItems: 'center', gap: 2 }}>
+        {['↩', '↪', '🖨', 'B', 'I', 'U', 'A', '≡', '≣', '⇥'].map((icon, i) => (
+          <div key={i} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 3, fontSize: i <= 2 ? 14 : 12, color: '#444', cursor: 'default' }}>{icon}</div>
+        ))}
+      </div>
+      {/* Page */}
+      <div style={{ padding: '32px 28px 80px' }}>
+        <div style={{ maxWidth: 816, margin: '0 auto', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.15)', minHeight: 1056, padding: '96px 96px 96px' }}>
+          <h1 style={{ fontSize: 26, fontWeight: 400, color: '#202124', marginBottom: 24, lineHeight: 1.3 }}>{title || 'Untitled document'}</h1>
           {quiz?.warmup?.length > 0 && (
-            <div style={{ marginBottom: 20, padding: '12px 16px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 4 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{quiz.warmupLabel || 'Warm-Up'}</div>
+            <div style={{ marginBottom: 24 }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#202124', marginBottom: 10 }}>{quiz.warmupLabel || 'Warm-Up'}</h2>
               {quiz.warmup.map((w, i) => (
-                <div key={i} style={{ fontSize: 13, color: '#202124', marginBottom: 4, lineHeight: 1.6 }}>
+                <p key={i} style={{ fontSize: 11, color: '#202124', marginBottom: 6, lineHeight: 1.8 }}>
                   <strong>{w.term}</strong> — {w.definition}
-                </div>
+                </p>
               ))}
             </div>
           )}
           {quiz?.questions?.map((q, i) => (
-            <div key={i} style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, color: '#202124', lineHeight: 1.7, marginBottom: q.hint ? 4 : 8 }}>
+            <div key={i} style={{ marginBottom: 22 }}>
+              <p style={{ fontSize: 11, color: '#202124', lineHeight: 1.8, marginBottom: 4 }}>
                 <strong>{i + 1}.</strong> {q.question}
-              </div>
-              {q.hint && <div style={{ fontSize: 12, color: '#888', fontStyle: 'italic', marginBottom: 6 }}>💡 {q.hint}</div>}
+              </p>
               {q.options?.length > 0 ? (
                 <div style={{ paddingLeft: 20 }}>
                   {q.options.map((opt, j) => (
-                    <div key={j} style={{ fontSize: 13, color: '#202124', lineHeight: 1.8 }}>
+                    <p key={j} style={{ fontSize: 11, color: '#202124', lineHeight: 1.8, margin: 0 }}>
                       {String.fromCharCode(65 + j)}. {opt}
-                    </div>
+                    </p>
                   ))}
                 </div>
               ) : (
-                <div style={{ borderBottom: '1px solid #ccc', width: '60%', marginTop: 8 }} />
+                <div style={{ borderBottom: '1px solid #bbb', width: '55%', marginTop: 10 }} />
+              )}
+              {q.explanation && (
+                <p style={{ fontSize: 10, color: '#5f6368', fontStyle: 'italic', marginTop: 4, lineHeight: 1.6 }}>{q.explanation}</p>
               )}
             </div>
           ))}
-          {!quiz && (
-            <div style={{ color: '#aaa', fontSize: 14, paddingTop: 40, textAlign: 'center' }}>Document will appear here</div>
-          )}
+          {!quiz && <p style={{ color: '#aaa', fontSize: 11, paddingTop: 40, textAlign: 'center' }}>Document will appear here</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Google Slides-style preview ────────────────────────────────
+function GoogleSlidesPreview({ quiz, title }) {
+  const slides = [];
+  if (quiz) {
+    // Title slide
+    slides.push({ type: 'title', heading: title || 'Untitled', sub: quiz.warmupLabel || '' });
+    // Warmup slide
+    if (quiz.warmup?.length > 0) {
+      slides.push({ type: 'warmup', heading: quiz.warmupLabel || 'Warm-Up', items: quiz.warmup });
+    }
+    // One slide per question (group 2 per slide)
+    const qs = quiz.questions || [];
+    for (let i = 0; i < qs.length; i += 2) {
+      slides.push({ type: 'questions', items: qs.slice(i, i + 2), startIdx: i });
+    }
+  }
+  const [active, setActive] = useState(0);
+  const current = slides[active];
+
+  function SlideContent({ slide }) {
+    if (!slide) return null;
+    if (slide.type === 'title') return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '40px 60px', textAlign: 'center' }}>
+        <div style={{ fontSize: 32, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 16 }}>{slide.heading}</div>
+        {slide.sub && <div style={{ fontSize: 16, color: '#5f6368' }}>{slide.sub}</div>}
+      </div>
+    );
+    if (slide.type === 'warmup') return (
+      <div style={{ padding: '32px 48px', height: '100%' }}>
+        <div style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e', marginBottom: 18, borderBottom: '2px solid #4285f4', paddingBottom: 8 }}>{slide.heading}</div>
+        {slide.items.map((w, i) => (
+          <div key={i} style={{ fontSize: 14, color: '#202124', marginBottom: 10, lineHeight: 1.6 }}>
+            <span style={{ fontWeight: 700, color: '#1a73e8' }}>{w.term}</span> — {w.definition}
+          </div>
+        ))}
+      </div>
+    );
+    if (slide.type === 'questions') return (
+      <div style={{ padding: '28px 48px', height: '100%' }}>
+        {slide.items.map((q, i) => (
+          <div key={i} style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a2e', lineHeight: 1.5, marginBottom: 8 }}>
+              Q{slide.startIdx + i + 1}. {q.question}
+            </div>
+            {q.options?.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+                {q.options.map((opt, j) => (
+                  <div key={j} style={{ fontSize: 13, color: '#444', lineHeight: 1.5, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                    <span style={{ fontWeight: 600, color: '#4285f4', flexShrink: 0 }}>{String.fromCharCode(65 + j)}.</span> {opt}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+    return null;
+  }
+
+  return (
+    <div style={{ minHeight: '100%', background: '#1e1e1e', fontFamily: 'Google Sans, Arial, sans-serif', display: 'flex', flexDirection: 'column' }}>
+      {/* App bar */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <img src="/icons/Slides.svg" width={30} height={30} alt="" style={{ display: 'block', flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 16, color: '#202124', fontWeight: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title || 'Untitled presentation'}</div>
+          <div style={{ fontSize: 11, color: '#5f6368', marginTop: 1 }}>File &nbsp; Edit &nbsp; View &nbsp; Insert &nbsp; Format &nbsp; Slide &nbsp; Tools &nbsp; Help</div>
+        </div>
+        <div style={{ background: '#fbbc04', color: '#000', fontSize: 13, fontWeight: 500, padding: '7px 20px', borderRadius: 4 }}>Share</div>
+      </div>
+      {/* Toolbar */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '2px 16px', display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+        {['↩', '↪', 'T', '⬛', '○', '◁', 'B', 'I', 'U'].map((icon, i) => (
+          <div key={i} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 3, fontSize: 12, color: '#444', cursor: 'default' }}>{icon}</div>
+        ))}
+      </div>
+      {/* Main area */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        {/* Slide strip */}
+        <div style={{ width: 160, background: '#2d2d2d', overflowY: 'auto', padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+          {slides.map((s, i) => (
+            <div key={i} onClick={() => setActive(i)}
+              style={{ background: active === i ? '#4285f4' : '#fff', borderRadius: 3, padding: 3, cursor: 'pointer', outline: active === i ? '2px solid #4285f4' : 'none', outlineOffset: 1 }}>
+              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 8px' }}>
+                <div style={{ fontSize: 5, color: '#333', lineHeight: 1.4, overflow: 'hidden', maxHeight: '100%', width: '100%', textAlign: 'center' }}>
+                  {s.type === 'title' ? s.heading :
+                   s.type === 'warmup' ? s.heading :
+                   `Q${s.startIdx + 1}${s.items.length > 1 ? `–${s.startIdx + s.items.length}` : ''}`}
+                </div>
+              </div>
+              <div style={{ fontSize: 9, color: active === i ? '#fff' : '#aaa', textAlign: 'center', marginTop: 3 }}>{i + 1}</div>
+            </div>
+          ))}
+          {!quiz && <div style={{ color: '#888', fontSize: 10, textAlign: 'center', marginTop: 20 }}>Slides will appear here</div>}
+        </div>
+        {/* Active slide */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
+          <div style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
+            {/* Slide accent bar */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #4285f4, #34a853)' }} />
+            {current ? <SlideContent slide={current} /> : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#aaa', fontSize: 14 }}>No slides yet</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -1281,8 +1401,9 @@ const FORMAT_OPTIONS = {
     { value: 'Nearpod', label: 'Nearpod',         icon: '/icons/Nearpod.svg' },
   ],
   doc: [
-    { value: 'Docs', label: 'Google Doc',      icon: '/icons/Docs.svg' },
-    { value: 'Word', label: 'Microsoft Word',  icon: '/icons/Word.svg'  },
+    { value: 'Docs',   label: 'Google Doc',      icon: '/icons/Docs.svg'   },
+    { value: 'Slides', label: 'Google Slides',   icon: '/icons/Slides.svg' },
+    { value: 'Word',   label: 'Microsoft Word',  icon: '/icons/Word.svg'   },
   ],
 };
 
@@ -3423,12 +3544,12 @@ export default function Home() {
           qgPageTitle ? `Reading "${qgPageTitle}"…` : `Analyzing ${qgShortTopic}…`,
           'Loading district guidance…',
           `Checking ${qgGrade} grade standards…`,
-          `Building your ${resourceLabel}…`,
+          `Almost ready — wrapping up your ${resourceLabel}…`,
         ] : [
           qgPageTitle ? `Reading "${qgPageTitle}"…` : `Analyzing ${qgShortTopic}…`,
           'Loading district guidance…',
           `Checking ${qgGrade} grade student data…`,
-          `Building your ${resourceLabel}…`,
+          `Almost ready — wrapping up your ${resourceLabel}…`,
         ];
 
         // Resource-specific Q1/Q2 for doc tools; subject-aware fallback for quiz tools
@@ -4171,38 +4292,86 @@ export default function Home() {
   return (
     <div style={outerStyle}>
       {/* Quiz-gen docked: document preview fills full viewport, panel overlays on right */}
-      {isDockedRight && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto', background: (screenOneToolType === 'doc' || prefs.platform === 'Docs') ? '#f1f3f4' : '#f0ebff' }}>
-          {qgFormsLoading ? (
-            /* Skeleton with grey→aqua gradient sweep */
-            <div style={{ padding: '32px 28px 80px', maxWidth: 680, margin: '0 auto' }}>
-              <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>
-              <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden', marginBottom: 12, border: '1px solid #e8e8e8' }}>
-                <div style={{ height: 8, backgroundImage: 'linear-gradient(90deg,#e2e2e2 0%,#CAFCF4 50%,#e2e2e2 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out infinite' }} />
-                <div style={{ padding: '22px 24px 18px' }}>
-                  <div style={{ height: 26, borderRadius: 4, width: '65%', marginBottom: 10, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out 0s infinite' }} />
-                  <div style={{ height: 13, borderRadius: 4, width: '38%', backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out 0.08s infinite' }} />
+      {isDockedRight && (() => {
+        const isSlidesTool = screenOneToolType === 'doc' && prefs.docFormat === 'Slides';
+        const isDocOutputTool = screenOneToolType === 'doc' || prefs.platform === 'Docs';
+        const bgColor = isSlidesTool ? '#1e1e1e' : isDocOutputTool ? '#f1f3f4' : '#f0ebff';
+        const outTitle = qgQuizData?.title || `${topic} ${resourceLabel}`;
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: isSlidesTool ? 'hidden' : 'auto', background: bgColor }}>
+            {qgFormsLoading ? (
+              /* Skeleton */
+              isSlidesTool ? (
+                /* Slides skeleton — dark, slide-strip + slide */
+                <div style={{ display: 'flex', height: '100%' }}>
+                  <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>
+                  <div style={{ width: 160, background: '#2d2d2d', padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {[1,2,3].map(i => (
+                      <div key={i} style={{ background: '#3a3a3a', borderRadius: 3, padding: 3 }}>
+                        <div style={{ aspectRatio: '16/9', backgroundImage: 'linear-gradient(90deg,#3a3a3a 0%,#4a5a6a 50%,#3a3a3a 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.8s ease-in-out ${i * 0.15}s infinite`, borderRadius: 2 }} />
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+                    <div style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#2a2a2a', boxShadow: '0 4px 24px rgba(0,0,0,0.5)', borderRadius: 3, padding: '10%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16 }}>
+                      <div style={{ height: 32, borderRadius: 4, width: '60%', backgroundImage: 'linear-gradient(90deg,#3a3a3a 0%,#4a6a7a 50%,#3a3a3a 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.8s ease-in-out infinite' }} />
+                      <div style={{ height: 16, borderRadius: 4, width: '40%', backgroundImage: 'linear-gradient(90deg,#3a3a3a 0%,#4a6a7a 50%,#3a3a3a 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.8s ease-in-out 0.1s infinite' }} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {[1,2,3,4,5].map(i => (
-                <div key={i} style={{ background: '#fff', borderRadius: 8, border: '1px solid #e8e8e8', padding: '18px 24px', marginBottom: 10 }}>
-                  <div style={{ height: 14, borderRadius: 4, width: `${65 + i * 4}%`, marginBottom: 14, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${i * 0.1}s infinite` }} />
-                  {[1,2,3,4].map(j => (
-                    <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, backgroundImage: 'linear-gradient(90deg,#e4e4e4 0%,#CAFCF4 50%,#e4e4e4 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06}s infinite` }} />
-                      <div style={{ height: 12, borderRadius: 4, width: `${38 + j * 10}%`, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06 + 0.04}s infinite` }} />
+              ) : isDocOutputTool ? (
+                /* Doc skeleton — white page on grey */
+                <div style={{ padding: '0 0 80px' }}>
+                  <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>
+                  <div style={{ background: '#fff', height: 56, borderBottom: '1px solid #e0e0e0', marginBottom: 0 }} />
+                  <div style={{ background: '#fff', height: 36, borderBottom: '1px solid #e0e0e0', marginBottom: 32 }} />
+                  <div style={{ maxWidth: 816, margin: '0 auto', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.15)', padding: '96px 96px 60px', minHeight: 600 }}>
+                    <div style={{ height: 28, borderRadius: 4, width: '55%', marginBottom: 32, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out infinite' }} />
+                    {[95,88,72,90,65,80,94,70].map((w, i) => (
+                      <div key={i} style={{ height: 13, borderRadius: 4, width: `${w}%`, marginBottom: 14, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${i * 0.07}s infinite` }} />
+                    ))}
+                    <div style={{ marginTop: 32 }}>
+                      <div style={{ height: 18, borderRadius: 4, width: '30%', marginBottom: 16, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out 0.5s infinite' }} />
+                      {[85,60,78,55].map((w, i) => (
+                        <div key={i} style={{ height: 13, borderRadius: 4, width: `${w}%`, marginBottom: 14, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${0.6 + i * 0.07}s infinite` }} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Forms skeleton — cards */
+                <div style={{ padding: '32px 28px 80px', maxWidth: 680, margin: '0 auto' }}>
+                  <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>
+                  <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden', marginBottom: 12, border: '1px solid #e8e8e8' }}>
+                    <div style={{ height: 8, backgroundImage: 'linear-gradient(90deg,#e2e2e2 0%,#CAFCF4 50%,#e2e2e2 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out infinite' }} />
+                    <div style={{ padding: '22px 24px 18px' }}>
+                      <div style={{ height: 26, borderRadius: 4, width: '65%', marginBottom: 10, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out 0s infinite' }} />
+                      <div style={{ height: 13, borderRadius: 4, width: '38%', backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: 'skAqua 1.6s ease-in-out 0.08s infinite' }} />
+                    </div>
+                  </div>
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} style={{ background: '#fff', borderRadius: 8, border: '1px solid #e8e8e8', padding: '18px 24px', marginBottom: 10 }}>
+                      <div style={{ height: 14, borderRadius: 4, width: `${65 + i * 4}%`, marginBottom: 14, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${i * 0.1}s infinite` }} />
+                      {[1,2,3,4].map(j => (
+                        <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                          <div style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, backgroundImage: 'linear-gradient(90deg,#e4e4e4 0%,#CAFCF4 50%,#e4e4e4 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06}s infinite` }} />
+                          <div style={{ height: 12, borderRadius: 4, width: `${38 + j * 10}%`, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06 + 0.04}s infinite` }} />
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          ) : (screenOneToolType === 'doc' || prefs.platform === 'Docs') ? (
-            <GoogleDocPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} ${resourceLabel}`} />
-          ) : (
-            <GoogleFormsPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} Quiz`} />
-          )}
-        </div>
-      )}
+              )
+            ) : isSlidesTool ? (
+              <GoogleSlidesPreview quiz={qgQuizData} title={outTitle} />
+            ) : isDocOutputTool ? (
+              <GoogleDocPreview quiz={qgQuizData} title={outTitle} />
+            ) : (
+              <GoogleFormsPreview quiz={qgQuizData} title={outTitle} />
+            )}
+          </div>
+        );
+      })()}
 
       {/* Quiz (old flow) — fixed full-screen scrollable behind panel */}
       {quizExists && !isDockedRight && (
