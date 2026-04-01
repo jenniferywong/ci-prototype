@@ -51,6 +51,21 @@ textarea::placeholder { color: #74818E; font-weight: 400; }
 @keyframes shimmer { 0%,100%{opacity:0.55} 50%{opacity:1} }
 @keyframes dpulse { 0%,60%,100%{opacity:0.2;transform:translateX(-50%) rotate(45deg) scale(0.78)} 30%{opacity:1;transform:translateX(-50%) rotate(45deg) scale(1)} }
 @keyframes skpulse { 0%,100%{opacity:.35} 50%{opacity:.8} }
+/* Intent chips */
+.intent-chip:hover { background: #F7F6F4 !important; }
+.intent-prompt-row:hover { background: #F7F6F4 !important; }
+.intent-popover {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+.intent-popover--open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 /* Library/reco row hover sub text — shown inline like ToolRow */
 .lib-sub { display: none; font-size: 12px; color: #344054; line-height: 17px; margin-top: 1px; }
 .lib-row:hover .lib-sub { display: block; }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import IntentChips from './components/IntentChips.js';
 
 function genUUID() {
   return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
@@ -1637,6 +1638,14 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           </div>
         </div>
       </div>
+
+      <IntentChips
+        toolName={toolName}
+        input={input}
+        onInputChange={onInputChange}
+        pageContext={pageContext}
+        pageChipVisible={pageChipVisible}
+      />
 
       {/* Scrollable body */}
       <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
