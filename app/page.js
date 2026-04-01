@@ -1898,43 +1898,16 @@ export default function Home() {
     el.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [screen, quizGenAnswers, quizGenPhase, quizGenLoadingIdx, qgIterationHistory]);
 
-  // Quiz-gen: fire initial API call immediately on arrival (before follow-up answers)
+  // Quiz-gen: generate resource once questions answered
   useEffect(() => {
-    if (screen !== 'quiz-gen') return;
+    if (screen !== 'quiz-gen' || quizGenPhase !== 'answered') return;
     setQgFormsLoading(true);
     setQgQuizData(null);
     const cls = CLASSES.find(c => c.id === selectedClass);
     const grade = cls?.grade || prefs.grade || '8th';
     const subject = cls?.subject || detectedSubject || 'ELA';
-    fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        topic, subject, grade,
-        toolName: screenOneToolLabel || 'Quiz',
-        questionType: prefs.questionType || 'Multiple choice',
-        numQuestions: prefs.numQuestions || 10,
-        pageContextTitle: pageContext?.title || '',
-        pageContextPreview: pageContext?.preview || '',
-      }),
-    })
-      .then(r => r.json())
-      .then(data => { if (data.questions) setQgQuizData(data); })
-      .catch(() => {})
-      .finally(() => setQgFormsLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, quizGenKey]);
-
-  // Quiz-gen: once questions are answered, re-generate with struggle + goal context
-  useEffect(() => {
-    if (screen !== 'quiz-gen' || quizGenPhase !== 'answered') return;
     const struggleAnswer = quizGenAnswers[0]?.a || '';
-    const goalAnswer = quizGenAnswers[1]?.a || '';
-    if (!struggleAnswer && !goalAnswer) return; // nothing extra to add — keep initial result
-    setQgFormsLoading(true);
-    const cls = CLASSES.find(c => c.id === selectedClass);
-    const grade = cls?.grade || prefs.grade || '8th';
-    const subject = cls?.subject || detectedSubject || 'ELA';
+    const goalAnswer = quizGenAnswers[1]?.a || 'check understanding';
     fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2516,9 +2489,8 @@ export default function Home() {
   // ── Styles ────────────────────────────────────────────────────
   const outerStyle = { minHeight: '100vh' };
 
-  // sourcesReady: true once we have data and the user is past the question cards
-  // qgFormsLoading is NOT included here — the resource panel handles its own skeleton overlay
-  const sourcesReady = !!qgQuizData && quizGenPhase !== 'q1' && quizGenPhase !== 'q2';
+  // sourcesReady: true once API has returned data (resource panel shows skeleton until then)
+  const sourcesReady = !!qgQuizData;
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
     width: 402, background: '#FAF9F6',
@@ -2773,9 +2745,11 @@ export default function Home() {
                   ])
                 : [];
 
-              // Recommendations — only when there's a real topic
+              // Recommendations — only when topic looks complete (all words ≥ 3 chars, total ≥ 6)
               const recoTopic = hasTopicComponent ? topicPart : q;
-              const recommendations = (!isPureToolQuery && (hasTopicComponent || !/\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|podcast)\b/i.test(q)))
+              const recoWords = recoTopic.trim().split(/\s+/);
+              const recoTopicComplete = recoTopic.trim().length >= 6 && recoWords.every(w => w.length >= 3);
+              const recommendations = (!isPureToolQuery && recoTopicComplete && (hasTopicComponent || !/\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|podcast)\b/i.test(q)))
                 ? recoItems(recoTopic, recoGrade, {
                     quiz:   () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(recoTopic); setScreen(1); },
                     slides: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(recoTopic); setScreen(1); },
@@ -2835,7 +2809,7 @@ export default function Home() {
                 );
               })() : null;
 
-              const hasAny = chainedPromptBtn || allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || assignmentsToGrade.length > 0;
+              const hasAny = chainedPromptBtn || allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || assignmentsToGrade.length > 0 || recommendations.length > 0;
               if (!hasAny) return <>{allToolRows}<div style={{ height: 4 }} /></>;
               return (
                 <>
@@ -2849,6 +2823,7 @@ export default function Home() {
                         {assignmentsToGrade.length > 0 && <>{sec('Assignments to Grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
                         {myLibrary.length > 0 && <>{sec('My Library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
                         {districtLibrary.length > 0 && <>{sec('District Library')}{districtLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
+                        {recommendations.length > 0 && <>{sec('Recommendations')}{recommendations.map(r => <RecoRow key={r.title} item={r} />)}</>}
                       </>
                     );
                   })()}
