@@ -1379,22 +1379,15 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         </div>
       </div>
 
-      {/* Fixed heading + prompt — locked to 185px so all tools look the same */}
-      <div style={{ height: 185, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#FAF9F6' }}>
-        {(() => {
-          const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
-          const fontSize = headingText.length <= 24 ? 18 : headingText.length <= 30 ? 16 : 14;
-          return (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '0 14px' }}>
-              <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={32} height={32} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />
-              <div style={{ fontSize, fontWeight: 700, color: '#0E151C', lineHeight: '24px', letterSpacing: '-0.02em' }}>{headingText}</div>
-            </div>
-          );
-        })()}
+      {/* Fixed heading */}
+      <div style={{ flexShrink: 0, padding: '20px 14px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#FAF9F6' }}>
+        <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={32} height={32} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '26px', letterSpacing: '-0.02em' }}>{`What\u2019s your ${toolName.toLowerCase()} about?`}</div>
+      </div>
 
-        {/* Fixed prompt box */}
-        <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 12px 12px' }}>
-        <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+      {/* Fixed prompt box — min 185px tall so the input area feels spacious */}
+      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 12px 12px' }}>
+        <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 185, display: 'flex', flexDirection: 'column' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
               <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -1406,8 +1399,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               </div>
             </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px 10px' }}>
-            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: 'flex-start' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: 4, padding: '10px 8px 10px' }}>
+            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
               <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
             </button>
             <textarea
@@ -1420,15 +1413,14 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               }}
               placeholder={promptPlaceholder}
               rows={1}
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 140 }}
             />
-            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: 'flex-start' }}>
+            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
               <img src="/icons/Mic.svg" width={20} height={20} alt="Mic" style={{ display: 'block' }} />
             </button>
           </div>
         </div>
-        </div>
-      </div>{/* end heading+prompt fixed 185px zone */}
+      </div>
 
       {/* Scrollable body */}
       <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 12px 0' }}>
