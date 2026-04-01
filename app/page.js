@@ -1421,7 +1421,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               }}
               placeholder={promptPlaceholder}
               rows={1}
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 140 }}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 140, paddingTop: 5 }}
             />
             <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
               <img src="/icons/Mic.svg" width={20} height={20} alt="Mic" style={{ display: 'block' }} />
@@ -1716,6 +1716,7 @@ export default function Home() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         topic, subject, grade,
+        toolName: screenOneToolLabel || 'Quiz',
         hardestThing: struggleAnswer,
         struggleAnswer: goalAnswer,
         questionType: prefs.questionType || 'Multiple choice',
@@ -1749,6 +1750,7 @@ export default function Home() {
       body: JSON.stringify({
         topic: `${topic} (${qgUserReply})`,
         subject, grade,
+        toolName: screenOneToolLabel || 'Quiz',
         hardestThing: struggleAnswer,
         struggleAnswer: goalAnswer,
         questionType: qgUserReply === 'Make it harder' ? 'Multiple choice' : (prefs.questionType || 'Multiple choice'),
@@ -1883,7 +1885,7 @@ export default function Home() {
   }, [curriculumCard]);
 
   function handleQuizBriskIt() {
-    const t = input.trim() || 'Quiz topic';
+    const t = input.trim() || screenOneToolLabel || 'Topic';
     setTopic(t);
     setQuizGenTab('Overview');
     setQuizGenPhase('q1');
@@ -3426,7 +3428,7 @@ export default function Home() {
           qgPageTitle ? `Reading "${qgPageTitle}"…` : `Analyzing ${qgShortTopic}…`,
           'Loading district guidance…',
           `Checking ${qgGrade} grade student data…`,
-          `Building your ${prefs.platform || 'Forms'} quiz…`,
+          `Building your ${resourceLabel}…`,
         ];
 
         // Resource-specific Q1/Q2 for doc tools; subject-aware fallback for quiz tools
@@ -3531,13 +3533,13 @@ export default function Home() {
 
           QG_Q1 = {
             type: 'multi-select',
-            text: `To personalize this quiz, what are students struggling with in ${qgShortTopic}?`,
+            text: `To personalize this ${resourceLabel.toLowerCase()}, what are students struggling with in ${qgShortTopic}?`,
             options: q1Options,
           };
 
           QG_Q2 = {
             type: 'single-select',
-            text: "What's your main goal for this quiz?",
+            text: `What\u2019s your main goal for this ${resourceLabel.toLowerCase()}?`,
             options: [
               `Check if students understood ${qgShortTopic}`,
               'Help students practice the key skills',
@@ -4170,7 +4172,7 @@ export default function Home() {
     <div style={outerStyle}>
       {/* Quiz-gen docked: document preview fills full viewport, panel overlays on right */}
       {isDockedRight && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto', background: (isDocTool || quizGenQ2 === 'Google Docs') ? '#f1f3f4' : '#f0ebff' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto', background: (screenOneToolType === 'doc' || prefs.platform === 'Docs') ? '#f1f3f4' : '#f0ebff' }}>
           {qgFormsLoading ? (
             /* Skeleton with grey→aqua gradient sweep */
             <div style={{ padding: '32px 28px 80px', maxWidth: 680, margin: '0 auto' }}>
@@ -4194,7 +4196,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          ) : (isDocTool || quizGenQ2 === 'Google Docs') ? (
+          ) : (screenOneToolType === 'doc' || prefs.platform === 'Docs') ? (
             <GoogleDocPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} ${resourceLabel}`} />
           ) : (
             <GoogleFormsPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} Quiz`} />

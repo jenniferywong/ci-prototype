@@ -6,12 +6,12 @@ function parseJSON(text) {
   );
 }
 
-async function callClaude(client, systemPrompt) {
+async function callClaude(client, systemPrompt, userMsg = 'Generate now.') {
   const message = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4000,
     system: systemPrompt,
-    messages: [{ role: 'user', content: 'Generate the quiz now.' }],
+    messages: [{ role: 'user', content: userMsg }],
   });
   return parseJSON(message.content[0].text);
 }
@@ -62,11 +62,13 @@ export async function POST(request) {
     topic, subject, grade, fluencyAnswer, struggleAnswer,
     hardestThing, scaffoldStrategy, scaffoldStrategyDesc,
     teacherScaffolds, questionType, numQuestions,
-    className, pageContextTitle, pageContextPreview, pageContextBodyText,
+    toolName, className, pageContextTitle, pageContextPreview, pageContextBodyText,
   } = await request.json();
 
-  console.log('[generate] params:', { topic, subject, grade, questionType, numQuestions, className, scaffoldStrategy });
+  console.log('[generate] params:', { topic, toolName, subject, grade, questionType, numQuestions, className, scaffoldStrategy });
 
+  const resolvedToolName = toolName || 'Quiz';
+  const isQuizTool = /quiz|test|check|formative|exit|assess/i.test(resolvedToolName);
   const qType = questionType || 'Multiple Choice';
   const nQ = numQuestions || 10;
   const classContext = className ? ` (${className})` : '';
@@ -89,7 +91,8 @@ export async function POST(request) {
       : null,
   ].filter(Boolean).join('\n');
 
-  const systemPrompt = `You are Brisk, an AI assistant for K-12 teachers. Generate a ${nQ}-question ${qType} quiz about ${topic} for ${grade || '8th grade'} students studying ${subject}${classContext}.
+  const systemPrompt = isQuizTool
+    ? `You are Brisk, an AI assistant for K-12 teachers. Generate a ${nQ}-question ${qType} quiz about ${topic} for ${grade || '8th grade'} students studying ${subject}${classContext}.
 
 STUDENT CONTEXT:
 - Students are struggling with: ${hardestThing}
@@ -109,7 +112,28 @@ QUESTION DESIGN:
 TITLE: Must be specific to the topic and struggle — e.g. "Dividing Fractions: Mastering the Reciprocal" or "Point of View in Summer of the Mariposas". Never use a website name, URL, or generic title.
 
 Return JSON only, no markdown backticks:
-{ "title": string, "warmupLabel": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string}] }`;
+{ "title": string, "warmupLabel": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [string], "correct": string, "explanation": string}] }`
+    : `You are Brisk, an AI assistant for K-12 teachers. Generate a ${resolvedToolName} about "${topic}" for ${grade || '8th grade'} ${subject} students${classContext}.
+
+STUDENT CONTEXT:
+- Students are struggling with: ${hardestThing || 'N/A'}
+- Specific challenge: ${struggleAnswer || 'N/A'}
+- Reading/fluency support needed: ${fluencyAnswer || 'N/A'}
+
+${scaffoldSection}
+
+WARM-UP (required): ${warmupInstruction}
+The warmupLabel for this document is: "${warmupLabel}"
+
+DOCUMENT DESIGN:
+- Make content rigorous, clear, and grade-appropriate
+- Use logical sections with helpful headers
+- Include actionable, specific guidance${pageCtx}
+
+TITLE: Must be specific to the topic — e.g. "ELA 8 Syllabus: Reading for Meaning" or "Portrait of a Graduate: Critical Thinker Framework". Never use a website name, URL, or generic title.
+
+Return JSON only, no markdown backticks:
+{ "title": string, "warmupLabel": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [], "correct": "", "explanation": string}] }`;
 
   const client = new Anthropic({ apiKey: key });
 
