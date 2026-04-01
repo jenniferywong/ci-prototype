@@ -2669,49 +2669,74 @@ export default function Home() {
 
               // Library data — subject field gates visibility per class
               const MY_LIBRARY_DATA = [
-                { label: 'Summer of Mariposas Quiz Pt. 1', sub: 'Modified 2 days ago',  icon: '/icons/Forms.svg', subject: 'ela',  tags: 'mariposas mariposa summer reading novel' },
-                { label: 'Summer of Mariposas Quiz Pt. 2', sub: 'Modified 5 days ago',  icon: '/icons/Forms.svg', subject: 'ela',  tags: 'mariposas mariposa summer reading novel' },
-                { label: 'Point of View Quiz',             sub: 'Modified 3 weeks ago', icon: '/icons/Forms.svg', subject: 'ela',  tags: 'point view pov reading author perspective' },
-                { label: 'Ratios and Proportions Quiz',    sub: 'Modified 1 week ago',  icon: '/icons/Forms.svg', subject: 'math', tags: 'ratio ratios proportion proportions' },
-                { label: 'Fractions Review',               sub: 'Modified 2 weeks ago', icon: '/icons/Docs.svg',  subject: 'math', tags: 'fraction fractions numbers divide' },
-                { label: 'Anchor Chart — Math Vocabulary', sub: 'Modified 1 month ago', icon: '/icons/Docs.svg',  subject: 'math', tags: 'math vocabulary anchor chart' },
+                { label: 'Summer of Mariposas Quiz Pt. 1',   sub: 'Modified 2 days ago',   icon: '/icons/Forms.svg', subject: 'ela',     tags: 'mariposas mariposa summer reading novel' },
+                { label: 'Summer of Mariposas Quiz Pt. 2',   sub: 'Modified 5 days ago',   icon: '/icons/Forms.svg', subject: 'ela',     tags: 'mariposas mariposa summer reading novel' },
+                { label: 'Point of View Quiz',               sub: 'Modified 3 weeks ago',  icon: '/icons/Forms.svg', subject: 'ela',     tags: 'point view pov reading author perspective' },
+                { label: 'Character Analysis Graphic Org.',  sub: 'Modified 1 month ago',  icon: '/icons/Docs.svg',  subject: 'ela',     tags: 'character analysis novel reading gatsby mariposas' },
+                { label: 'Reading Response Journal',         sub: 'Modified 3 weeks ago',  icon: '/icons/Docs.svg',  subject: 'ela',     tags: 'reading response journal novel text' },
+                { label: 'Ratios and Proportions Quiz',      sub: 'Modified 1 week ago',   icon: '/icons/Forms.svg', subject: 'math',    tags: 'ratio ratios proportion proportions' },
+                { label: 'Fractions Review',                 sub: 'Modified 2 weeks ago',  icon: '/icons/Docs.svg',  subject: 'math',    tags: 'fraction fractions numbers divide' },
+                { label: 'Anchor Chart — Math Vocabulary',  sub: 'Modified 1 month ago',  icon: '/icons/Docs.svg',  subject: 'math',    tags: 'math vocabulary anchor chart' },
+                { label: 'Cause & Effect Notes',             sub: 'Modified 2 weeks ago',  icon: '/icons/Docs.svg',  subject: 'history', tags: 'cause effect history event war revolution washington colonial' },
+                { label: 'Primary Source Analysis Sheet',   sub: 'Modified 1 month ago',  icon: '/icons/PDF.svg',   subject: 'history', tags: 'primary source document analysis history washington colonial revolution' },
+                { label: 'Timeline Activity',               sub: 'Modified 3 weeks ago',  icon: '/icons/Docs.svg',  subject: 'history', tags: 'timeline history events sequence war revolution washington' },
+                { label: 'Lab Report Template',             sub: 'Modified 2 weeks ago',  icon: '/icons/Docs.svg',  subject: 'science', tags: 'lab report science experiment data' },
+                { label: 'Vocabulary Graphic Organizer',    sub: 'Modified 1 month ago',  icon: '/icons/Docs.svg',  subject: 'science', tags: 'science vocabulary terms definitions' },
               ];
               const DISTRICT_LIBRARY_DATA = [
-                { label: 'Summer of Mariposas Close Reading Ch.1', sub: 'District · ELA Dept',  icon: '/icons/PDF.svg',   subject: 'ela',  tags: 'mariposas mariposa summer reading novel close' },
-                { label: 'Summer of Mariposas Close Reading Ch.2', sub: 'District · ELA Dept',  icon: '/icons/PDF.svg',   subject: 'ela',  tags: 'mariposas mariposa summer reading novel close' },
-                { label: 'Figurative Language Quiz',               sub: 'District · ELA Dept',  icon: '/icons/Forms.svg', subject: 'ela',  tags: 'figurative language metaphor simile' },
-                { label: 'Text Evidence Practice',                 sub: 'District · ELA Dept',  icon: '/icons/Docs.svg',  subject: 'ela',  tags: 'text evidence cite citing' },
-                { label: 'Ratios Grade 7 Assessment',              sub: 'District · Math Dept', icon: '/icons/Forms.svg', subject: 'math', tags: 'ratio ratios proportion' },
-                { label: 'Number Sense Practice',                  sub: 'District · Math Dept', icon: '/icons/Docs.svg',  subject: 'math', tags: 'number sense arithmetic operations' },
-                { label: 'Fractions Unit Assessment',              sub: 'District · Math Dept', icon: '/icons/Forms.svg', subject: 'math', tags: 'fraction fractions unit assessment' },
+                { label: 'Summer of Mariposas Close Reading Ch.1', sub: 'District · ELA Dept',          icon: '/icons/PDF.svg',   subject: 'ela',     tags: 'mariposas mariposa summer reading novel close' },
+                { label: 'Summer of Mariposas Close Reading Ch.2', sub: 'District · ELA Dept',          icon: '/icons/PDF.svg',   subject: 'ela',     tags: 'mariposas mariposa summer reading novel close' },
+                { label: 'Figurative Language Quiz',               sub: 'District · ELA Dept',          icon: '/icons/Forms.svg', subject: 'ela',     tags: 'figurative language metaphor simile' },
+                { label: 'Text Evidence Practice',                 sub: 'District · ELA Dept',          icon: '/icons/Docs.svg',  subject: 'ela',     tags: 'text evidence cite citing gatsby mariposas novel' },
+                { label: 'Literary Analysis Rubric',               sub: 'District · ELA Dept',          icon: '/icons/Docs.svg',  subject: 'ela',     tags: 'literary analysis essay rubric novel reading' },
+                { label: 'Ratios Grade 7 Assessment',              sub: 'District · Math Dept',         icon: '/icons/Forms.svg', subject: 'math',    tags: 'ratio ratios proportion' },
+                { label: 'Number Sense Practice',                  sub: 'District · Math Dept',         icon: '/icons/Docs.svg',  subject: 'math',    tags: 'number sense arithmetic operations' },
+                { label: 'Fractions Unit Assessment',              sub: 'District · Math Dept',         icon: '/icons/Forms.svg', subject: 'math',    tags: 'fraction fractions unit assessment' },
+                { label: 'US History Standards Alignment',         sub: 'District · Social Studies Dept', icon: '/icons/PDF.svg', subject: 'history', tags: 'history standards washington colonial revolution war civil rights' },
+                { label: 'DBQ: Primary Source Analysis Guide',     sub: 'District · Social Studies Dept', icon: '/icons/Docs.svg', subject: 'history', tags: 'primary source dbq document history washington revolution war colonial' },
+                { label: 'Social Studies Vocabulary Bank',         sub: 'District · Social Studies Dept', icon: '/icons/Docs.svg', subject: 'history', tags: 'vocabulary history social studies terms washington colonial revolution' },
+                { label: 'Science Lab Safety & Procedures',        sub: 'District · Science Dept',      icon: '/icons/PDF.svg',   subject: 'science', tags: 'science lab safety procedures experiment' },
+                { label: 'NGSS Standards Alignment Guide',         sub: 'District · Science Dept',      icon: '/icons/Docs.svg',  subject: 'science', tags: 'science standards ngss biology chemistry physics' },
               ];
 
-              // Filter by subject (uses detected subject even without selected class)
+              // Detect subject even when no class selected (for pure topic queries)
+              const topicSubjectDetect = !selectedClass ? detectSubjectFromTopic(searchTerm) : null;
+              const effectiveSubjectIsELA     = subjectIsELA     || topicSubjectDetect === 'ELA';
+              const effectiveSubjectIsMath    = subjectIsMath    || topicSubjectDetect === 'Math';
+              const effectiveSubjectIsHistory = subjectIsHistory || topicSubjectDetect === 'Social Studies' || /\b(washington|lincoln|colonial|revolution|civil war|world war|constitution|amendment|president|congress|senate|slavery|civil rights|gatsby|steinbeck|history)\b/i.test(searchTerm);
+              const effectiveSubjectIsScience = subjectIsScience || topicSubjectDetect === 'Science';
+              const effectiveSubjectIsELAFull = effectiveSubjectIsELA || /\b(mariposa|gatsby|mockingbird|romeo|juliet|hamlet|novel|poem|poetry|author|character|theme|plot|setting|narrative|figurative|metaphor|simile|reading|writing|essay)\b/i.test(searchTerm);
+
+              // Filter by effective subject
               const subjectFilter = item => {
-                if (subjectIsELA     && item.subject === 'ela')     return true;
-                if (subjectIsMath    && item.subject === 'math')    return true;
-                if (subjectIsHistory && item.subject === 'history') return true;
-                if (subjectIsScience && item.subject === 'science') return true;
-                // No hardcoded subject match — let generated items fill the gap
+                if (effectiveSubjectIsELAFull && item.subject === 'ela')     return true;
+                if (effectiveSubjectIsMath    && item.subject === 'math')    return true;
+                if (effectiveSubjectIsHistory && item.subject === 'history') return true;
+                if (effectiveSubjectIsScience && item.subject === 'science') return true;
                 return false;
               };
 
-              const topicMatch = (item, term) => {
-                const haystack = (item.label + ' ' + (item.tags || '')).toLowerCase();
-                return term.toLowerCase().split(/\s+/).some(w => w.length > 2 && haystack.includes(w));
-              };
-
               const recoGrade = CLASSES.find(c => c.id === selectedClass)?.grade || prefs.grade || '8th';
-              const subjectDept = subjectIsELA ? 'ELA' : subjectIsMath ? 'Math' : subjectIsHistory ? 'Social Studies' : subjectIsScience ? 'Science' : null;
+              const subjectDept = effectiveSubjectIsELAFull ? 'ELA' : effectiveSubjectIsMath ? 'Math' : effectiveSubjectIsHistory ? 'Social Studies' : effectiveSubjectIsScience ? 'Science' : null;
 
               // Tool match takes priority — if a tool was found (by full query or topic part), suppress library
               const isPureToolQuery = allMatchedTools.length > 0 || isFeedbackQuery;
 
+              // For topic queries with no hardcoded subject match, show generic subject-appropriate items
+              const noSubjectMatch = !effectiveSubjectIsELAFull && !effectiveSubjectIsMath && !effectiveSubjectIsHistory && !effectiveSubjectIsScience;
+              const GENERIC_MY = hasTopicComponent && !isPureToolQuery && noSubjectMatch ? [
+                { label: 'Graphic Organizer — Notes',  sub: 'Modified 2 weeks ago', icon: '/icons/Docs.svg' },
+                { label: 'Guided Reading Questions',   sub: 'Modified 1 month ago', icon: '/icons/Docs.svg' },
+              ] : [];
+              const GENERIC_DIST = hasTopicComponent && !isPureToolQuery && noSubjectMatch ? [
+                { label: 'Standards-Aligned Unit Guide', sub: 'District · Curriculum Dept', icon: '/icons/PDF.svg' },
+                { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
+              ] : [];
+
               const hardcodedMy   = isPureToolQuery ? [] : topMatches(searchTerm, MY_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
               const hardcodedDist = isPureToolQuery ? [] : topMatches(searchTerm, DISTRICT_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
-              // Only show real hardcoded library items — no generated fakes
-              const myLibrary = hardcodedMy;
-              const districtLibrary = hardcodedDist;
+              const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
+              const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
 
               // Assignments to grade — shown when query is feedback/grading related
               const assignmentSubject = subjectIsHistory ? 'Social Studies' : subjectIsMath ? 'Math' : subjectIsScience ? 'Science' : subjectIsELA ? 'ELA' : null;
