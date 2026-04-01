@@ -2022,10 +2022,10 @@ export default function Home() {
 
     const detected = detectToolAndTopic(p);
     if (detected) {
-      // Topic + tool detected — go straight to ToolCreationScreen with topic pre-filled
+      // Topic + tool detected — go straight to ToolCreationScreen with full text preserved
       setScreenOneToolType(detected.type);
       setScreenOneToolLabel(detected.label);
-      setInput(detected.topic);
+      setInput(p);
       setScreen(1);
     } else {
       const toolName = classifyPrompt(p);
@@ -2479,7 +2479,7 @@ export default function Home() {
     if (detected) {
       setScreenOneToolType(detected.type);
       setScreenOneToolLabel(detected.label);
-      setInput(detected.topic);
+      setInput(p);
       setScreen(1);
     } else {
       const toolName = classifyPrompt(p);
@@ -2801,7 +2801,7 @@ export default function Home() {
                 return (
                   <div style={{ padding: '6px 12px 2px' }}>
                     <button
-                      onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(chainedTopic); setScreen(1); }}
+                      onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(q); setScreen(1); }}
                       style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', border: '1.5px solid #D0E8F0', borderRadius: 10, background: '#F0F8FB', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                       <img src={chainedTool.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
