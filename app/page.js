@@ -1723,6 +1723,11 @@ export default function Home() {
   const createTextareaRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [pageChipVisible, setPageChipVisible] = useState(true);
+  const [chipDismissing, setChipDismissing] = useState(false);
+  function dismissChip() {
+    setChipDismissing(true);
+    setTimeout(() => { setPageChipVisible(false); setChipDismissing(false); }, 220);
+  }
   const [welcomeScroll, setWelcomeScroll] = useState(0);
   const [createScroll, setCreateScroll] = useState(0);
   const [welcomeSearch, setWelcomeSearch] = useState('');
@@ -2582,15 +2587,15 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px', position: 'relative' }}>
-            <div style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 28, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 56, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              {pageChipVisible && (
-                <div style={{ padding: '8px 10px 2px' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 28, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 56, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              {(pageChipVisible || chipDismissing) && (
+                <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
                     <img src="/icons/Web - Stroke.svg" width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0, opacity: 0.5 }} />
                     <span style={{ flex: 1, fontSize: 12, color: '#475467', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '20px' }}>
                       {pageContext?.title || 'Jennifer Wong - Point of View in Summer of M...'}
                     </span>
-                    <button onClick={() => setPageChipVisible(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    <button onClick={dismissChip} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="#475467" strokeWidth="1.4" strokeLinecap="round"/></svg>
                     </button>
                   </div>
@@ -2932,15 +2937,15 @@ export default function Home() {
 
           {/* Fixed search box — same padding as Welcome */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px 12px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div style={{ border: '1px solid #E5E4E2', borderRadius: 12, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              {pageChipVisible && (
-                <div style={{ padding: '8px 10px 2px' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: 12, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              {(pageChipVisible || chipDismissing) && (
+                <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
                     <img src="/icons/Web - Stroke.svg" width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0, opacity: 0.5 }} />
                     <span style={{ flex: 1, fontSize: 12, color: '#475467', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '20px' }}>
                       {pageContext?.title || 'Jennifer Wong - Point of View in Summer of M...'}
                     </span>
-                    <button onClick={() => setPageChipVisible(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    <button onClick={dismissChip} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="#475467" strokeWidth="1.4" strokeLinecap="round"/></svg>
                     </button>
                   </div>
