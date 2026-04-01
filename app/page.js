@@ -2938,7 +2938,7 @@ export default function Home() {
           </div>
 
           {/* Fixed search box — same padding as Welcome */}
-          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px 24px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
+          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px ${createScroll > 40 ? 12 : 24}px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
             <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
