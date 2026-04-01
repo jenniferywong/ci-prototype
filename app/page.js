@@ -1567,7 +1567,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     <>
       {/* Header */}
       <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', borderBottom: '1px solid #e7e5e4', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', height: 52, gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', height: 52, gap: 8 }}>
           <ModalBackBtn onClick={onBack} />
           <div style={{ flex: 1 }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -1588,7 +1588,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         const effectiveDocFormat = prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs');
         const icon = <img src={toolType === 'doc' ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
         return (
-          <div style={{ flexShrink: 0, padding: '20px 14px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
+          <div style={{ flexShrink: 0, padding: '20px 24px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
             {icon}
             <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '26px', letterSpacing: '-0.02em', ...(stacked ? { padding: '0 24px' } : {}) }}>{headingText}</div>
           </div>
@@ -1596,7 +1596,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       })()}
 
       {/* Fixed prompt box — min 185px tall so the input area feels spacious */}
-      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 12px 12px' }}>
+      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 24px 12px' }}>
         <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 185, display: 'flex', flexDirection: 'column' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
@@ -1634,7 +1634,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       </div>
 
       {/* Scrollable body */}
-      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 12px 0' }}>
+      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
 
         {/* Audience */}
         <div style={{ marginBottom: 16 }}>
