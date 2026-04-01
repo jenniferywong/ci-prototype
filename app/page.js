@@ -1545,8 +1545,9 @@ function FormatDropdown({ options, value, onChange }) {
   );
 }
 
-function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onBriskIt, onBack, onClose }) {
+function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose }) {
   const textareaRef = useRef(null);
+  const addBtnRef = useRef(null);
   const chevron = (
     <svg style={{ position: 'absolute', right: 10, pointerEvents: 'none' }} width="10" height="6" viewBox="0 0 10 6" fill="none">
       <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1609,7 +1610,9 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             </div>
           )}
           <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: 4, padding: '10px 8px 10px' }}>
-            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
+            <button ref={addBtnRef} className="icon-btn"
+              onClick={() => { const r = addBtnRef.current?.getBoundingClientRect(); if (r && onAddClick) onAddClick({ top: r.bottom + 6, left: r.left }); }}
+              style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
               <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
             </button>
             <textarea
@@ -2587,7 +2590,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px', position: 'relative' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2601,14 +2604,14 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: pageChipVisible ? '6px 8px 10px' : '6px 8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: (pageChipVisible && !chipDismissing) ? '6px 8px 10px' : '6px 8px' }}>
                 <button ref={addBtnRef} className="icon-btn"
                   onClick={() => {
                     const r = addBtnRef.current?.getBoundingClientRect();
                     if (r) setAddMenuPos({ top: r.bottom + 6, left: r.left });
                     setAddMenuOpen(v => !v);
                   }}
-                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center' }}>
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
                 <textarea
@@ -2623,10 +2626,10 @@ export default function Home() {
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
-                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: pageChipVisible ? 'flex-start' : 'center' }}
+                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
                   onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
                 {wsIsPromptMode && welcomeSearch.trim() && (
-                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center', marginLeft: 4 }}>
+                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
@@ -2937,7 +2940,7 @@ export default function Home() {
 
           {/* Fixed search box — same padding as Welcome */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px 12px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2951,14 +2954,14 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: pageChipVisible ? '6px 8px 10px' : '6px 8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: (pageChipVisible && !chipDismissing) ? '6px 8px 10px' : '6px 8px' }}>
                 <button ref={addBtnRef} className="icon-btn"
                   onClick={() => {
                     const r = addBtnRef.current?.getBoundingClientRect();
                     if (r) setAddMenuPos({ top: r.bottom + 6, left: r.left });
                     setAddMenuOpen(v => !v);
                   }}
-                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center' }}>
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
                 <textarea ref={createTextareaRef} value={createSearch}
@@ -2967,10 +2970,10 @@ export default function Home() {
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
-                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: pageChipVisible ? 'flex-start' : 'center' }}
+                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
                   onTranscript={(t) => { setCreateSearch(t); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
                 {csIsPromptMode && createSearch.trim() && (
-                  <button onClick={handleCreatePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center', marginLeft: 4 }}>
+                  <button onClick={handleCreatePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
@@ -3263,7 +3266,8 @@ export default function Home() {
           onPrefsChange={delta => setPrefs(p => ({ ...p, ...delta }))}
           pageContext={pageContext}
           pageChipVisible={pageChipVisible}
-          onDismissChip={() => setPageChipVisible(false)}
+          onDismissChip={dismissChip}
+          onAddClick={({ top, left }) => { setAddMenuPos({ top, left }); setAddMenuOpen(v => !v); }}
           onBriskIt={handleQuizBriskIt}
           onBack={() => setScreen('create')}
           onClose={handleClose}
