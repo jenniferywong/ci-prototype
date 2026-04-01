@@ -3869,8 +3869,10 @@ export default function Home() {
                     {showLoading && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingTop: 8 }}>
                         <BriskLogo size={20} style={{ animation: 'shimmer 1.6s ease-in-out infinite', opacity: 0.7 }} />
-                        <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
-                          {QUIZ_GEN_LOADING_MSGS[quizGenLoadingIdx % QUIZ_GEN_LOADING_MSGS.length]}
+                        <span key={quizGenPhase === 'answered' ? 'answered' : quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
+                          {quizGenPhase === 'answered'
+                            ? `Almost ready — finalizing your ${resourceLabel}…`
+                            : QUIZ_GEN_LOADING_MSGS[quizGenLoadingIdx % QUIZ_GEN_LOADING_MSGS.length]}
                         </span>
                       </div>
                     )}
