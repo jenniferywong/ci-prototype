@@ -1483,6 +1483,10 @@ const FORMAT_OPTIONS = {
     { value: 'Slides', label: 'Google Slides',   icon: '/icons/Slides.svg' },
     { value: 'Word',   label: 'Microsoft Word',  icon: '/icons/Word.svg'   },
   ],
+  presentation: [
+    { value: 'Slides',     label: 'Google Slides',       icon: '/icons/Slides.svg'     },
+    { value: 'Powerpoint', label: 'Microsoft PowerPoint', icon: '/icons/Powerpoint.svg' },
+  ],
 };
 
 function FormatDropdown({ options, value, onChange }) {
@@ -1586,7 +1590,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         const iconSize = stacked ? 40 : 32;
         const isSlidesDefault = toolType === 'doc' && (toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide'));
         const effectiveDocFormat = prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs');
-        const icon = <img src={toolType === 'doc' ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
+        const docIcon = effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs';
+        const icon = <img src={toolType === 'doc' ? `/icons/${docIcon}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
         return (
           <div style={{ flexShrink: 0, padding: '20px 24px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
             {icon}
@@ -1650,8 +1655,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           <div style={{ fontSize: 12, fontWeight: 500, color: '#78716c', marginBottom: 8, lineHeight: '18px' }}>Format</div>
           {toolType === 'doc' ? (
             <FormatDropdown
-              options={FORMAT_OPTIONS.doc}
-              value={prefs.docFormat || ((toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide')) ? 'Slides' : 'Docs')}
+              options={isSlidesDefault ? FORMAT_OPTIONS.presentation : FORMAT_OPTIONS.doc}
+              value={prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs')}
               onChange={v => onPrefsChange({ docFormat: v })}
             />
           ) : (
