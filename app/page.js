@@ -2544,7 +2544,7 @@ export default function Home() {
   const sourcesReady = !!qgQuizData;
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
-    width: 402, background: '#FAF9F6',
+    width: 'min(402px, calc(100vw - 48px))', background: '#FAF9F6',
     borderRadius: 12,
     border: '1px solid #E5E4E2',
     boxShadow: '0 24px 64px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12)',
@@ -2555,7 +2555,7 @@ export default function Home() {
       ? { top: panelPos.top, left: panelPos.left }
       : isDockedRight
         ? { top: 24, right: 24 }
-        : { top: 40, left: 'calc(50vw - 201px)' }
+        : { top: 40, left: 'max(24px, calc(50vw - 201px))', right: 'max(24px, calc(50vw - 201px))' }
     ),
   };
 
