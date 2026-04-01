@@ -68,7 +68,7 @@ export default function IntentChips({ toolName, input, onInputChange, pageContex
           return (
             <button
               key={chip.label}
-              onClick={() => active ? closeChip() : openChip(i)}
+              onClick={() => openIdx !== null ? closeChip() : openChip(i)}
               className="intent-chip"
               style={{
                 height: 28,

@@ -1550,10 +1550,28 @@ function FormatDropdown({ options, value, onChange }) {
   );
 }
 
-function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose }) {
+function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum }) {
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
   const promptBoxRef = useRef(null);
+  const [editingSection, setEditingSection] = useState(null); // null | 'audience' | 'format'
+  const isSlidesDefault = toolType === 'doc' && (toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide'));
+  const effectiveDocFormat = prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs');
+
+  const cls = selectedClass ? CLASSES.find(c => c.id === selectedClass) : null;
+  const curriculumValue = curriculumCard
+    ? `${curriculumCard.unit}${curriculumCard.title ? ' \u2022 ' + curriculumCard.title.slice(0, 28) : ''}`
+    : cls ? cls.label : '\u2014';
+  const audienceSummary = `${prefs.grade} Grade \u2022 ${prefs.language}`;
+  const formatSummary = toolType === 'doc'
+    ? (isSlidesDefault ? FORMAT_OPTIONS.presentation : FORMAT_OPTIONS.doc).find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat
+    : `${FORMAT_OPTIONS.quiz.find(o => o.value === (prefs.platform || 'Forms'))?.label || prefs.platform} \u2022 ${prefs.questionType} \u2022 ${prefs.numQuestions} questions`;
+
+  const pencilIcon = (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M9.5 1.5L12.5 4.5M1.5 12.5l.6-2.8L9.5 1.5l3 3-7.4 7.4-2.8.6z" stroke="#a8a29e" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
   const chevron = (
     <svg style={{ position: 'absolute', right: 10, pointerEvents: 'none' }} width="10" height="6" viewBox="0 0 10 6" fill="none">
       <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1590,8 +1608,6 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
         const stacked = headingText.length > 32;
         const iconSize = stacked ? 40 : 32;
-        const isSlidesDefault = toolType === 'doc' && (toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide'));
-        const effectiveDocFormat = prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs');
         const docIcon = effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs';
         const icon = <img src={toolType === 'doc' ? `/icons/${docIcon}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
         return (
@@ -1650,42 +1666,77 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       />
 
       {/* Scrollable body */}
-      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
+      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '12px 24px 12px' }}>
 
-        {/* Audience */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 500, color: '#78716c', marginBottom: 8, lineHeight: '18px' }}>Audience</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
-            {pillSelect(prefs.grade, ['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` })), v => onPrefsChange({ grade: v }))}
-            {pillSelect(prefs.language, ['English','Spanish','French','Mandarin','Arabic'], v => onPrefsChange({ language: v }))}
+        {editingSection === null && (
+          <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, overflow: 'hidden' }}>
+            {/* Curriculum row */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px', borderBottom: '1px solid #F3F2F0' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', minWidth: 84 }}>Curriculum</span>
+              <span style={{ flex: 1, fontSize: 13, color: '#78716c', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right', paddingRight: 8 }}>{curriculumValue}</span>
+              <button onClick={onEditCurriculum} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+            </div>
+            {/* Audience row */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px', borderBottom: '1px solid #F3F2F0' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', minWidth: 84 }}>Audience</span>
+              <span style={{ flex: 1, fontSize: 13, color: '#78716c', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right', paddingRight: 8 }}>{audienceSummary}</span>
+              <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+            </div>
+            {/* Format row */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', minWidth: 84 }}>Format</span>
+              <span style={{ flex: 1, fontSize: 13, color: '#78716c', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right', paddingRight: 8 }}>{formatSummary}</span>
+              <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Format */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, fontWeight: 500, color: '#78716c', marginBottom: 8, lineHeight: '18px' }}>Format</div>
-          {toolType === 'doc' ? (
-            <FormatDropdown
-              options={isSlidesDefault ? FORMAT_OPTIONS.presentation : FORMAT_OPTIONS.doc}
-              value={prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs')}
-              onChange={v => onPrefsChange({ docFormat: v })}
-            />
-          ) : (
-            <>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8, marginBottom: 8 }}>
-                <FormatDropdown
-                  options={FORMAT_OPTIONS.quiz}
-                  value={prefs.platform || 'Forms'}
-                  onChange={v => onPrefsChange({ platform: v })}
-                />
-                {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }))}
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
-                {pillSelect(String(prefs.numQuestions), ['5','10','15','20'].map(n => ({ value: n, label: `${n} questions` })), v => onPrefsChange({ numQuestions: Number(v) }))}
-              </div>
-            </>
-          )}
-        </div>
+        {editingSection === 'audience' && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Audience</span>
+              <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
+              {pillSelect(prefs.grade, ['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` })), v => onPrefsChange({ grade: v }))}
+              {pillSelect(prefs.language, ['English','Spanish','French','Mandarin','Arabic'], v => onPrefsChange({ language: v }))}
+            </div>
+          </>
+        )}
+
+        {editingSection === 'format' && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format</span>
+              <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            {toolType === 'doc' ? (
+              <FormatDropdown
+                options={isSlidesDefault ? FORMAT_OPTIONS.presentation : FORMAT_OPTIONS.doc}
+                value={effectiveDocFormat}
+                onChange={v => onPrefsChange({ docFormat: v })}
+              />
+            ) : (
+              <>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8, marginBottom: 8 }}>
+                  <FormatDropdown
+                    options={FORMAT_OPTIONS.quiz}
+                    value={prefs.platform || 'Forms'}
+                    onChange={v => onPrefsChange({ platform: v })}
+                  />
+                  {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }))}
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
+                  {pillSelect(String(prefs.numQuestions), ['5','10','15','20'].map(n => ({ value: n, label: `${n} questions` })), v => onPrefsChange({ numQuestions: Number(v) }))}
+                </div>
+              </>
+            )}
+          </>
+        )}
 
       </div>
 
@@ -3286,6 +3337,9 @@ export default function Home() {
           onBriskIt={handleQuizBriskIt}
           onBack={() => setScreen('create')}
           onClose={handleClose}
+          curriculumCard={curriculumCard}
+          selectedClass={selectedClass}
+          onEditCurriculum={() => setScreen(2)}
         />
       )}
 
