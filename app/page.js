@@ -247,7 +247,7 @@ function ToolRow({ svg, label, sub, onClick }) {
       <button
         onClick={onClick || undefined}
         style={{ width: '100%', height: 58, padding: '0 10px', border: 'none', borderRadius: 10, background: hovered ? '#EBE9E6' : 'transparent', display: 'flex', alignItems: 'center', gap: 12, cursor: onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left', transition: 'background 0.12s', flexShrink: 0 }}>
-        <img src={svg} width={32} height={32} alt="" style={{ flexShrink: 0, display: 'block' }} />
+        <img src={svg} width={28} height={28} alt="" style={{ flexShrink: 0, display: 'block' }} />
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.01em' }}>{label}</div>
           {hovered && <div style={{ fontSize: 12, color: '#344054', lineHeight: '17px', marginTop: 1 }}>{sub}</div>}
@@ -259,10 +259,10 @@ function ToolRow({ svg, label, sub, onClick }) {
 
 // Icon squares for create submenu tools (32×32 to match ToolRow)
 const CREATE_ICONS = {
-  Presentation: <img src="/icons/Slides.svg" width={32} height={32} alt="Presentation" style={{ display: 'block', flexShrink: 0 }} />,
-  Quiz:         <img src="/icons/Quiz.svg"   width={32} height={32} alt="Quiz"         style={{ display: 'block', flexShrink: 0 }} />,
-  Podcast:      <img src="/icons/Podcast.svg" width={32} height={32} alt="Podcast"     style={{ display: 'block', flexShrink: 0 }} />,
-  Nearpod:      <img src="/icons/Nearpod.svg" width={32} height={32} alt="Nearpod"     style={{ display: 'block', flexShrink: 0 }} />,
+  Presentation: <img src="/icons/Slides.svg" width={28} height={28} alt="Presentation" style={{ display: 'block', flexShrink: 0 }} />,
+  Quiz:         <img src="/icons/Quiz.svg"   width={28} height={28} alt="Quiz"         style={{ display: 'block', flexShrink: 0 }} />,
+  Podcast:      <img src="/icons/Podcast.svg" width={28} height={28} alt="Podcast"     style={{ display: 'block', flexShrink: 0 }} />,
+  Nearpod:      <img src="/icons/Nearpod.svg" width={28} height={28} alt="Nearpod"     style={{ display: 'block', flexShrink: 0 }} />,
   CPS: (
     <div style={{ width: 32, height: 32, borderRadius: 7, background: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -621,7 +621,7 @@ const CREATE_TOOL_SECTIONS = [
 function CreateToolRow({ svg, iconEl, label, sub, chips, onClick }) {
   const [hovered, setHovered] = useState(false);
   const icon = svg
-    ? <img src={svg} width={32} height={32} alt={label} style={{ display: 'block', flexShrink: 0 }} />
+    ? <img src={svg} width={28} height={28} alt={label} style={{ display: 'block', flexShrink: 0 }} />
     : iconEl;
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ padding: '0 8px' }}>
@@ -2850,7 +2850,7 @@ export default function Home() {
               const LibraryRow = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
                   <button className="tool-row lib-row" style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                    <img src={item.icon} width={32} height={32} alt="" style={{ display: 'block', flexShrink: 0, borderRadius: 7 }} />
+                    <img src={item.icon} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0, borderRadius: 7 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
                       <div className="lib-sub">{item.sub}</div>
@@ -2862,7 +2862,7 @@ export default function Home() {
               const RecoRow = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
                   <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
-                    <img src={item.svg} width={32} height={32} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                    <img src={item.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
                       <div className="lib-sub">{item.tooltip}</div>
@@ -2947,7 +2947,7 @@ export default function Home() {
 
           {/* Collapsing heading — same position as Welcome */}
           <div style={{ overflow: 'hidden', maxHeight: createScroll > 40 ? 0 : 80, opacity: createScroll > 40 ? 0 : 1, padding: createScroll > 40 ? '0 14px' : '20px 14px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexShrink: 0, background: '#FAF9F6', transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <img src="/icons/Create.svg" width={32} height={32} alt="" style={{ flexShrink: 0, display: 'block' }} />
+            <img src="/icons/Create.svg" width={28} height={28} alt="" style={{ flexShrink: 0, display: 'block' }} />
             <div style={{ fontSize: 18, fontWeight: 700, color: C.slate900, letterSpacing: '-0.02em', lineHeight: '24px' }}>What do you want to create?</div>
           </div>
 
@@ -3121,7 +3121,7 @@ export default function Home() {
               const LibRowCS = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
                   <button className="tool-row lib-row" style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                    <img src={item.icon} width={32} height={32} alt="" style={{ display: 'block', flexShrink: 0, borderRadius: 7 }} />
+                    <img src={item.icon} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0, borderRadius: 7 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
                       <div className="lib-sub">{item.sub}</div>
@@ -3132,7 +3132,7 @@ export default function Home() {
               const RecoRowCS = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
                   <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
-                    <img src={item.svg} width={32} height={32} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                    <img src={item.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
                       <div className="lib-sub">{item.tooltip}</div>
@@ -4361,7 +4361,7 @@ export default function Home() {
                     <div key={section.id} style={{ background: '#fff', border: '1px solid #E2E1DE', borderRadius: 10, marginBottom: 8, padding: '14px 14px 0', overflow: 'hidden' }}>
                       <button onClick={() => setQuizGenExpandedSource(quizGenExpandedSource === section.id ? null : section.id)}
                         style={{ width: '100%', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: '0 0 14px' }}>
-                        <img src={section.icon} width={32} height={32} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                        <img src={section.icon} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: '22px' }}>{section.label}</div>
                           <div style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{section.count} sources</div>
@@ -4716,7 +4716,7 @@ export default function Home() {
             onClick={() => setIsOpen(true)}
             title="Open Brisk (⌘K)"
             style={{ position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', border: 'none', background: '#0E151C', boxShadow: '0 4px 16px rgba(0,0,0,0.28)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, padding: 4 }}>
-            <img src="/icons/Brisk Logo.svg" width={32} height={32} alt="Brisk" style={{ display: 'block' }} />
+            <img src="/icons/Brisk Logo.svg" width={28} height={28} alt="Brisk" style={{ display: 'block' }} />
           </button>
 
           {/* Page context bar — top of page, only when panel is closed */}
