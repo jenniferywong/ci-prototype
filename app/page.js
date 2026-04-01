@@ -388,7 +388,7 @@ function scoreMatch(query, label) {
       if (labelWords.some(lw => lw === qw)) { total += 60; matched++; }
       else if (labelWords.some(lw => lw.startsWith(qw))) { total += 40; matched++; }
     }
-    return matched > 0 ? Math.round(total / significant.length) : 0;
+    return matched > 0 ? Math.round(total / matched) : 0;
   }
   if (labelWords[0].startsWith(q)) return 60;                  // first word starts with query
   if (labelWords.some(w => w.startsWith(q))) return 40;        // any word starts with query
