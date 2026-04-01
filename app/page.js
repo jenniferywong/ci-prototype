@@ -1659,10 +1659,6 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Action buttons — pinned to bottom */}
       <div style={{ flexShrink: 0, padding: '12px 12px 16px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-        <button style={{ height: 40, padding: '0 20px', border: '1px solid #e7e5e4', borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, color: '#57534e', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <img src="/icons/Chat.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
-          Refine
-        </button>
         <button onClick={onBriskIt} style={{ height: 40, padding: '0 24px', border: 'none', borderRadius: 20, background: '#06465C', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
           Brisk It
         </button>
@@ -2733,8 +2729,8 @@ export default function Home() {
                 { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
               ] : [];
 
-              const hardcodedMy   = isPureToolQuery ? [] : topMatches(searchTerm, MY_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
-              const hardcodedDist = isPureToolQuery ? [] : topMatches(searchTerm, DISTRICT_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
+              const hardcodedMy   = isPureToolQuery ? [] : topMatches(searchTerm, MY_LIBRARY_DATA.filter(subjectFilter), l => `${l.label} ${l.tags || ''}`, 3);
+              const hardcodedDist = isPureToolQuery ? [] : topMatches(searchTerm, DISTRICT_LIBRARY_DATA.filter(subjectFilter), l => `${l.label} ${l.tags || ''}`, 3);
               const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
               const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
 
@@ -3038,8 +3034,8 @@ export default function Home() {
 
               const recoGradeCS = CLASSES.find(c => c.id === selectedClass)?.grade || prefs.grade || '8th';
               const subjectDeptCS = subjectIsELA_CS ? 'ELA' : subjectIsMath_CS ? 'Math' : subjectIsHistory_CS ? 'Social Studies' : subjectIsScience_CS ? 'Science' : null;
-              const hardcodedMyCS   = isPureToolQueryCS ? [] : topMatches(searchTermCS, MY_LIB_CS.filter(subjectFilterCS), l => l.label, 3);
-              const hardcodedDistCS = isPureToolQueryCS ? [] : topMatches(searchTermCS, DIST_LIB_CS.filter(subjectFilterCS), l => l.label, 3);
+              const hardcodedMyCS   = isPureToolQueryCS ? [] : topMatches(searchTermCS, MY_LIB_CS.filter(subjectFilterCS), l => `${l.label} ${l.tags || ''}`, 3);
+              const hardcodedDistCS = isPureToolQueryCS ? [] : topMatches(searchTermCS, DIST_LIB_CS.filter(subjectFilterCS), l => `${l.label} ${l.tags || ''}`, 3);
               // Only show real hardcoded library items — no generated fakes
               const myLibCS = hardcodedMyCS;
               const distLibCS = hardcodedDistCS;
