@@ -2587,7 +2587,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px', position: 'relative' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 28, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: pageChipVisible ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
