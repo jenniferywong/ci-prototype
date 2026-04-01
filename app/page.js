@@ -189,6 +189,53 @@ function BriskLogo({ size = 28 }) {
   return <img src="/icons/Brisk Logo.svg" width={size} height={size} alt="Brisk" style={{ flexShrink: 0, display: 'block' }} />;
 }
 
+// ── Mic button with Web Speech API ────────────────────────────
+function MicButton({ onTranscript, size = 20, btnStyle, className }) {
+  const [supported, setSupported] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const recRef = useRef(null);
+  const transcriptRef = useRef('');
+
+  useEffect(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { setSupported(false); return; }
+    const r = new SR();
+    r.continuous = false;
+    r.interimResults = true;
+    r.lang = 'en-US';
+    r.onresult = (e) => {
+      const text = Array.from(e.results).map(res => res[0].transcript).join('');
+      const isFinal = e.results[e.results.length - 1].isFinal;
+      transcriptRef.current = text;
+      onTranscript(text, isFinal);
+    };
+    r.onerror = () => setIsListening(false);
+    r.onend = () => setIsListening(false);
+    recRef.current = r;
+  }, []);
+
+  if (!supported) return null;
+
+  const toggle = () => {
+    if (isListening) {
+      recRef.current?.stop();
+      setIsListening(false);
+    } else {
+      try { recRef.current?.start(); setIsListening(true); transcriptRef.current = ''; } catch {}
+    }
+  };
+
+  return (
+    <button onClick={toggle} className={className}
+      style={{ width: size + 12, height: size + 12, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, ...btnStyle }}>
+      <img src="/icons/Mic.svg" width={size} height={size} alt="Mic"
+        style={{ display: 'block',
+          filter: isListening ? 'invert(29%) sepia(80%) saturate(400%) hue-rotate(130deg) brightness(0.85)' : undefined,
+          animation: isListening ? 'pulse 1s ease-in-out infinite' : undefined }} />
+    </button>
+  );
+}
+
 function ToolRow({ svg, label, sub, onClick }) {
   const [hovered, setHovered] = useState(false);
   return (
@@ -421,7 +468,7 @@ function recoItems(topic, grade, onClickFns) {
       onClick: null,
     },
     {
-      svg: '/icons/Gavel.svg',
+      svg: '/icons/gavel.svg',
       title: pick([`${t} Debate`, `${t} Socratic Debate`, `The ${t} Debate`, `${t} Discussion Challenge`]),
       tooltip: `Builds critical thinking`,
       onClick: null,
@@ -824,9 +871,8 @@ function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled }) {
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
         ) : (
-          <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, opacity: disabled ? 0.4 : 1 }}>
-            <img src="/icons/Mic.svg" width={22} height={22} alt="Mic" style={{ display: 'block' }} />
-          </button>
+          <MicButton size={22} className="icon-btn" btnStyle={{ opacity: disabled ? 0.4 : 1 }}
+            onTranscript={(t, isFinal) => { if (!disabled) onChange(t); }} />
         )}
       </div>
     </div>
@@ -1544,9 +1590,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               rows={1}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 140, paddingTop: 5 }}
             />
-            <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
-              <img src="/icons/Mic.svg" width={20} height={20} alt="Mic" style={{ display: 'block' }} />
-            </button>
+            <MicButton size={20} className="icon-btn"
+              onTranscript={(t) => { onInputChange(t); const el = textareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; } }} />
           </div>
         </div>
       </div>
@@ -2478,9 +2523,8 @@ export default function Home() {
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
-                <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: 'flex-start' }}>
-                  <img src="/icons/Mic.svg" width={20} height={20} alt="Mic" style={{ display: 'block' }} />
-                </button>
+                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: 'flex-start' }}
+                  onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
                 {wsIsPromptMode && welcomeSearch.trim() && (
                   <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: 'flex-start', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -2798,9 +2842,8 @@ export default function Home() {
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
-                <button className="icon-btn" style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: 'flex-start' }}>
-                  <img src="/icons/Mic.svg" width={20} height={20} alt="Mic" style={{ display: 'block' }} />
-                </button>
+                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: 'flex-start' }}
+                  onTranscript={(t) => { setCreateSearch(t); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
                 {csIsPromptMode && createSearch.trim() && (
                   <button onClick={handleCreatePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: 'flex-start', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -4338,9 +4381,7 @@ export default function Home() {
                       <svg width="16" height="16" viewBox="0 0 12 12" fill="none"><path d="M6 9.5V2.5M6 2.5L3 5.5M6 2.5L9 5.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </button>
                   ) : (
-                    <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
-                      <img src="/icons/Mic.svg" width={22} height={22} alt="Mic" style={{ display: 'block' }} />
-                    </button>
+                    <MicButton size={22} className="icon-btn" onTranscript={(t) => setChatInput(t)} />
                   )}
                 </div>
               </div>
