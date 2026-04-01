@@ -7,11 +7,9 @@ function hydrate(template, topic) {
 }
 
 function deriveTopic(input, pageContext, pageChipVisible, toolName) {
-  // 3+ words typed by user → use their input as the topic
   if (input && input.trim().split(/\s+/).filter(Boolean).length >= 3) {
     return input.trim().slice(0, 60);
   }
-  // Page context chip visible → use cleaned page title
   if (pageChipVisible && pageContext?.title) {
     return pageContext.title
       .replace(/\s*[-–|]\s*[^-–|]{3,}$/, '')
@@ -21,44 +19,65 @@ function deriveTopic(input, pageContext, pageChipVisible, toolName) {
   return `your ${(toolName || 'content').toLowerCase()}`;
 }
 
-export default function IntentChips({ toolName, input, onInputChange, pageContext, pageChipVisible }) {
+export default function IntentChips({ toolName, input, onInputChange, pageContext, pageChipVisible, promptBoxRef }) {
   const [openIdx, setOpenIdx] = useState(null);
+  const [overlayRect, setOverlayRect] = useState(null);
   const containerRef = useRef(null);
 
   const chips = INTENT_PROMPTS[toolName] || GENERIC_CHIPS;
   const topic = deriveTopic(input, pageContext, pageChipVisible, toolName);
 
+  function openChip(i) {
+    if (promptBoxRef?.current) {
+      const r = promptBoxRef.current.getBoundingClientRect();
+      setOverlayRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    }
+    setOpenIdx(i);
+  }
+
+  function closeChip() {
+    setOpenIdx(null);
+    setOverlayRect(null);
+  }
+
   // Close on outside click
   useEffect(() => {
     if (openIdx === null) return;
     function onDown(e) {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpenIdx(null);
+      // Close if click is outside the overlay area
+      if (overlayRect) {
+        const { top, left, width, height } = overlayRect;
+        const inOverlay =
+          e.clientX >= left && e.clientX <= left + width &&
+          e.clientY >= top && e.clientY <= top + height;
+        if (!inOverlay) closeChip();
+      } else if (containerRef.current && !containerRef.current.contains(e.target)) {
+        closeChip();
       }
     }
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [openIdx]);
+  }, [openIdx, overlayRect]);
 
   return (
-    <div ref={containerRef} style={{ flexShrink: 0, padding: '4px 24px 12px', position: 'relative' }}>
+    <div ref={containerRef} style={{ flexShrink: 0, padding: '4px 24px 12px' }}>
       {/* Chip row */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8 }}>
         {chips.map((chip, i) => {
           const active = openIdx === i;
           return (
             <button
               key={chip.label}
-              onClick={() => setOpenIdx(active ? null : i)}
+              onClick={() => active ? closeChip() : openChip(i)}
               className="intent-chip"
               style={{
-                height: 30,
-                padding: '0 12px',
+                height: 28,
+                padding: '0 11px',
                 border: `1px solid ${active ? '#06465C' : '#E5E4E2'}`,
                 borderRadius: 999,
                 background: active ? '#EEF4F6' : '#fff',
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: 500,
                 color: active ? '#06465C' : '#57534e',
                 cursor: 'pointer',
@@ -72,53 +91,72 @@ export default function IntentChips({ toolName, input, onInputChange, pageContex
         })}
       </div>
 
-      {/* Popovers — one per chip, CSS-animated */}
-      {chips.map((chip, i) => (
+      {/* Overlay — fixed over the prompt box */}
+      {openIdx !== null && overlayRect && (
         <div
-          key={chip.label + '-pop'}
-          className={openIdx === i ? 'intent-popover intent-popover--open' : 'intent-popover'}
+          className="intent-popover intent-popover--open"
           style={{
-            position: 'absolute',
-            top: '100%',
-            left: 24,
-            right: 24,
-            marginTop: 4,
+            position: 'fixed',
+            top: overlayRect.top,
+            left: overlayRect.left,
+            width: overlayRect.width,
+            height: overlayRect.height,
             background: '#fff',
             border: '1px solid #E5E4E2',
             borderRadius: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-            zIndex: 50,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            zIndex: 100,
             overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          {chip.prompts.map((prompt, j) => (
+          {/* Header */}
+          <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid #F3F2F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {chips[openIdx].label}
+            </span>
             <button
-              key={j}
-              onClick={() => {
-                onInputChange(hydrate(prompt, topic));
-                setOpenIdx(null);
-              }}
-              className="intent-prompt-row"
-              style={{
-                width: '100%',
-                textAlign: 'left',
-                padding: '10px 14px',
-                border: 'none',
-                borderBottom: j < chip.prompts.length - 1 ? '1px solid #F3F2F0' : 'none',
-                background: 'none',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 13,
-                fontWeight: 400,
-                color: '#0E151C',
-                lineHeight: '20px',
-                cursor: 'pointer',
-              }}
+              onClick={closeChip}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: '#78716c' }}
             >
-              {hydrate(prompt, topic)}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
             </button>
-          ))}
+          </div>
+
+          {/* Prompt list */}
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {chips[openIdx].prompts.map((prompt, j) => (
+              <button
+                key={j}
+                onClick={() => {
+                  onInputChange(hydrate(prompt, topic));
+                  closeChip();
+                }}
+                className="intent-prompt-row"
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '11px 14px',
+                  border: 'none',
+                  borderBottom: j < chips[openIdx].prompts.length - 1 ? '1px solid #F3F2F0' : 'none',
+                  background: 'none',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 13,
+                  fontWeight: 400,
+                  color: '#0E151C',
+                  lineHeight: '20px',
+                  cursor: 'pointer',
+                }}
+              >
+                {hydrate(prompt, topic)}
+              </button>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
