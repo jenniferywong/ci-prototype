@@ -2546,13 +2546,13 @@ export default function Home() {
     border: '1px solid #E5E4E2',
     boxShadow: '0 24px 64px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12)',
     display: 'flex', flexDirection: 'column',
-    height: (isDockedRight && !panelPos) ? 'calc(100vh - 48px)' : 'calc(100vh - 32px)',
+    height: (isDockedRight && !panelPos) ? 'calc(100vh - 48px)' : 'calc(100vh - 48px)',
     overflow: 'hidden', position: 'fixed', zIndex: 10,
     ...(panelPos
       ? { top: panelPos.top, left: panelPos.left }
       : isDockedRight
         ? { top: 24, right: 24 }
-        : { top: 16, left: 'calc(50vw - 201px)' }
+        : { top: 24, left: 'calc(50vw - 201px)' }
     ),
   };
 
