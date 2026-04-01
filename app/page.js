@@ -4277,7 +4277,7 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  <BottomInputBar placeholder="Share what you'd like to revise" value={input} onChange={setInput} onSubmit={() => {
+                  <BottomInputBar placeholder={sourcesReady ? "Share what you'd like to revise" : "Share more details"} value={input} onChange={setInput} onSubmit={() => {
                     const val = input.trim();
                     if (!val) return;
                     setQgUserReply(val);
