@@ -376,10 +376,23 @@ function scoreMatch(query, label) {
   if (!q) return 0;
   if (l === q) return 100;                                      // exact
   if (l.startsWith(q)) return 80;                               // label starts with query
-  const words = l.split(/\s+/);
-  if (words[0].startsWith(q)) return 60;                        // first word starts with query
-  if (words.some(w => w.startsWith(q))) return 40;              // any word starts with query
-  return 0;                                                      // no word-boundary match
+  const labelWords = l.split(/\s+/);
+  const queryWords = q.split(/\s+/);
+  // Multi-word query: score each meaningful query word against label words
+  if (queryWords.length > 1) {
+    const significant = queryWords.filter(w => w.length >= 3);
+    if (!significant.length) return 0;
+    let matched = 0;
+    let total = 0;
+    for (const qw of significant) {
+      if (labelWords.some(lw => lw === qw)) { total += 60; matched++; }
+      else if (labelWords.some(lw => lw.startsWith(qw))) { total += 40; matched++; }
+    }
+    return matched > 0 ? Math.round(total / significant.length) : 0;
+  }
+  if (labelWords[0].startsWith(q)) return 60;                  // first word starts with query
+  if (labelWords.some(w => w.startsWith(q))) return 40;        // any word starts with query
+  return 0;                                                     // no word-boundary match
 }
 
 // Score + filter + cap helper
