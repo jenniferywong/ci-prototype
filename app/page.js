@@ -1379,20 +1379,21 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         </div>
       </div>
 
-      {/* Fixed heading */}
-      {(() => {
-        const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
-        const isLong = headingText.length > 30;
-        return (
-          <div style={{ padding: '20px 14px 12px', display: 'flex', flexDirection: isLong ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: isLong ? 12 : 10, flexShrink: 0, background: '#FAF9F6' }}>
-            <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={isLong ? 40 : 32} height={isLong ? 40 : 32} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '24px', letterSpacing: '-0.02em', textAlign: isLong ? 'center' : 'left', padding: isLong ? '0 24px' : 0 }}>{headingText}</div>
-          </div>
-        );
-      })()}
+      {/* Fixed heading + prompt — locked to 185px so all tools look the same */}
+      <div style={{ height: 185, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#FAF9F6' }}>
+        {(() => {
+          const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
+          const fontSize = headingText.length <= 24 ? 18 : headingText.length <= 30 ? 16 : 14;
+          return (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '0 14px' }}>
+              <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={32} height={32} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />
+              <div style={{ fontSize, fontWeight: 700, color: '#0E151C', lineHeight: '24px', letterSpacing: '-0.02em' }}>{headingText}</div>
+            </div>
+          );
+        })()}
 
-      {/* Fixed prompt box */}
-      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px' }}>
+        {/* Fixed prompt box */}
+        <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 12px 12px' }}>
         <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
@@ -1426,7 +1427,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             </button>
           </div>
         </div>
-      </div>
+        </div>
+      </div>{/* end heading+prompt fixed 185px zone */}
 
       {/* Scrollable body */}
       <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 12px 0' }}>
@@ -2216,14 +2218,15 @@ export default function Home() {
     if (e.target.closest('button, input, select, textarea, a')) return;
     const rect = panelRef.current?.getBoundingClientRect();
     if (!rect) return;
-    if (e.clientY - rect.top > 44) return; // header area only
+    if (e.clientY - rect.top > 52) return; // header area only
     e.preventDefault();
     const startX = e.clientX, startY = e.clientY;
     const startLeft = rect.left, startTop = rect.top;
     function onMove(ev) {
+      const w = panelRef.current?.offsetWidth || 402;
       const h = panelRef.current?.offsetHeight || 620;
       setPanelPos({
-        left: Math.max(8, Math.min(window.innerWidth - 380 - 8, startLeft + ev.clientX - startX)),
+        left: Math.max(8, Math.min(window.innerWidth - w - 8, startLeft + ev.clientX - startX)),
         top: Math.max(8, Math.min(window.innerHeight - h - 8, startTop + ev.clientY - startY)),
       });
     }
@@ -2271,15 +2274,17 @@ export default function Home() {
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
     width: 402, background: '#FAF9F6',
-    borderRadius: isDockedRight ? 12 : 12,
+    borderRadius: 12,
     border: '1px solid #E5E4E2',
     boxShadow: '0 24px 64px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12)',
     display: 'flex', flexDirection: 'column',
-    height: isDockedRight ? 'calc(100vh - 48px)' : 'min(680px, calc(100vh - 24px))',
+    height: (isDockedRight && !panelPos) ? 'calc(100vh - 48px)' : 'min(680px, calc(100vh - 24px))',
     overflow: 'hidden', position: 'fixed', zIndex: 10,
-    ...(isDockedRight
-      ? { top: 24, right: 24, bottom: 24 }
-      : { top: 'max(12px, calc(50vh - 340px))', left: 'calc(50vw - 201px)' }
+    ...(panelPos
+      ? { top: panelPos.top, left: panelPos.left }
+      : isDockedRight
+        ? { top: 24, right: 24 }
+        : { top: 'max(12px, calc(50vh - 340px))', left: 'calc(50vw - 201px)' }
     ),
   };
 
