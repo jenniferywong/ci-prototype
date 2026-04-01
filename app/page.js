@@ -2565,10 +2565,10 @@ export default function Home() {
     display: 'flex', flexDirection: 'column',
     overflow: 'hidden', position: 'fixed', zIndex: 10,
     ...(panelPos
-      ? { width: 402, top: panelPos.top, left: panelPos.left, height: 'calc(100vh - 80px)' }
+      ? { width: 402, top: panelPos.top, left: panelPos.left, height: 'min(624px, calc(100vh - 80px))' }
       : isDockedRight
-        ? { width: 402, top: 24, right: 24, height: 'calc(100vh - 48px)' }
-        : { width: 'min(402px, calc(100vw - 48px))', top: 40, left: 'max(24px, calc(50vw - 201px))', height: 'calc(100vh - 80px)' }
+        ? { width: 402, top: 24, right: 24, height: 'min(624px, calc(100vh - 48px))' }
+        : { width: 'min(402px, calc(100vw - 48px))', top: 40, left: 'max(24px, calc(50vw - 201px))', height: 'min(624px, calc(100vh - 80px))' }
     ),
   };
 
