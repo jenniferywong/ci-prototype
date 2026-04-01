@@ -2690,7 +2690,30 @@ export default function Home() {
                 <div style={{ padding: `${first ? 10 : 16}px 16px 4px`, fontSize: 12, fontWeight: 500, color: '#475467', lineHeight: '18px' }}>{txt}</div>
               );
 
-              const hasAny = allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || recommendations.length > 0 || assignmentsToGrade.length > 0;
+              // Chained query (tool + topic): e.g. "manifest destiny quiz" → show a direct prompt shortcut
+              const chainedTopic = allMatchedTools.length > 0 && hasTopicComponent && topicPart.trim().length > 2 ? topicPart.trim() : null;
+              const chainedTool  = chainedTopic ? allMatchedTools[0] : null;
+              const chainedPromptBtn = chainedTool ? (() => {
+                const isQuizType = /quiz|test|exit|formative|check/i.test(chainedTool.label);
+                const toolType   = isQuizType ? 'quiz' : 'doc';
+                const displayTopic = chainedTopic.charAt(0).toUpperCase() + chainedTopic.slice(1);
+                return (
+                  <div style={{ padding: '6px 12px 2px' }}>
+                    <button
+                      onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(chainedTopic); setScreen(1); }}
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', border: '1.5px solid #D0E8F0', borderRadius: 10, background: '#F0F8FB', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                      <img src={chainedTool.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, color: '#0E151C', fontWeight: 500, lineHeight: '20px' }}>Create: {displayTopic} {chainedTool.label}</div>
+                        <div style={{ fontSize: 12, color: '#475467', lineHeight: '17px', marginTop: 1 }}>Jump straight in — topic pre-loaded</div>
+                      </div>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#06465C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                  </div>
+                );
+              })() : null;
+
+              const hasAny = chainedPromptBtn || allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || recommendations.length > 0 || assignmentsToGrade.length > 0;
               if (!hasAny) return <>{allToolRows}<div style={{ height: 4 }} /></>;
               return (
                 <>
@@ -2699,6 +2722,7 @@ export default function Home() {
                     const sec = txt => { const el = secLabel(txt, isFirst); isFirst = false; return el; };
                     return (
                       <>
+                        {chainedPromptBtn}
                         {allMatchedTools.length > 0 && <>{sec('Tools')}{allMatchedTools.map(t => <ToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} onClick={t.onClick} />)}</>}
                         {assignmentsToGrade.length > 0 && <>{sec('Assignments to Grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
                         {myLibrary.length > 0 && <>{sec('My Library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
