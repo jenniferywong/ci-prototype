@@ -2121,7 +2121,7 @@ export default function Home() {
   }, [curriculumCard]);
 
   function handleQuizBriskIt() {
-    const t = input.trim() || screenOneToolLabel || 'Topic';
+    const t = input.trim() || pageContext?.title || screenOneToolLabel || 'Topic';
     setTopic(t);
     setQuizGenTab('Overview');
     setQuizGenPhase('q1');
@@ -3677,7 +3677,9 @@ export default function Home() {
         const qgGrade = qgCls?.grade || prefs.grade || '8th';
         const qgSubjectL = qgSubject.toLowerCase();
         const qgPageTitle = pageContext?.title || '';
-        const qgShortTopic = topic || 'this topic';
+        // Derive a clean short topic: strip site names after " - " or " | ", cap at 50 chars
+        const qgRawTopic = topic || qgPageTitle || 'this topic';
+        const qgShortTopic = qgRawTopic.replace(/\s*[-|]\s*[^-|]{3,}$/, '').trim().slice(0, 50) || qgRawTopic;
 
         // Dynamic loading messages tied to actual context
         const isDocTool = screenOneToolType === 'doc';
@@ -3782,43 +3784,44 @@ export default function Home() {
             };
           }
         } else {
-          // Quiz tool: subject-aware Q1 options
+          // Quiz tool: subject-aware Q1 options, made specific to page content when available
+          const hasPage = !!qgPageTitle;
           const q1Options = qgSubjectL.includes('math') ? [
-            'Setting up the problem correctly',
+            `Setting up ${qgShortTopic} problems correctly`,
             'Understanding the concept behind the steps',
             'Connecting it to real-world contexts',
-            'Checking their work',
+            'Checking their work for errors',
           ] : qgSubjectL.includes('science') ? [
-            'Understanding key vocabulary',
+            `Understanding key vocabulary in ${qgShortTopic}`,
             'Applying concepts to new situations',
             'Analyzing data and drawing conclusions',
-            'Connecting ideas across the unit',
+            'Connecting ideas to the bigger unit',
           ] : (qgSubjectL.includes('social') || qgSubjectL.includes('history')) ? [
-            'Analyzing primary sources',
-            'Understanding cause and effect',
+            hasPage ? `Grasping the significance of ${qgShortTopic}` : 'Analyzing primary sources',
+            'Understanding cause and effect relationships',
             'Identifying multiple perspectives',
-            'Connecting events to today',
+            'Connecting events or ideas to today',
           ] : [
-            'Finding and using evidence from the text',
-            "Understanding the author's purpose or perspective",
+            hasPage ? `Tracking what happens in ${qgShortTopic} and why` : 'Finding and using evidence from the text',
+            hasPage ? `Understanding the author's choices in ${qgShortTopic}` : "Understanding the author's purpose or perspective",
             'Making inferences beyond the literal meaning',
             'Connecting themes across the text',
           ];
 
           QG_Q1 = {
             type: 'multi-select',
-            text: `To personalize this ${resourceLabel.toLowerCase()}, what are students struggling with in ${qgShortTopic}?`,
+            text: `What are students finding hardest about ${qgShortTopic}?`,
             options: q1Options,
           };
 
           QG_Q2 = {
             type: 'single-select',
-            text: `What\u2019s your main goal for this ${resourceLabel.toLowerCase()}?`,
+            text: `What do you want this ${resourceLabel.toLowerCase()} to do?`,
             options: [
               `Check if students understood ${qgShortTopic}`,
-              'Help students practice the key skills',
+              'Help students practice and apply what they learned',
               'Prep them for an upcoming assessment',
-              'See who needs more support before we move on',
+              'Catch who needs more support before moving on',
             ],
           };
         }
