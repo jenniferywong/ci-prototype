@@ -3881,15 +3881,53 @@ export default function Home() {
                     {showSummary && (
                       <>
                         {/* Summary text */}
-                        <div ref={qgSummaryRef} className="fade-in" style={{ fontSize: 14, color: C.slate700, lineHeight: '21px', marginBottom: 16, paddingTop: 8 }}>
-                          {isDocTool ? (
-                            <>Your <strong>{resourceLabel}</strong> on <strong>{topic}</strong> is ready.{struggle ? <> You included: <strong>{struggle.toLowerCase()}</strong>.</> : null}</>
-                          ) : (
-                            <>
-                              {struggle ? <>You told me: students are struggling with <strong>{struggle.toLowerCase()}</strong>. Your goal is to <strong>{(goal || 'check understanding').toLowerCase()}</strong>.<br/><br/></> : null}
-                              So I&apos;m using the <strong>{qgStrategy.name}</strong> strategy — {qgStrategy.desc}.
-                            </>
-                          )}
+                        <div ref={qgSummaryRef} className="fade-in" style={{ fontSize: 14, color: C.slate700, lineHeight: '22px', marginBottom: 16, paddingTop: 8 }}>
+                          {(() => {
+                            const districtStrat = strategy;
+                            const teacherScaffoldList = activeScaffolds.map(s => s.text.trim()).filter(Boolean);
+                            const hasDistrict = !!districtStrat;
+                            const hasTeacher = teacherScaffoldList.length > 0;
+                            const needPhrase = struggle ? struggle.toLowerCase() : null;
+                            const goalPhrase = goal ? goal.toLowerCase() : null;
+
+                            return (
+                              <>
+                                {/* Context line */}
+                                {needPhrase && (
+                                  <div style={{ marginBottom: 10 }}>
+                                    Your {resourceLabel.toLowerCase()} is tailored for students struggling with <strong>{needPhrase}</strong>{goalPhrase ? <> with the goal to <strong>{goalPhrase}</strong></> : null}.
+                                  </div>
+                                )}
+
+                                {/* District instructional strategy */}
+                                {hasDistrict && (
+                                  <div style={{ marginBottom: hasTeacher ? 8 : 0 }}>
+                                    <strong>{districtStrat.name}</strong> is woven throughout — {districtStrat.desc}. This helps students access {qgShortTopic || 'the content'} by giving them a structured entry point before diving in.
+                                  </div>
+                                )}
+
+                                {/* Teacher scaffolds */}
+                                {hasTeacher && (
+                                  <div style={{ marginTop: hasDistrict ? 0 : 0 }}>
+                                    {teacherScaffoldList.length === 1
+                                      ? <><strong>{teacherScaffoldList[0]}</strong> is also included to further support student access.</>
+                                      : <>Also included: {teacherScaffoldList.map((s, i) => <span key={i}><strong>{s}</strong>{i < teacherScaffoldList.length - 1 ? ', ' : ''}</span>)}.</>
+                                    }
+                                  </div>
+                                )}
+
+                                {/* Fallback — no district or teacher scaffolds */}
+                                {!hasDistrict && !hasTeacher && (
+                                  <div>
+                                    {needPhrase
+                                      ? <>I used the <strong>{qgStrategy.name}</strong> approach — {qgStrategy.desc} — to help address this.</>
+                                      : <>Your {resourceLabel.toLowerCase()} on <strong>{topic}</strong> is ready.</>
+                                    }
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
 
                         {/* Improvement chips */}
