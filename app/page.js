@@ -2516,8 +2516,9 @@ export default function Home() {
   // ── Styles ────────────────────────────────────────────────────
   const outerStyle = { minHeight: '100vh' };
 
-  // sourcesReady: true only when API has returned real data AND questions are done AND not reloading
-  const sourcesReady = !!qgQuizData && quizGenPhase !== 'q1' && quizGenPhase !== 'q2' && !qgFormsLoading;
+  // sourcesReady: true once we have data and the user is past the question cards
+  // qgFormsLoading is NOT included here — the resource panel handles its own skeleton overlay
+  const sourcesReady = !!qgQuizData && quizGenPhase !== 'q1' && quizGenPhase !== 'q2';
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
     width: 402, background: '#FAF9F6',
