@@ -662,7 +662,7 @@ function Header({ onClose, selectedClass: selCls, classBtnRef: cRef, onClassClic
   const cls = selCls ? CLASSES.find(c => c.id === selCls) : null;
   return (
     <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', borderBottom: `1px solid ${C.slate200}`, flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', gap: 6, height: 52 }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', gap: 6, height: 52 }}>
         <button ref={cRef} onClick={onClassClick} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
           <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{cls?.label || 'Select Class'}</span>
           <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M2 5.5L5 2.5L8 5.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 8.5L5 11.5L8 8.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -688,7 +688,7 @@ function HeaderFlat({ onClose, selectedClass: selCls, classBtnRef: cRef, onClass
   const cls = selCls ? CLASSES.find(c => c.id === selCls) : null;
   return (
     <div style={{ background: '#FAF9F6', borderBottom: `1px solid ${C.slate200}`, flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', gap: 6, height: 52 }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', gap: 6, height: 52 }}>
         <button ref={cRef} onClick={onClassClick} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
           <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{cls?.label || 'Select Class'}</span>
           <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M2 5.5L5 2.5L8 5.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 8.5L5 11.5L8 8.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -885,7 +885,7 @@ function TextInput({ placeholder, value, onChange, onSubmit, disabled, animatedP
 // Shared pill-style bottom input bar — used on Sources, Overview, Chat screens
 function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled }) {
   return (
-    <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+    <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 10px' }}>
       <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: disabled ? '#F4F3F0' : '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px', height: 52, transition: 'background 0.15s' }}>
         <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, opacity: disabled ? 0.4 : 1 }}>
           <img src="/icons/Add.svg" width={22} height={22} alt="Add" style={{ display: 'block' }} />
@@ -2582,13 +2582,13 @@ export default function Home() {
           <Header onClose={handleClose} selectedClass={selectedClass} classBtnRef={classBtnRef} onClassClick={() => { const r = classBtnRef.current?.getBoundingClientRect(); if (r) setClassPickerPos({ top: r.bottom + 4, left: r.left }); setClassPickerOpen(v => !v); }} />
 
           {/* Fixed title */}
-          <div style={{ padding: '20px 14px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexShrink: 0, background: '#FAF9F6' }}>
+          <div style={{ padding: '20px 24px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexShrink: 0, background: '#FAF9F6' }}>
             <BriskLogo size={30} />
             <div style={{ fontSize: 18, fontWeight: 700, color: C.slate900, letterSpacing: '-0.02em', lineHeight: '24px' }}>What do you need today?</div>
           </div>
 
           {/* Fixed prompt box */}
-          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px', position: 'relative' }}>
+          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 24px 8px', position: 'relative' }}>
             <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
@@ -2916,7 +2916,7 @@ export default function Home() {
         <>
           {/* Header — collapses on scroll */}
           <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', borderBottom: createScroll > 40 ? 'none' : `1px solid ${C.slate200}`, flexShrink: 0, overflow: 'hidden', maxHeight: createScroll > 40 ? 0 : 60, transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1), border 0.25s ease' }}>
-            <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', gap: 6, height: 52 }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', gap: 6, height: 52 }}>
               <ModalBackBtn onClick={() => { setScreen('welcome'); setCreateScroll(0); }} />
               <button ref={classBtnRef} onClick={() => { const r = classBtnRef.current?.getBoundingClientRect(); if (r) setClassPickerPos({ top: r.bottom + 4, left: r.left }); setClassPickerOpen(v => !v); }} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 6px' }}>
                 <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{selectedClass ? CLASSES.find(c => c.id === selectedClass)?.label : 'Select Class'}</span>
@@ -2938,7 +2938,7 @@ export default function Home() {
           </div>
 
           {/* Fixed search box — same padding as Welcome */}
-          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px 12px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
+          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px 24px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
             <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
@@ -3167,7 +3167,7 @@ export default function Home() {
         <>
           <Header onClose={handleClose} selectedClass={selectedClass} classBtnRef={classBtnRef} onClassClick={() => { const r = classBtnRef.current?.getBoundingClientRect(); if (r) setClassPickerPos({ top: r.bottom + 4, left: r.left }); setClassPickerOpen(v => !v); }} />
           <SubHeader onBack={() => setScreen('welcome')} label="Quiz" />
-          <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '20px 14px' }}>
+          <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
             <div style={{ fontWeight: 700, fontSize: 15, color: C.slate900, marginBottom: 4 }}>Simulate your current page</div>
             <div style={{ fontSize: 13, color: C.slate500, marginBottom: 14 }}>In the real Brisk extension, we&apos;d read the page you&apos;re on automatically. For this demo, paste a URL or upload a screenshot to simulate that.</div>
 
@@ -3507,7 +3507,7 @@ export default function Home() {
       {screen === '7c' && (
         <>
           <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', paddingTop: 8 }}>
-            {scaffolds.length === 0 && <div style={{ padding: '20px 14px', textAlign: 'center', color: C.slate400, fontSize: 13 }}>No scaffolds yet. Add one below.</div>}
+            {scaffolds.length === 0 && <div style={{ padding: '20px 24px', textAlign: 'center', color: C.slate400, fontSize: 13 }}>No scaffolds yet. Add one below.</div>}
             {scaffolds.map(s => (
               <div key={s.id} style={{ padding: '6px 14px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <textarea value={s.text} onChange={e => updateScaffold(s.id, e.target.value)}
@@ -4024,7 +4024,7 @@ export default function Home() {
           <>
             {/* Header bar + segmented control */}
             <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', flexShrink: 0, borderBottom: `1px solid ${C.slate200}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', height: 52, gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', height: 52, gap: 8 }}>
                 <ModalBackBtn onClick={() => setScreen(1)} />
                 <span style={{ flex: 1, fontWeight: 700, fontSize: 14, color: C.slate900, textAlign: 'center', letterSpacing: '-0.01em' }}>{resourceLabel}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -4033,7 +4033,7 @@ export default function Home() {
                 </div>
               </div>
               {/* Segmented control — inside header */}
-              <div style={{ padding: '0 16px 12px' }}>
+              <div style={{ padding: '0 24px 12px' }}>
                 <div style={{ display: 'flex', background: '#EEEDE9', borderRadius: 10, padding: 4, height: 40 }}>
                   {['Overview', 'Sources'].map(tab => {
                     const isActive = quizGenTab === tab;
@@ -4052,7 +4052,7 @@ export default function Home() {
             {quizGenTab === 'Overview' && (
               <>
                 <div ref={qgScrollRef} className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6' }}>
-                  <div style={{ padding: '20px 16px 8px' }}>
+                  <div style={{ padding: '20px 24px 8px' }}>
 
                     {/* ── HISTORY (oldest first, natural order) ── */}
                     {topic && (
@@ -4194,7 +4194,7 @@ export default function Home() {
 
                 {/* Bottom: question card or input bar */}
                 {currentCard ? (
-                  <div style={{ flexShrink: 0, padding: '4px 16px 16px' }}>
+                  <div style={{ flexShrink: 0, padding: '4px 24px 16px' }}>
                     <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 16px' }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px' }}>{currentCard.text}</div>
                       <div style={{ fontSize: 12, lineHeight: '18px', color: '#475467', fontWeight: 400, marginTop: 2, marginBottom: 12 }}>
@@ -4342,7 +4342,7 @@ export default function Home() {
             {/* SOURCES TAB */}
             {quizGenTab === 'Sources' && (
               <>
-                <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '12px 12px 8px', background: '#FAF9F6' }}>
+                <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '12px 24px 8px', background: '#FAF9F6' }}>
                   {qgSources.map(section => (
                     <div key={section.id} style={{ background: '#fff', border: '1px solid #E2E1DE', borderRadius: 10, marginBottom: 8, padding: '14px 14px 0', overflow: 'hidden' }}>
                       <button onClick={() => setQuizGenExpandedSource(quizGenExpandedSource === section.id ? null : section.id)}
@@ -4405,7 +4405,7 @@ export default function Home() {
           <>
             {/* Header */}
             <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', borderBottom: `1px solid ${C.slate200}`, flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', height: 52, gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', height: 52, gap: 8 }}>
                 <ModalBackBtn onClick={() => setScreen('welcome')} />
                 <span style={{ flex: 1, fontWeight: 700, fontSize: 14, color: C.slate900, textAlign: 'center', letterSpacing: '-0.01em' }}>{chatToolName}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -4416,7 +4416,7 @@ export default function Home() {
             </div>
 
             {/* Scrollable body */}
-            <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 16px 8px' }}>
+            <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 24px 8px' }}>
               {/* Ask Anything: Brisk starter message */}
               {chatToolName === 'Ask Anything' && !chatInitialPrompt && chatAnswers.length === 0 && (
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 12 }}>
@@ -4471,7 +4471,7 @@ export default function Home() {
 
             {/* Bottom area — question card replaces input bar while questions remain */}
             {currentQ && !chatIsRouting ? (
-              <div style={{ flexShrink: 0, padding: '4px 16px 16px' }}>
+              <div style={{ flexShrink: 0, padding: '4px 24px 16px' }}>
                 <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 16px' }}>
 
                   {/* Question + counter */}
@@ -4550,7 +4550,7 @@ export default function Home() {
               </div>
             ) : (
               /* Pinned bottom input bar — shown only after all questions answered */
-              <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+              <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 10px' }}>
                 <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px', height: 52 }}>
                   <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
                     <img src="/icons/Add.svg" width={22} height={22} alt="Add" style={{ display: 'block' }} />
