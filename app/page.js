@@ -2589,7 +2589,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 24px 8px', position: 'relative' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2939,7 +2939,7 @@ export default function Home() {
 
           {/* Fixed search box — same padding as Welcome */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px ${createScroll > 40 ? 12 : 24}px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: (pageChipVisible && !chipDismissing) ? 'unset' : 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
