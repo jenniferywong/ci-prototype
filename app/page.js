@@ -3902,7 +3902,7 @@ export default function Home() {
                                 {/* District instructional strategy */}
                                 {hasDistrict && (
                                   <div style={{ marginBottom: hasTeacher ? 8 : 0 }}>
-                                    <strong>{districtStrat.name}</strong> is woven throughout — {districtStrat.desc}. This helps students access {qgShortTopic || 'the content'} by giving them a structured entry point before diving in.
+                                    <strong>{districtStrat.name}</strong> is your district&apos;s instructional strategy for {qgSubject || 'this subject'} — {districtStrat.desc}. It&apos;s applied here to give students a consistent, familiar structure as they work through {qgShortTopic || 'this content'}.
                                   </div>
                                 )}
 
