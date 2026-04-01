@@ -2582,7 +2582,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 12px 8px', position: 'relative' }}>
-            <div style={{ border: '1px solid #E5E4E2', borderRadius: 12, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ border: '1px solid #E5E4E2', borderRadius: pageChipVisible ? 12 : 20, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               {pageChipVisible && (
                 <div style={{ padding: '8px 10px 2px' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2596,14 +2596,14 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px 10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: pageChipVisible ? '6px 8px 10px' : '6px 8px' }}>
                 <button ref={addBtnRef} className="icon-btn"
                   onClick={() => {
                     const r = addBtnRef.current?.getBoundingClientRect();
                     if (r) setAddMenuPos({ top: r.bottom + 6, left: r.left });
                     setAddMenuOpen(v => !v);
                   }}
-                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: 'flex-start' }}>
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center' }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
                 <textarea
@@ -2618,10 +2618,10 @@ export default function Home() {
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
-                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: 'flex-start' }}
+                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: pageChipVisible ? 'flex-start' : 'center' }}
                   onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
                 {wsIsPromptMode && welcomeSearch.trim() && (
-                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: 'flex-start', marginLeft: 4 }}>
+                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: pageChipVisible ? 'flex-start' : 'center', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
