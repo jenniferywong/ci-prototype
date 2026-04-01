@@ -1669,7 +1669,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '12px 24px 12px' }}>
 
         {editingSection === null && (
-          <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, overflow: 'hidden' }}>
+          <div>
             {/* Curriculum row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px', borderBottom: '1px solid #F3F2F0' }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', minWidth: 84 }}>Curriculum</span>
