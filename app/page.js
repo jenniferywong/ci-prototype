@@ -1729,6 +1729,8 @@ export default function Home() {
   const [createSearch, setCreateSearch] = useState('');
   const [debouncedWelcomeSearch, setDebouncedWelcomeSearch] = useState('');
   const [debouncedCreateSearch, setDebouncedCreateSearch] = useState('');
+  const [semanticLibResults, setSemanticLibResults] = useState({ my: [], district: [] });
+  const [semanticLibResultsCS, setSemanticLibResultsCS] = useState({ my: [], district: [] });
   const panelRef = useRef(null);
   const retryFeedbackRef = useRef('');
   const retryQuizRef = useRef(null);
@@ -1981,6 +1983,38 @@ export default function Home() {
     const t = setTimeout(() => setDebouncedCreateSearch(createSearch), 400);
     return () => clearTimeout(t);
   }, [createSearch]);
+
+  // Semantic library search — main panel
+  useEffect(() => {
+    const q = debouncedWelcomeSearch.trim();
+    if (q.length < 2) { setSemanticLibResults({ my: [], district: [] }); return; }
+    let cancelled = false;
+    fetch('/api/library-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q, panel: 'main' }),
+    })
+      .then(r => r.json())
+      .then(data => { if (!cancelled) setSemanticLibResults(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [debouncedWelcomeSearch]);
+
+  // Semantic library search — create/class panel
+  useEffect(() => {
+    const q = debouncedCreateSearch.trim();
+    if (q.length < 2) { setSemanticLibResultsCS({ my: [], district: [] }); return; }
+    let cancelled = false;
+    fetch('/api/library-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q, panel: 'create' }),
+    })
+      .then(r => r.json())
+      .then(data => { if (!cancelled) setSemanticLibResultsCS(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [debouncedCreateSearch]);
 
   useEffect(() => {
     function onKeyDown(e) {
@@ -2742,8 +2776,8 @@ export default function Home() {
                 { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
               ] : [];
 
-              const hardcodedMy   = isPureToolQuery ? [] : topMatches(searchTerm, MY_LIBRARY_DATA.filter(subjectFilter), l => `${l.label} ${l.tags || ''}`, 3);
-              const hardcodedDist = isPureToolQuery ? [] : topMatches(searchTerm, DISTRICT_LIBRARY_DATA.filter(subjectFilter), l => `${l.label} ${l.tags || ''}`, 3);
+              const hardcodedMy   = isPureToolQuery ? [] : semanticLibResults.my;
+              const hardcodedDist = isPureToolQuery ? [] : semanticLibResults.district;
               const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
               const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
 
@@ -3047,8 +3081,8 @@ export default function Home() {
 
               const recoGradeCS = CLASSES.find(c => c.id === selectedClass)?.grade || prefs.grade || '8th';
               const subjectDeptCS = subjectIsELA_CS ? 'ELA' : subjectIsMath_CS ? 'Math' : subjectIsHistory_CS ? 'Social Studies' : subjectIsScience_CS ? 'Science' : null;
-              const hardcodedMyCS   = isPureToolQueryCS ? [] : topMatches(searchTermCS, MY_LIB_CS.filter(subjectFilterCS), l => `${l.label} ${l.tags || ''}`, 3);
-              const hardcodedDistCS = isPureToolQueryCS ? [] : topMatches(searchTermCS, DIST_LIB_CS.filter(subjectFilterCS), l => `${l.label} ${l.tags || ''}`, 3);
+              const hardcodedMyCS   = isPureToolQueryCS ? [] : semanticLibResultsCS.my;
+              const hardcodedDistCS = isPureToolQueryCS ? [] : semanticLibResultsCS.district;
               // Only show real hardcoded library items — no generated fakes
               const myLibCS = hardcodedMyCS;
               const distLibCS = hardcodedDistCS;

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@huggingface/transformers": "^4.0.0",
     "@mendable/firecrawl-js": "^4.15.2",
     "next": "16.1.6",
     "react": "19.2.3",
