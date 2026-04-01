@@ -4496,7 +4496,7 @@ export default function Home() {
         const isSlidesTool = screenOneToolType === 'doc' && prefs.docFormat === 'Slides';
         const isDocOutputTool = screenOneToolType === 'doc' || prefs.platform === 'Docs';
         const bgColor = isSlidesTool ? '#1e1e1e' : isDocOutputTool ? '#f1f3f4' : '#f0ebff';
-        const outTitle = qgQuizData?.title || `${topic} ${resourceLabel}`;
+        const outTitle = qgQuizData?.title || `${topic} ${screenOneToolLabel || 'Quiz'}`;
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: isSlidesTool ? 'hidden' : 'auto', background: bgColor }}>
             {qgFormsLoading ? (
