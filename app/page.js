@@ -3548,8 +3548,9 @@ export default function Home() {
         }
 
         const currentCard = quizGenPhase === 'q1' ? QG_Q1 : quizGenPhase === 'q2' ? QG_Q2 : null;
-        const showSummary = quizGenPhase === 'done';
-        const showLoading = quizGenPhase !== 'done';
+        // Only show "you told me" summary after the output has loaded — not during generation
+        const showSummary = quizGenPhase === 'done' && !qgFormsLoading;
+        const showLoading = quizGenPhase !== 'done' || qgFormsLoading;
 
         // Sources badge
         const CIRC = (2 * Math.PI * 9.5).toFixed(1);
@@ -3756,17 +3757,24 @@ export default function Home() {
                       <>
                         {/* Summary text */}
                         <div ref={qgSummaryRef} className="fade-in" style={{ fontSize: 14, color: C.slate700, lineHeight: '21px', marginBottom: 16, paddingTop: 8 }}>
-                          {struggle
-                            ? <>You told me: students are struggling with <strong>{struggle.toLowerCase()}</strong>. Your goal is to <strong>{(goal || 'check understanding').toLowerCase()}</strong>.<br/><br/></>
-                            : null}
-                          So I&apos;m using the <strong>{qgStrategy.name}</strong> strategy — {qgStrategy.desc}.
+                          {isDocTool ? (
+                            <>Your <strong>{resourceLabel}</strong> on <strong>{topic}</strong> is ready.{struggle ? <> You included: <strong>{struggle.toLowerCase()}</strong>.</> : null}</>
+                          ) : (
+                            <>
+                              {struggle ? <>You told me: students are struggling with <strong>{struggle.toLowerCase()}</strong>. Your goal is to <strong>{(goal || 'check understanding').toLowerCase()}</strong>.<br/><br/></> : null}
+                              So I&apos;m using the <strong>{qgStrategy.name}</strong> strategy — {qgStrategy.desc}.
+                            </>
+                          )}
                         </div>
 
                         {/* Improvement chips */}
                         <div style={{ marginBottom: 16 }}>
                           <div style={{ fontSize: 13, fontWeight: 600, color: C.slate700, marginBottom: 12 }}>Anything you want to improve?</div>
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            {['Make it shorter', 'Make it harder', 'Something else'].map(pill => (
+                            {(isDocTool
+                              ? ['Make it shorter', 'Add more detail', 'Something else']
+                              : ['Make it shorter', 'Make it harder', 'Something else']
+                            ).map(pill => (
                               <button key={pill} onClick={() => { if (!qgFormsLoading) { setQgIterationHistory(h => [...h, pill]); setQgUserReply(pill); setInput(pill); } }}
                                 style={{ padding: '6px 12px', border: `1px solid ${qgUserReply === pill ? C.slate400 : C.slate300}`, borderRadius: 20, background: qgUserReply === pill ? C.slate100 : '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: qgFormsLoading ? 'default' : 'pointer', lineHeight: '20px', opacity: qgFormsLoading && qgUserReply !== pill ? 0.5 : 1 }}>
                                 {pill}
@@ -4162,7 +4170,7 @@ export default function Home() {
     <div style={outerStyle}>
       {/* Quiz-gen docked: document preview fills full viewport, panel overlays on right */}
       {isDockedRight && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto', background: quizGenQ2 === 'Google Docs' ? '#f1f3f4' : '#f0ebff' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto', background: (isDocTool || quizGenQ2 === 'Google Docs') ? '#f1f3f4' : '#f0ebff' }}>
           {qgFormsLoading ? (
             /* Skeleton with grey→aqua gradient sweep */
             <div style={{ padding: '32px 28px 80px', maxWidth: 680, margin: '0 auto' }}>
@@ -4186,8 +4194,8 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          ) : quizGenQ2 === 'Google Docs' ? (
-            <GoogleDocPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} Document`} />
+          ) : (isDocTool || quizGenQ2 === 'Google Docs') ? (
+            <GoogleDocPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} ${resourceLabel}`} />
           ) : (
             <GoogleFormsPreview quiz={qgQuizData} title={qgQuizData?.title || `${topic} Quiz`} />
           )}
