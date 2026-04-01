@@ -119,7 +119,7 @@ function buildPromptPlaceholder(toolType, toolLabel, pageContext) {
   const preview  = (pageContext?.preview || '').trim();
 
   if (!rawTitle && !preview) {
-    return toolType === 'doc' ? 'e.g. a persuasive writing unit' : 'e.g. a quiz on persuasive writing';
+    return 'Describe your topic or what you need…';
   }
 
   // Strip site-name suffixes from the title
@@ -3259,7 +3259,7 @@ export default function Home() {
           toolName={screenOneToolLabel}
           toolType={screenOneToolType}
           toolIcon={screenOneToolType === 'doc' ? '/icons/Docs.svg' : '/icons/Quiz.svg'}
-          promptPlaceholder={buildPromptPlaceholder(screenOneToolType, screenOneToolLabel, pageContext)}
+          promptPlaceholder={buildPromptPlaceholder(screenOneToolType, screenOneToolLabel, pageChipVisible ? pageContext : null)}
           input={input}
           onInputChange={setInput}
           prefs={prefs}
