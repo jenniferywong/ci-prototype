@@ -1877,6 +1877,20 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [screen, quizGenPhase, input]);
 
+  // Chat routing: B shimmer shows briefly then transitions to ToolCreationScreen
+  useEffect(() => {
+    if (!chatIsRouting || !chatRoutingTarget) return;
+    const t = setTimeout(() => {
+      setScreenOneToolType(chatRoutingTarget.type);
+      setScreenOneToolLabel(chatRoutingTarget.label);
+      setInput(chatRoutingTarget.topic);
+      setChatIsRouting(false);
+      setChatRoutingTarget(null);
+      setScreen(1);
+    }, 1600);
+    return () => clearTimeout(t);
+  }, [chatIsRouting, chatRoutingTarget]);
+
   // Quiz-gen: scroll so newest content is always visible
   useEffect(() => {
     if (screen !== 'quiz-gen') return;
@@ -4282,6 +4296,19 @@ export default function Home() {
           setChatCurrentQ(prev => prev + 1);
           setChatOpenTextVal('');
           setChatQCurrentSel('');
+          setChatOtherMode(false);
+          setChatOtherText('');
+
+          // After last question, check if the accumulated answers imply a tool+topic
+          const isLastQ = chatCurrentQ >= qs.length - 1;
+          if (isLastQ) {
+            const allText = [chatInitialPrompt, ...chatAnswers.map(a => a.a), answer].join(' ');
+            const detected = detectToolAndTopic(allText);
+            if (detected) {
+              setChatIsRouting(true);
+              setChatRoutingTarget(detected);
+            }
+          }
         }
 
         return (
@@ -4328,8 +4355,18 @@ export default function Home() {
                 </div>
               ))}
 
+              {/* Routing shimmer — detected tool+topic, transitioning to creation screen */}
+              {chatIsRouting && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                  <BriskLogo size={20} style={{ animation: 'shimmer 1.6s ease-in-out infinite', opacity: 0.7 }} />
+                  <span className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
+                    Got it — taking you to the {chatRoutingTarget?.label || 'tool'} creator…
+                  </span>
+                </div>
+              )}
+
               {/* Loading shimmer */}
-              {allAnswered && (chatAnswers.length > 0 || chatInitialPrompt) && (() => {
+              {!chatIsRouting && allAnswered && (chatAnswers.length > 0 || chatInitialPrompt) && (() => {
                 const msgs = CHAT_LOADING_MSGS[chatToolName] || CHAT_LOADING_MSGS['Ask Brisk'];
                 const msg = msgs[chatLoadingMsgIdx % msgs.length];
                 return (
@@ -4343,7 +4380,7 @@ export default function Home() {
             </div>
 
             {/* Bottom area — question card replaces input bar while questions remain */}
-            {currentQ ? (
+            {currentQ && !chatIsRouting ? (
               <div style={{ flexShrink: 0, padding: '4px 16px 16px' }}>
                 <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 16px' }}>
 
@@ -4355,30 +4392,45 @@ export default function Home() {
                     {chatCurrentQ + 1} of {totalQ}
                   </div>
 
-                  {/* Single-select options */}
+                  {/* Single-select options — click once to submit; "Something else" opens inline text */}
                   {currentQ.type === 'single-select' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {currentQ.options.map((opt) => {
-                        const isSel = chatSel === opt;
+                        const isOther = opt === 'Something else';
                         return (
-                          <button key={opt} onClick={() => setChatQCurrentSel(opt)}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: isSel ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                            <span>{opt}</span>
-                            <span style={{ opacity: isSel ? 1 : 0, fontSize: 14, color: C.slate400, transition: 'opacity 0.1s', flexShrink: 0 }}>→</span>
+                          <button key={opt}
+                            onClick={() => isOther ? setChatOtherMode(true) : answerQ(opt)}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: (chatOtherMode && isOther) ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                            <span>{isOther ? 'Other' : opt}</span>
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ opacity: isOther && chatOtherMode ? 1 : 0, flexShrink: 0 }}>
+                              <path d="M3 7H11M11 7L7.5 3.5M11 7L7.5 10.5" stroke={C.slate400} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                           </button>
                         );
                       })}
-                      {/* Skip / Next */}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-                        <button onClick={() => answerQ('—')}
-                          style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate400, cursor: 'pointer' }}>
-                          Skip
-                        </button>
-                        <button onClick={() => answerQ(chatSel || currentQ.options[0])}
-                          style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate300}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: C.slate900, cursor: 'pointer' }}>
-                          {chatCurrentQ === totalQ - 1 ? 'Finish' : 'Next'}
-                        </button>
-                      </div>
+                      {/* Inline text for "Other" */}
+                      {chatOtherMode && (
+                        <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <input
+                            autoFocus
+                            value={chatOtherText}
+                            onChange={e => setChatOtherText(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter' && chatOtherText.trim()) answerQ(chatOtherText.trim()); }}
+                            placeholder="Type what you mean…"
+                            style={{ border: `1px solid ${C.slate200}`, borderRadius: 8, padding: '8px 10px', fontFamily: 'inherit', fontSize: 13, color: C.slate900, background: '#FAF9F6', outline: 'none', lineHeight: '20px' }}
+                          />
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                            <button onClick={() => { setChatOtherMode(false); setChatOtherText(''); }}
+                              style={{ height: 32, padding: '0 16px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate400, cursor: 'pointer' }}>
+                              Cancel
+                            </button>
+                            <button onClick={() => { if (chatOtherText.trim()) answerQ(chatOtherText.trim()); }}
+                              style={{ height: 32, padding: '0 16px', borderRadius: 20, border: `1px solid ${C.slate300}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: C.slate900, cursor: 'pointer', opacity: chatOtherText.trim() ? 1 : 0.4 }}>
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
