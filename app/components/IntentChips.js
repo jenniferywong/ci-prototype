@@ -111,21 +111,6 @@ export default function IntentChips({ toolName, input, onInputChange, pageContex
             flexDirection: 'column',
           }}
         >
-          {/* Header */}
-          <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid #F3F2F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {chips[openIdx].label}
-            </span>
-            <button
-              onClick={closeChip}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: '#78716c' }}
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-
           {/* Prompt list */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {chips[openIdx].prompts.map((prompt, j) => (
