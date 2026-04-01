@@ -2544,18 +2544,17 @@ export default function Home() {
   const sourcesReady = !!qgQuizData;
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
-    width: 'min(402px, calc(100vw - 48px))', background: '#FAF9F6',
+    background: '#FAF9F6',
     borderRadius: 12,
     border: '1px solid #E5E4E2',
     boxShadow: '0 24px 64px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12)',
     display: 'flex', flexDirection: 'column',
-    height: (isDockedRight && !panelPos) ? 'calc(100vh - 48px)' : 'calc(100vh - 80px)',
     overflow: 'hidden', position: 'fixed', zIndex: 10,
     ...(panelPos
-      ? { top: panelPos.top, left: panelPos.left }
+      ? { width: 402, top: panelPos.top, left: panelPos.left, height: 'calc(100vh - 80px)' }
       : isDockedRight
-        ? { top: 24, right: 24 }
-        : { top: 40, left: 'max(24px, calc(50vw - 201px))', right: 'max(24px, calc(50vw - 201px))' }
+        ? { width: 402, top: 24, right: 24, height: 'calc(100vh - 48px)' }
+        : { width: 'min(402px, calc(100vw - 48px))', top: 40, left: 'max(24px, calc(50vw - 201px))', height: 'calc(100vh - 80px)' }
     ),
   };
 
