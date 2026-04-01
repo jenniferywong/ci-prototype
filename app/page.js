@@ -1383,11 +1383,12 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       {(() => {
         const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
         const stacked = headingText.length > 32;
-        const icon = <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={32} height={32} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
+        const iconSize = stacked ? 40 : 32;
+        const icon = <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
         return (
           <div style={{ flexShrink: 0, padding: '20px 14px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
             {icon}
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '26px', letterSpacing: '-0.02em' }}>{headingText}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '26px', letterSpacing: '-0.02em', ...(stacked ? { padding: '0 24px' } : {}) }}>{headingText}</div>
           </div>
         );
       })()}
