@@ -436,8 +436,8 @@ function detectCharacter(topic) {
 
 // Generate varied, grade-specific recommendation objects for a topic
 function recoItems(topic, grade, onClickFns) {
-  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const t = cap(topic.trim());
+  const toTitleCase = s => s.replace(/\b\w/g, c => c.toUpperCase());
+  const t = toTitleCase(topic.trim());
   const g = grade || '8th';
   const h = Math.abs([...topic].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0));
   const pick = (arr) => arr[h % arr.length];
@@ -516,8 +516,8 @@ function recoItems(topic, grade, onClickFns) {
 
 // Generate simulated library items for any topic (used when no hardcoded match exists)
 function generateLibraryItems(topic, grade, subjectLabel) {
-  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const t = cap(topic.trim());
+  const toTitleCase = s => s.replace(/\b\w/g, c => c.toUpperCase());
+  const t = toTitleCase(topic.trim());
   const g = grade || '8th';
   const dept = subjectLabel ? `${subjectLabel} Dept` : 'Curriculum Dept';
   const h = Math.abs([...topic].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0));
@@ -1570,7 +1570,9 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
         const stacked = headingText.length > 32;
         const iconSize = stacked ? 40 : 32;
-        const icon = <img src={toolType === 'doc' ? `/icons/${prefs.docFormat === 'Word' ? 'Word' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
+        const isSlidesDefault = toolType === 'doc' && (toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide'));
+        const effectiveDocFormat = prefs.docFormat || (isSlidesDefault ? 'Slides' : 'Docs');
+        const icon = <img src={toolType === 'doc' ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
         return (
           <div style={{ flexShrink: 0, padding: '20px 14px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
             {icon}
@@ -1633,7 +1635,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           {toolType === 'doc' ? (
             <FormatDropdown
               options={FORMAT_OPTIONS.doc}
-              value={prefs.docFormat || 'Docs'}
+              value={prefs.docFormat || ((toolName.toLowerCase().includes('presentation') || toolName.toLowerCase().includes('slide')) ? 'Slides' : 'Docs')}
               onChange={v => onPrefsChange({ docFormat: v })}
             />
           ) : (
@@ -1781,7 +1783,7 @@ export default function Home() {
   const [quizGenAnswers, setQuizGenAnswers] = useState([]); // [{q, a}]
   const [quizGenLoadingIdx, setQuizGenLoadingIdx] = useState(0);
   const [quizGenKey, setQuizGenKey] = useState(0);
-  const [sourcesReady, setSourcesReady] = useState(false);
+  // sourcesReady is derived below near isDockedRight
   const [sourcesViewed, setSourcesViewed] = useState(false);
   const [quizGenExpandedSource, setQuizGenExpandedSource] = useState(null);
   const [qgQuizData, setQgQuizData] = useState(null);
@@ -1860,14 +1862,6 @@ export default function Home() {
     return () => clearInterval(id);
   }, [screen, quizGenKey]);
 
-  // Quiz-gen: sources ready after 12 seconds
-  useEffect(() => {
-    if (screen !== 'quiz-gen') return;
-    setSourcesReady(false);
-    const t = setTimeout(() => setSourcesReady(true), 12000);
-    return () => clearTimeout(t);
-  }, [screen, quizGenKey]);
-
   // Quiz-gen: transition to 'done' phase 3s after all questions answered
   // But wait if the user is actively typing (input non-empty) — let them finish
   useEffect(() => {
@@ -1904,16 +1898,43 @@ export default function Home() {
     el.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [screen, quizGenAnswers, quizGenPhase, quizGenLoadingIdx, qgIterationHistory]);
 
-  // Quiz-gen: start generating Google Forms preview when questions answered
+  // Quiz-gen: fire initial API call immediately on arrival (before follow-up answers)
   useEffect(() => {
-    if (screen !== 'quiz-gen' || quizGenPhase !== 'answered') return;
+    if (screen !== 'quiz-gen') return;
     setQgFormsLoading(true);
     setQgQuizData(null);
     const cls = CLASSES.find(c => c.id === selectedClass);
     const grade = cls?.grade || prefs.grade || '8th';
     const subject = cls?.subject || detectedSubject || 'ELA';
+    fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topic, subject, grade,
+        toolName: screenOneToolLabel || 'Quiz',
+        questionType: prefs.questionType || 'Multiple choice',
+        numQuestions: prefs.numQuestions || 10,
+        pageContextTitle: pageContext?.title || '',
+        pageContextPreview: pageContext?.preview || '',
+      }),
+    })
+      .then(r => r.json())
+      .then(data => { if (data.questions) setQgQuizData(data); })
+      .catch(() => {})
+      .finally(() => setQgFormsLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, quizGenKey]);
+
+  // Quiz-gen: once questions are answered, re-generate with struggle + goal context
+  useEffect(() => {
+    if (screen !== 'quiz-gen' || quizGenPhase !== 'answered') return;
     const struggleAnswer = quizGenAnswers[0]?.a || '';
-    const goalAnswer = quizGenAnswers[1]?.a || 'check understanding';
+    const goalAnswer = quizGenAnswers[1]?.a || '';
+    if (!struggleAnswer && !goalAnswer) return; // nothing extra to add — keep initial result
+    setQgFormsLoading(true);
+    const cls = CLASSES.find(c => c.id === selectedClass);
+    const grade = cls?.grade || prefs.grade || '8th';
+    const subject = cls?.subject || detectedSubject || 'ELA';
     fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1951,7 +1972,7 @@ export default function Home() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        topic: `${topic} (${qgUserReply})`,
+        topic,
         subject, grade,
         toolName: screenOneToolLabel || 'Quiz',
         hardestThing: struggleAnswer,
@@ -2109,7 +2130,6 @@ export default function Home() {
     setQuizGenAnswers([]);
     setQuizGenLoadingIdx(0);
     setQuizGenKey(k => k + 1);
-    setSourcesReady(false);
     setSourcesViewed(false);
     setQuizGenExpandedSource(null);
     setQgQuizData(null);
@@ -2496,6 +2516,8 @@ export default function Home() {
   // ── Styles ────────────────────────────────────────────────────
   const outerStyle = { minHeight: '100vh' };
 
+  // sourcesReady: true only when API has returned real data AND questions are done AND not reloading
+  const sourcesReady = !!qgQuizData && quizGenPhase !== 'q1' && quizGenPhase !== 'q2' && !qgFormsLoading;
   const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = {
     width: 402, background: '#FAF9F6',
@@ -2714,11 +2736,9 @@ export default function Home() {
 
               const hardcodedMy   = isPureToolQuery ? [] : topMatches(searchTerm, MY_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
               const hardcodedDist = isPureToolQuery ? [] : topMatches(searchTerm, DISTRICT_LIBRARY_DATA.filter(subjectFilter), l => l.label, 3);
-              const generatedLibItems = (!isPureToolQuery && hasTopicComponent && hardcodedMy.length === 0 && hardcodedDist.length === 0)
-                ? generateLibraryItems(searchTerm, recoGrade, subjectDept)
-                : { myItems: [], distItems: [] };
-              const myLibrary = hardcodedMy.length > 0 ? hardcodedMy : generatedLibItems.myItems;
-              const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : generatedLibItems.distItems;
+              // Only show real hardcoded library items — no generated fakes
+              const myLibrary = hardcodedMy;
+              const districtLibrary = hardcodedDist;
 
               // Assignments to grade — shown when query is feedback/grading related
               const assignmentSubject = subjectIsHistory ? 'Social Studies' : subjectIsMath ? 'Math' : subjectIsScience ? 'Science' : subjectIsELA ? 'ELA' : null;
@@ -2814,7 +2834,7 @@ export default function Home() {
                 );
               })() : null;
 
-              const hasAny = chainedPromptBtn || allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || recommendations.length > 0 || assignmentsToGrade.length > 0;
+              const hasAny = chainedPromptBtn || allMatchedTools.length > 0 || myLibrary.length > 0 || districtLibrary.length > 0 || assignmentsToGrade.length > 0;
               if (!hasAny) return <>{allToolRows}<div style={{ height: 4 }} /></>;
               return (
                 <>
@@ -2828,7 +2848,6 @@ export default function Home() {
                         {assignmentsToGrade.length > 0 && <>{sec('Assignments to Grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
                         {myLibrary.length > 0 && <>{sec('My Library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
                         {districtLibrary.length > 0 && <>{sec('District Library')}{districtLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
-                        {recommendations.length > 0 && <>{sec('Recommendations')}{recommendations.map(r => <RecoRow key={r.title} item={r} />)}</>}
                       </>
                     );
                   })()}
@@ -3020,11 +3039,9 @@ export default function Home() {
               const subjectDeptCS = subjectIsELA_CS ? 'ELA' : subjectIsMath_CS ? 'Math' : subjectIsHistory_CS ? 'Social Studies' : subjectIsScience_CS ? 'Science' : null;
               const hardcodedMyCS   = isPureToolQueryCS ? [] : topMatches(searchTermCS, MY_LIB_CS.filter(subjectFilterCS), l => l.label, 3);
               const hardcodedDistCS = isPureToolQueryCS ? [] : topMatches(searchTermCS, DIST_LIB_CS.filter(subjectFilterCS), l => l.label, 3);
-              const genLibCS = (!isPureToolQueryCS && hasTopicCS && hardcodedMyCS.length === 0 && hardcodedDistCS.length === 0)
-                ? generateLibraryItems(searchTermCS, recoGradeCS, subjectDeptCS)
-                : { myItems: [], distItems: [] };
-              const myLibCS = hardcodedMyCS.length > 0 ? hardcodedMyCS : genLibCS.myItems;
-              const distLibCS = hardcodedDistCS.length > 0 ? hardcodedDistCS : genLibCS.distItems;
+              // Only show real hardcoded library items — no generated fakes
+              const myLibCS = hardcodedMyCS;
+              const distLibCS = hardcodedDistCS;
               const recoTopicCS = hasTopicCS ? topicPartCS : q;
               const noToolKw = !/\b(quiz|test|question|presentation|slide|podcast|nearpod|worksheet|lesson|rubric|discussion)\b/i.test(q);
               const recoCS = (hasTopicCS || noToolKw)
@@ -3683,7 +3700,7 @@ export default function Home() {
           if (rl.includes('syllabus')) {
             QG_Q1 = {
               type: 'multi-select',
-              text: `What should this syllabus include?`,
+              text: `What should your ${qgShortTopic} syllabus include?`,
               options: ['Learning objectives', 'Grading breakdown', 'Weekly schedule', 'Required materials'],
             };
             QG_Q2 = {
@@ -3694,12 +3711,12 @@ export default function Home() {
           } else if (rl.includes('rubric')) {
             QG_Q1 = {
               type: 'multi-select',
-              text: `What aspects should this rubric assess?`,
+              text: `What should the ${qgShortTopic} rubric assess?`,
               options: ['Content & accuracy', 'Organization & structure', 'Writing quality', 'Evidence & citations'],
             };
             QG_Q2 = {
               type: 'single-select',
-              text: 'What is the main goal of this rubric?',
+              text: `How will students use this rubric for ${qgShortTopic}?`,
               options: [
                 'Grade a final project or essay',
                 'Help students self-assess their work',
@@ -3710,12 +3727,12 @@ export default function Home() {
           } else if (rl.includes('lesson')) {
             QG_Q1 = {
               type: 'multi-select',
-              text: `What should this lesson plan emphasize?`,
+              text: `What should your ${qgShortTopic} lesson emphasize?`,
               options: ['Direct instruction', 'Group discussion', 'Hands-on activities', 'Independent practice'],
             };
             QG_Q2 = {
               type: 'single-select',
-              text: "What's the primary learning goal for this lesson?",
+              text: `What's the primary goal for this ${qgShortTopic} lesson?`,
               options: [
                 'Introduce a new concept',
                 'Practice and reinforce prior learning',
@@ -3726,24 +3743,35 @@ export default function Home() {
           } else if (rl.includes('facilitation') || rl.includes('discussion')) {
             QG_Q1 = {
               type: 'multi-select',
-              text: `What should this facilitation guide include?`,
+              text: `What should the ${qgShortTopic} facilitation guide include?`,
               options: ['Discussion questions', 'Student grouping strategies', 'Timing & pacing notes', 'Common misconceptions'],
             };
             QG_Q2 = {
               type: 'single-select',
-              text: 'What format works best for your class?',
+              text: `How do you want students to discuss ${qgShortTopic}?`,
               options: ['Whole-class discussion', 'Small group breakouts', 'Fishbowl or Socratic seminar', 'Pair & share'],
+            };
+          } else if (rl.includes('slide') || rl.includes('presentation')) {
+            QG_Q1 = {
+              type: 'multi-select',
+              text: `What should the ${qgShortTopic} presentation cover?`,
+              options: ['Key concepts & definitions', 'Real-world examples', 'Discussion or reflection prompts', 'Practice problems or checks'],
+            };
+            QG_Q2 = {
+              type: 'single-select',
+              text: `Who is the audience for this ${qgShortTopic} presentation?`,
+              options: ['Students following along', 'Teacher-led direct instruction', 'Student-created project', 'Family or community sharing'],
             };
           } else {
             // Generic doc fallback
             QG_Q1 = {
               type: 'multi-select',
-              text: `What should this ${resourceLabel} focus on?`,
+              text: `What should this ${qgShortTopic} ${resourceLabel.toLowerCase()} focus on?`,
               options: ['Key concepts & vocabulary', 'Student practice opportunities', 'Real-world connections', 'Assessment or review'],
             };
             QG_Q2 = {
               type: 'single-select',
-              text: `What's your main goal for this ${resourceLabel}?`,
+              text: `What's your main goal for this ${resourceLabel.toLowerCase()}?`,
               options: [
                 'Support student understanding',
                 'Provide structured practice',
@@ -3796,8 +3824,9 @@ export default function Home() {
 
         const currentCard = quizGenPhase === 'q1' ? QG_Q1 : quizGenPhase === 'q2' ? QG_Q2 : null;
         // Only show "you told me" summary after the output has loaded — not during generation
-        const showSummary = quizGenPhase === 'done' && !qgFormsLoading;
-        const showLoading = quizGenPhase !== 'done' || qgFormsLoading;
+        const showSummary = quizGenPhase === 'done' && !qgFormsLoading && sourcesReady;
+        // Don't show the generic loading shimmer during chip refinements — the iteration shimmer handles that
+        const showLoading = !qgUserReply && (quizGenPhase !== 'done' || !sourcesReady);
 
         // Sources badge
         const CIRC = (2 * Math.PI * 9.5).toFixed(1);
@@ -4081,10 +4110,16 @@ export default function Home() {
 
                         {/* Iteration shimmer — newest, at very bottom */}
                         {qgUserReply && qgFormsLoading && (() => {
+                          const r = qgUserReply.toLowerCase();
                           const iterMsgs =
-                            qgUserReply === 'Make it shorter' ? ['Trimming the questions…', 'Shortening for your class…', 'Almost done…'] :
-                            qgUserReply === 'Make it harder' ? ['Raising the difficulty…', 'Adding more rigor…', 'Almost done…'] :
-                            ['Applying your changes…', 'Reworking the quiz…', 'Almost done…'];
+                            /short|fewer|less/.test(r) ? ['Trimming the content…', 'Shortening for your class…', 'Almost done…'] :
+                            /hard|rigorous|challeng|difficult|advanced/.test(r) ? ['Raising the difficulty…', 'Adding more rigor…', 'Almost done…'] :
+                            /easier|simpl|reading level|lower|accessi|scaffold/.test(r) ? ['Simplifying the language…', 'Adjusting the reading level…', 'Almost done…'] :
+                            /longer|more detail|expand|add more|deeper/.test(r) ? ['Adding more depth…', 'Expanding the content…', 'Almost done…'] :
+                            /different|new|change|redo|try again/.test(r) ? ['Trying a different approach…', 'Reworking the content…', 'Almost done…'] :
+                            /vocab|word|term|definition/.test(r) ? ['Focusing on key vocabulary…', 'Updating the word choices…', 'Almost done…'] :
+                            /format|layout|structure/.test(r) ? ['Restructuring the layout…', 'Adjusting the format…', 'Almost done…'] :
+                            [`Applying: "${qgUserReply.length > 40 ? qgUserReply.slice(0, 40) + '…' : qgUserReply}"`, 'Revising the content…', 'Almost done…'];
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: 8 }}>
                               <BriskLogo size={20} style={{ opacity: 0.7 }} />
@@ -4493,7 +4528,9 @@ export default function Home() {
     <div style={outerStyle}>
       {/* Quiz-gen docked: document preview fills full viewport, panel overlays on right */}
       {isDockedRight && (() => {
-        const isSlidesTool = screenOneToolType === 'doc' && prefs.docFormat === 'Slides';
+        const slidesDefault = screenOneToolLabel?.toLowerCase().includes('presentation') || screenOneToolLabel?.toLowerCase().includes('slide');
+        const effectiveDocFmt = prefs.docFormat || (slidesDefault ? 'Slides' : 'Docs');
+        const isSlidesTool = screenOneToolType === 'doc' && effectiveDocFmt === 'Slides';
         const isDocOutputTool = screenOneToolType === 'doc' || prefs.platform === 'Docs';
         const bgColor = isSlidesTool ? '#1e1e1e' : isDocOutputTool ? '#f1f3f4' : '#f0ebff';
         const outTitle = qgQuizData?.title || `${topic} ${screenOneToolLabel || 'Quiz'}`;
