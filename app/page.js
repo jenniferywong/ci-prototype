@@ -337,6 +337,25 @@ function classifyPrompt(p) {
   return 'Ask Brisk';
 }
 
+// Tool patterns for intent routing (topic + tool → direct to creation)
+const CHAT_TOOL_PATTERNS = [
+  { re: /\b(quiz|test|assessment|formative|exit ticket|exit-ticket)\b/i, type: 'quiz', label: 'Quiz' },
+  { re: /\b(slide|slides|presentation)\b/i,                              type: 'doc',  label: 'Presentation' },
+  { re: /\bsyllabus\b/i,                                                 type: 'doc',  label: 'Syllabus' },
+  { re: /\blesson plan\b/i,                                              type: 'doc',  label: 'Lesson Plan' },
+  { re: /\brubric\b/i,                                                   type: 'doc',  label: 'Rubric' },
+  { re: /\b(guided notes|notes)\b/i,                                     type: 'doc',  label: 'Guided Notes' },
+];
+const CHAT_TOOL_KW_STRIP = /\b(quiz|test|assessment|formative|exit ticket|slides?|presentation|syllabus|lesson plan|rubric|guided notes?|create|make|build|a|an|for|about|on|me|my|the|please)\b/gi;
+
+function detectToolAndTopic(prompt) {
+  const matched = CHAT_TOOL_PATTERNS.find(p => p.re.test(prompt));
+  if (!matched) return null;
+  const topic = prompt.replace(matched.re, '').replace(CHAT_TOOL_KW_STRIP, '').replace(/\s+/g, ' ').trim();
+  if (topic.length < 3) return null;
+  return { type: matched.type, label: matched.label, topic };
+}
+
 // Fuzzy match: all typed chars appear in order in the target string (kept for prompt-mode label detection)
 function fuzzyMatch(query, str) {
   if (!query) return true;
@@ -1745,6 +1764,10 @@ export default function Home() {
   const [chatOpenTextVal, setChatOpenTextVal] = useState('');
   const [chatLoadingMsgIdx, setChatLoadingMsgIdx] = useState(0);
   const [chatQCurrentSel, setChatQCurrentSel] = useState('');
+  const [chatOtherMode, setChatOtherMode] = useState(false); // "Something else" inline text
+  const [chatOtherText, setChatOtherText] = useState('');
+  const [chatIsRouting, setChatIsRouting] = useState(false);   // routing to a tool
+  const [chatRoutingTarget, setChatRoutingTarget] = useState(null); // {type, label, topic}
 
   // Screen 1 tool type ('quiz' | 'doc') and label
   const [screenOneToolType, setScreenOneToolType] = useState('quiz');
@@ -1975,15 +1998,27 @@ export default function Home() {
   function handlePromptSend() {
     const p = welcomeSearch.trim();
     if (!p) return;
-    const toolName = classifyPrompt(p);
-    setChatToolName(toolName);
-    setChatInitialPrompt(p);
+    setWelcomeSearch('');
     setChatAnswers([]);
     setChatCurrentQ(0);
     setChatInput('');
     setChatOpenTextVal('');
-    setWelcomeSearch('');
-    setScreen('chat');
+    setChatOtherMode(false);
+    setChatOtherText('');
+
+    const detected = detectToolAndTopic(p);
+    if (detected) {
+      // Topic + tool detected — go straight to ToolCreationScreen with topic pre-filled
+      setScreenOneToolType(detected.type);
+      setScreenOneToolLabel(detected.label);
+      setInput(detected.topic);
+      setScreen(1);
+    } else {
+      const toolName = classifyPrompt(p);
+      setChatToolName(toolName);
+      setChatInitialPrompt(p);
+      setScreen('chat');
+    }
   }
 
   async function handleFetchPage(urlOverride) {
@@ -2425,15 +2460,23 @@ export default function Home() {
   function handleCreatePromptSend() {
     const p = createSearch.trim();
     if (!p) return;
-    const toolName = classifyPrompt(p);
-    setChatToolName(toolName);
-    setChatInitialPrompt(p);
-    setChatAnswers([]);
-    setChatCurrentQ(0);
-    setChatInput('');
-    setChatOpenTextVal('');
     setCreateSearch('');
-    setScreen('chat');
+    const detected = detectToolAndTopic(p);
+    if (detected) {
+      setScreenOneToolType(detected.type);
+      setScreenOneToolLabel(detected.label);
+      setInput(detected.topic);
+      setScreen(1);
+    } else {
+      const toolName = classifyPrompt(p);
+      setChatToolName(toolName);
+      setChatInitialPrompt(p);
+      setChatAnswers([]);
+      setChatCurrentQ(0);
+      setChatInput('');
+      setChatOpenTextVal('');
+      setScreen('chat');
+    }
   }
 
   // ── Styles ────────────────────────────────────────────────────
