@@ -1560,7 +1560,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     ? `${FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat} • ${prefs.numSlides ?? 10} slides`
     : toolType === 'doc'
       ? FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat
-      : `${prefs.platform || 'Forms'} • ${prefs.questionType} • ${prefs.numQuestions ?? 10}`;
+      : `${prefs.platform || 'Forms'} • ${prefs.questionType} • ${prefs.numQuestions ?? 10} questions`;
 
   const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block', opacity: 0.5 }} />;
   const chevron = (
