@@ -1829,7 +1829,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Action buttons — pinned to bottom */}
       <div style={{ flexShrink: 0, padding: '12px 24px 16px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-        <button onClick={onBriskIt} style={{ height: 40, padding: '0 24px', border: 'none', borderRadius: 20, background: '#06465C', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+        <button onClick={onBriskIt} style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: '#06465C', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
           Brisk It
         </button>
       </div>
