@@ -1964,6 +1964,7 @@ export default function Home() {
   const qgScrollRef = useRef(null);
   const qgSummaryRef = useRef(null);
   const qgBottomRef = useRef(null);
+  const chatScrollRef = useRef(null);
   const [qgUserReply, setQgUserReply] = useState('');
   const [qgIterationHistory, setQgIterationHistory] = useState([]); // [{msg}] — chip/prompt history
   const [qgNeedsText, setQgNeedsText] = useState('');
@@ -2070,6 +2071,13 @@ export default function Home() {
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [screen, quizGenAnswers, quizGenPhase, quizGenLoadingIdx, qgIterationHistory]);
+
+  // Chat screen: scroll to bottom on new messages or loading state changes
+  useEffect(() => {
+    if (screen !== 'chat') return;
+    const el = chatScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [screen, chatAnswers, chatIsRouting, chatLoadingMsgIdx]);
 
   // Quiz-gen: generate resource once questions answered
   useEffect(() => {
@@ -4568,7 +4576,7 @@ export default function Home() {
             </div>
 
             {/* Scrollable body */}
-            <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 24px 8px' }}>
+            <div ref={chatScrollRef} className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 24px 8px' }}>
               {/* Ask Anything: Brisk starter message */}
               {chatToolName === 'Ask Anything' && !chatInitialPrompt && chatAnswers.length === 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
