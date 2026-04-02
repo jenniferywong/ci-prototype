@@ -1551,11 +1551,16 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
   const subject = curriculumCard?.subject || (selectedClass ? CLASSES.find(c => c.id === selectedClass)?.subject : null) || 'ELA';
   const curriculumName = subject === 'Math' ? 'Illustrative Mathematics' : subject === 'Science' ? 'Amplify Science' : subject === 'Social Studies' ? 'TCI History Alive!' : 'EL Education';
-  const curriculumValue = `${curriculumName} Grade ${prefs.grade} • Entire Course`;
+  const curriculumValue = `${curriculumName} Grade ${prefs.grade} (all)`;
   const audienceSummary = `${prefs.grade} Grade • ${prefs.language}`;
   const formatIconSrc = toolType === 'doc'
     ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg`
     : `/icons/${prefs.platform || 'Forms'}.svg`;
+  const formatValueText = toolType === 'doc' && isSlidesDefault
+    ? `${FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat} • ${prefs.numSlides ?? 10} slides`
+    : toolType === 'doc'
+      ? FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat
+      : `${prefs.platform || 'Forms'} • ${prefs.questionType} • ${prefs.numQuestions ?? 10}`;
 
   const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block', opacity: 0.5 }} />;
   const chevron = (
@@ -1670,9 +1675,9 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             {/* Format row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
               <span style={{ fontSize: 13, fontWeight: 400, color: '#0E151C', flexShrink: 0 }}>Format</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block' }} />
-                {(toolType !== 'doc' || isSlidesDefault) && <span style={{ fontSize: 12, color: '#344054', fontWeight: 500 }}>+2</span>}
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+                <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatValueText}</span>
                 <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
@@ -1689,11 +1694,11 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Grade</div>
+                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade</div>
                 {pillSelect(prefs.grade, ['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` })), v => onPrefsChange({ grade: v }), null, true)}
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Language</div>
+                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Language</div>
                 {pillSelect(prefs.language, ['English','Spanish','French','Mandarin','Arabic'], v => onPrefsChange({ language: v }), null, true)}
               </div>
             </div>
@@ -1711,15 +1716,15 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             {toolType === 'doc' && isSlidesDefault ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Platform</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Platform</div>
                   <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Slides</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Slides</div>
                   {pillSelect(String(prefs.numSlides ?? 10), ['5','8','10','15','20'].map(n => ({ value: n, label: `${n} slides` })), v => onPrefsChange({ numSlides: Number(v) }), null, true)}
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Images</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Images</div>
                   <button
                     onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })}
                     style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}
@@ -1731,22 +1736,22 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             ) : toolType === 'doc' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Format</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Format</div>
                   <FormatDropdown options={FORMAT_OPTIONS.doc} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                 </div>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>File Type</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>File Type</div>
                   <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Response Type</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Response Type</div>
                   {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }), null, true)}
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Questions</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Questions</div>
                   <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E2E1DE', borderRadius: 8, height: 34, overflow: 'hidden', background: 'transparent' }}>
                     <button onClick={() => onPrefsChange({ numQuestions: Math.max(1, (prefs.numQuestions || 10) - 1) })} style={{ width: 34, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
                     <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#0E151C', lineHeight: '34px' }}>{prefs.numQuestions ?? 10}</span>
