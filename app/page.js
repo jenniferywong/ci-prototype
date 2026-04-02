@@ -1171,9 +1171,10 @@ function VersionTile({ version, versionNum, isActive, onClick }) {
 }
 
 // ── Clean Google Forms quiz (no interactivity, no answers) ─────
-function GoogleFormsPreview({ quiz, title }) {
+function GoogleFormsPreview({ quiz, title, description, isIterating }) {
   return (
     <div style={{ minHeight: '100%', background: '#f0ebff', padding: '32px 28px 80px' }}>
+      {isIterating && <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>}
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
         {/* Title card */}
@@ -1181,7 +1182,7 @@ function GoogleFormsPreview({ quiz, title }) {
           <div style={{ background: C.formsPurple, height: 8 }} />
           <div style={{ padding: '22px 24px 18px' }}>
             <div style={{ fontSize: 26, fontWeight: 400, color: '#202124', lineHeight: 1.3 }}>{title || 'Quiz'}</div>
-            <div style={{ fontSize: 14, color: '#70757a', marginTop: 4, lineHeight: '24px' }}>Form description</div>
+            {description && <div style={{ fontSize: 14, color: '#70757a', marginTop: 4, lineHeight: '24px' }}>{description}</div>}
           </div>
         </div>
 
@@ -1198,7 +1199,17 @@ function GoogleFormsPreview({ quiz, title }) {
         )}
 
         {/* Questions */}
-        {quiz?.questions?.map((q, i) => (
+        {quiz?.questions?.map((q, i) => isIterating ? (
+          <div key={i} style={{ background: '#fff', borderRadius: 8, border: '1px solid #e8e8e8', padding: '18px 24px', marginBottom: 10 }}>
+            <div style={{ height: 14, borderRadius: 4, width: `${65 + (i % 4) * 5}%`, marginBottom: 14, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${i * 0.1}s infinite` }} />
+            {[1,2,3,4].map(j => (
+              <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, backgroundImage: 'linear-gradient(90deg,#e4e4e4 0%,#CAFCF4 50%,#e4e4e4 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06}s infinite` }} />
+                <div style={{ height: 12, borderRadius: 4, width: `${38 + j * 10}%`, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.06 + 0.04}s infinite` }} />
+              </div>
+            ))}
+          </div>
+        ) : (
           <div key={i} style={{ background: '#fff', borderRadius: 8, border: '1px solid #e8e8e8', padding: '18px 24px', marginBottom: 10 }}>
             <div style={{ fontSize: 14, color: '#202124', lineHeight: 1.6, marginBottom: q.hint ? 8 : 14 }}>
               {q.question}
@@ -1211,13 +1222,18 @@ function GoogleFormsPreview({ quiz, title }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {q.options.map((opt, j) => (
                   <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid #9e9e9e', flexShrink: 0, background: '#fff' }} />
-                    <span style={{ fontSize: 14, color: '#202124', lineHeight: 1.5 }}>{opt}</span>
+                    <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${opt === q.correct ? '#1B6B6B' : '#9e9e9e'}`, flexShrink: 0, background: opt === q.correct ? '#e6f4f1' : '#fff' }} />
+                    <span style={{ fontSize: 14, color: '#202124', lineHeight: 1.5, fontWeight: opt === q.correct ? 500 : 400 }}>{opt}</span>
                   </div>
                 ))}
               </div>
             ) : (
               <div style={{ borderBottom: '1px solid #9e9e9e', paddingBottom: 4, color: '#9e9e9e', fontSize: 14 }}>Your answer</div>
+            )}
+            {q.explanation && (
+              <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #f1f1f1', fontSize: 12, color: '#70757a', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600, color: '#1B6B6B' }}>Explanation:</span> {q.explanation}
+              </div>
             )}
           </div>
         ))}
@@ -1231,9 +1247,10 @@ function GoogleFormsPreview({ quiz, title }) {
 }
 
 // ── Google Doc-style preview ───────────────────────────────────
-function GoogleDocPreview({ quiz, title }) {
+function GoogleDocPreview({ quiz, title, isIterating }) {
   return (
     <div style={{ minHeight: '100%', background: '#f1f3f4', fontFamily: 'Arial, sans-serif' }}>
+      {isIterating && <style>{`@keyframes skAqua{0%{background-position:-600px 0}100%{background-position:600px 0}}`}</style>}
       {/* App bar */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 10 }}>
         <img src="/icons/Docs.svg" width={30} height={30} alt="" style={{ display: 'block', flexShrink: 0 }} />
@@ -1265,7 +1282,14 @@ function GoogleDocPreview({ quiz, title }) {
               ))}
             </div>
           )}
-          {quiz?.questions?.map((q, i) => (
+          {quiz?.questions?.map((q, i) => isIterating ? (
+            <div key={i} style={{ marginBottom: 22 }}>
+              <div style={{ height: 11, borderRadius: 3, width: `${70 + (i % 3) * 8}%`, marginBottom: 10, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${i * 0.1}s infinite` }} />
+              {[75, 60, 55, 65].map((w, j) => (
+                <div key={j} style={{ height: 10, borderRadius: 3, width: `${w}%`, marginBottom: 8, marginLeft: 20, backgroundImage: 'linear-gradient(90deg,#ececec 0%,#CAFCF4 50%,#ececec 100%)', backgroundSize: '600px 100%', animation: `skAqua 1.6s ease-in-out ${j * 0.07}s infinite` }} />
+              ))}
+            </div>
+          ) : (
             <div key={i} style={{ marginBottom: 22 }}>
               <p style={{ fontSize: 11, color: '#202124', lineHeight: 1.8, marginBottom: 4 }}>
                 <strong>{i + 1}.</strong> {q.question}
@@ -4678,10 +4702,11 @@ export default function Home() {
         const isDocOutputTool = screenOneToolType === 'doc' || prefs.platform === 'Docs';
         const bgColor = isSlidesTool ? '#1e1e1e' : isDocOutputTool ? '#f1f3f4' : '#f0ebff';
         const outTitle = qgQuizData?.title || `${topic} ${screenOneToolLabel || 'Quiz'}`;
+        const formDescription = topic ? `${qgGrade || '8th Grade'} Grade · ${qgSubject || 'ELA'} · ${qgQuizData?.questions?.length ?? (prefs.numQuestions ?? 10)} questions` : null;
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: isSlidesTool ? 'hidden' : 'auto', background: bgColor }}>
-            {qgFormsLoading ? (
-              /* Skeleton */
+            {qgFormsLoading && !qgUserReply ? (
+              /* Skeleton — initial generation only */
               isSlidesTool ? (
                 /* Slides skeleton — dark, slide-strip + slide */
                 <div style={{ display: 'flex', height: '100%' }}>
@@ -4744,11 +4769,11 @@ export default function Home() {
                 </div>
               )
             ) : isSlidesTool ? (
-              <GoogleSlidesPreview quiz={qgQuizData} title={outTitle} />
+              <GoogleSlidesPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
             ) : isDocOutputTool ? (
-              <GoogleDocPreview quiz={qgQuizData} title={outTitle} />
+              <GoogleDocPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
             ) : (
-              <GoogleFormsPreview quiz={qgQuizData} title={outTitle} />
+              <GoogleFormsPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} description={formDescription} />
             )}
           </div>
         );
