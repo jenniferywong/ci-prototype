@@ -4900,7 +4900,7 @@ export default function Home() {
       {/* ── Global Add Menu Dropdown — outside panel to avoid transform stacking context ── */}
       {addMenuOpen && (
         <div onMouseLeave={() => setAddMenuOpen(false)} style={{ position: 'fixed', top: addMenuPos.top, left: addMenuPos.left, width: 240, background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)', zIndex: 10001, overflow: 'hidden' }}>
-          {!pageChipVisible && (
+          {!pageChipVisible && !!pageContext && (
             <>
               <button className="menu-item" onClick={() => { setPageChipVisible(true); setAddMenuOpen(false); }}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
