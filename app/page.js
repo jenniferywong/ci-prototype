@@ -1603,7 +1603,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     return shown;
   })();
 
-  const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block', opacity: 0.5 }} />;
+  const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block' }} />;
   const chevron = (
     <svg style={{ position: 'absolute', right: 10, pointerEvents: 'none' }} width="10" height="6" viewBox="0 0 10 6" fill="none">
       <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
