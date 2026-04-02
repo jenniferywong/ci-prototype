@@ -1672,7 +1672,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <span style={{ fontSize: 13, fontWeight: 400, color: '#344054', flexShrink: 0 }}>Format</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
                 <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block' }} />
-                {toolType !== 'doc' && <span style={{ fontSize: 12, color: '#344054', fontWeight: 500 }}>+2</span>}
+                {(toolType !== 'doc' || isSlidesDefault) && <span style={{ fontSize: 12, color: '#344054', fontWeight: 500 }}>+2</span>}
                 <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
@@ -1702,9 +1702,29 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
               </button>
             </div>
-            {toolType === 'doc' ? (
+            {toolType === 'doc' && isSlidesDefault ? (
+              <>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8, marginBottom: 8 }}>
+                  <FormatDropdown
+                    options={FORMAT_OPTIONS.presentation}
+                    value={effectiveDocFormat}
+                    onChange={v => onPrefsChange({ docFormat: v })}
+                  />
+                  {pillSelect(String(prefs.numSlides ?? 10), ['5','8','10','15','20'].map(n => ({ value: n, label: `${n} slides` })), v => onPrefsChange({ numSlides: Number(v) }))}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 13, color: '#344054' }}>Include images</span>
+                  <button
+                    onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })}
+                    style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}
+                  >
+                    <span style={{ position: 'absolute', top: 2, left: prefs.includeImages ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
+                  </button>
+                </div>
+              </>
+            ) : toolType === 'doc' ? (
               <FormatDropdown
-                options={isSlidesDefault ? FORMAT_OPTIONS.presentation : FORMAT_OPTIONS.doc}
+                options={FORMAT_OPTIONS.doc}
                 value={effectiveDocFormat}
                 onChange={v => onPrefsChange({ docFormat: v })}
               />
@@ -1741,7 +1761,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 // ══════════════════════════════════════════════════════════════
 // MAIN
 // ══════════════════════════════════════════════════════════════
-const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multiple choice', numQuestions: 10, platform: 'Forms', includeSources: false };
+const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multiple choice', numQuestions: 10, platform: 'Forms', includeSources: false, numSlides: 10, includeImages: true };
 
 export default function Home() {
   const [sessionId] = useState(() => genUUID());
