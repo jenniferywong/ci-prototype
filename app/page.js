@@ -1508,8 +1508,8 @@ function FormatDropdown({ options, value, onChange, fullWidth }) {
       <button ref={triggerRef} onClick={handleOpen}
         style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
         <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-        <span>{selected.label}</span>
-        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0 }}>
+        <span style={{ flex: 1 }}>{selected.label}</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0, marginLeft: 'auto' }}>
           <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
