@@ -2014,11 +2014,12 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Settings body — accordion rows */}
       <div className="scroll-area" style={{ flexShrink: 0, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
-        {/* Curriculum row — no accordion */}
+        {/* Curriculum row — edit button placeholder (no destination yet) */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
           <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0, opacity: curriculumHover ? 0 : 1, transition: 'opacity 0.18s ease' }}>Curriculum</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
             <CurriculumMarquee name={curriculumBaseName} onHoverChange={setCurriculumHover} />
+            <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
           </div>
         </div>
 
