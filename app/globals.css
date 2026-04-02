@@ -15,10 +15,11 @@ body {
   justify-content: center;
 }
 
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 0; height: 0; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 2px; }
-.scroll-area { overflow-y: overlay !important; }
+::-webkit-scrollbar-thumb { background: transparent; }
+.scroll-area { overflow-y: auto !important; scrollbar-width: none; }
+* { scrollbar-width: none; }
 
 .tool-row { transition: background 0.1s; }
 .tool-row:hover { background: #EBE9E6 !important; }
@@ -51,6 +52,12 @@ textarea::placeholder { color: #74818E; font-weight: 400; }
 @keyframes shimmer { 0%,100%{opacity:0.55} 50%{opacity:1} }
 @keyframes dpulse { 0%,60%,100%{opacity:0.2;transform:translateX(-50%) rotate(45deg) scale(0.78)} 30%{opacity:1;transform:translateX(-50%) rotate(45deg) scale(1)} }
 @keyframes skpulse { 0%,100%{opacity:.35} 50%{opacity:.8} }
+/* Counter input */
+.counter-input { cursor: text; border-radius: 4px; transition: background 0.12s; }
+.counter-input:hover { background: #F0F0EE; }
+.counter-input:focus { outline: none; background: #F0F0EE; }
+.counter-input::-webkit-inner-spin-button, .counter-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
 /* Intent chips */
 .intent-chip:hover { background: #F7F6F4 !important; }
 .intent-prompt-row:hover { background: #F7F6F4 !important; }
