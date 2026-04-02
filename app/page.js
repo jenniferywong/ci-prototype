@@ -3157,33 +3157,7 @@ export default function Home() {
                 <ToolRow key={item.label} svg={item.svg} label={item.label} sub={item.sub} onClick={item.onClick} />
               ));
 
-              if (!q) {
-                // When page context is active, show short quick-action chips before the tool rows
-                if (pageChipVisible && pageContext) {
-                  const pageQuickChips = [
-                    { label: 'Make a quiz', onClick: () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(''); setScreen(1); } },
-                    { label: 'Make guided notes', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(''); setScreen(1); } },
-                    { label: 'Make a lesson plan', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(''); setScreen(1); } },
-                    { label: 'Make a presentation', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(''); setScreen(1); } },
-                  ];
-                  return (
-                    <>
-                      <div style={{ padding: '12px 16px 6px', fontSize: 12, fontWeight: 500, color: '#475467' }}>Quick actions for this page</div>
-                      <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                        {pageQuickChips.map(chip => (
-                          <button key={chip.label} onClick={chip.onClick}
-                            style={{ padding: '7px 14px', border: '1.5px solid #D0E8F0', borderRadius: 20, background: '#F0F8FB', color: '#06465C', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-                            {chip.label}
-                          </button>
-                        ))}
-                      </div>
-                      {allToolRows}
-                      <div style={{ height: 4 }} />
-                    </>
-                  );
-                }
-                return <>{allToolRows}<div style={{ height: 4 }} /></>;
-              }
+              if (!q) return <>{allToolRows}<div style={{ height: 4 }} /></>;
 
               // Also surface individual create tools (Quiz, Presentation, etc.) when searched directly
               const flatCreateTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools).map(t => ({
