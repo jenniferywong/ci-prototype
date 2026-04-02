@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import IntentChips from './components/IntentChips.js';
 
 function genUUID() {
@@ -1722,7 +1722,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 {formatParts.slice(0, formatShownCount).map((part, idx) => {
                   const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
                   return (
-                    <React.Fragment key={idx}>
+                    <Fragment key={idx}>
                       {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
                       {isQuizCount ? (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
@@ -1732,7 +1732,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                       ) : (
                         <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
                       )}
-                    </React.Fragment>
+                    </Fragment>
                   );
                 })}
                 {formatParts.length > formatShownCount && (
