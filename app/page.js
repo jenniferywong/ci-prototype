@@ -1530,10 +1530,12 @@ function FormatDropdown({ options, value, onChange, fullWidth }) {
   return (
     <div style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block', width: fullWidth ? '100%' : undefined }}>
       <button ref={triggerRef} onClick={handleOpen}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
-        <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-        <span style={{ flex: 1 }}>{selected.label}</span>
-        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0, marginLeft: 'auto' }}>
+        style={{ display: 'flex', alignItems: 'center', height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+          <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selected.label}</span>
+        </div>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0, marginLeft: 8 }}>
           <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
@@ -1545,11 +1547,13 @@ function FormatDropdown({ options, value, onChange, fullWidth }) {
               const isSel = opt.value === value;
               return (
                 <button key={opt.value} onClick={() => { onChange(opt.value); setOpen(false); }}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', textAlign: 'left' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '10px 14px 10px 8px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', textAlign: 'left' }}
                   onMouseEnter={e => { e.currentTarget.style.background = '#F5F4F2'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}>
-                  <img src={opt.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                  <span style={{ flex: 1 }}>{opt.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                    <img src={opt.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.label}</span>
+                  </div>
                   {isSel && (
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
                       <path d="M3 8L6.5 11.5L13 4.5" stroke="#1B6B6B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1685,7 +1689,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Curriculum</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
                 <span title={curriculumValue} style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
-                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Audience row */}
@@ -1693,7 +1697,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Audience</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
                 <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
-                <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+                <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Format row */}
@@ -1702,7 +1706,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
                 <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
                 <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatValueText}</span>
-                <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: 6, flexShrink: 0 }}>{pencilIcon}</button>
+                <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
           </div>
