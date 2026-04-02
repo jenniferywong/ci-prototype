@@ -1981,7 +1981,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               }}
               placeholder={promptPlaceholder}
               rows={1}
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: editingSection ? 44 : 140, transition: 'min-height 0.22s cubic-bezier(0.4,0,0.2,1)', paddingTop: 5 }}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: editingSection ? 44 : pageChipVisible ? 72 : 110, transition: 'min-height 0.22s cubic-bezier(0.4,0,0.2,1)', paddingTop: 5 }}
             />
             <MicButton size={20} className="icon-btn"
               onTranscript={(t) => { onInputChange(t); const el = textareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; } }} />
