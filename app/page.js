@@ -3144,6 +3144,7 @@ export default function Home() {
                   }}
                   placeholder="Search or type what you need"
                   rows={1}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && wsIsPromptMode && welcomeSearch.trim()) { e.preventDefault(); handlePromptSend(); } }}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
                 <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
@@ -3481,6 +3482,7 @@ export default function Home() {
                   onChange={e => { setCreateSearch(e.target.value); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; setCreateMultiline(el.scrollHeight > 30); } }}
                   placeholder="Search or type what you need"
                   rows={1}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && csIsPromptMode && createSearch.trim()) { e.preventDefault(); handleCreatePromptSend(); } }}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
                 <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
