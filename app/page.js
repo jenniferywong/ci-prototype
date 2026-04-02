@@ -1481,7 +1481,7 @@ const FORMAT_OPTIONS = {
   ],
 };
 
-function FormatDropdown({ options, value, onChange }) {
+function FormatDropdown({ options, value, onChange, fullWidth }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, openUp: false });
   const triggerRef = useRef(null);
@@ -1504,9 +1504,9 @@ function FormatDropdown({ options, value, onChange }) {
   }
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block', width: fullWidth ? '100%' : undefined }}>
       <button ref={triggerRef} onClick={handleOpen}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
         <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
         <span>{selected.label}</span>
         <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0 }}>
@@ -1563,11 +1563,11 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
-  const pillSelect = (value, options, onChange, leftIcon) => (
-    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+  const pillSelect = (value, options, onChange, leftIcon, block) => (
+    <div style={{ position: 'relative', display: block ? 'flex' : 'inline-flex', alignItems: 'center', width: block ? '100%' : undefined }}>
       {leftIcon && <div style={{ position: 'absolute', left: 10, pointerEvents: 'none', display: 'flex', alignItems: 'center', zIndex: 1 }}>{leftIcon}</div>}
       <select value={value} onChange={e => onChange(e.target.value)}
-        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 8, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: 'transparent', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none' }}>
+        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 8, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: 'transparent', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none', width: block ? '100%' : undefined }}>
         {options.map(o => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
       </select>
       {chevron}
@@ -1681,39 +1681,45 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
         {editingSection === 'audience' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Audience</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Audience</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
               </button>
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
-              {pillSelect(prefs.grade, ['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` })), v => onPrefsChange({ grade: v }))}
-              {pillSelect(prefs.language, ['English','Spanish','French','Mandarin','Arabic'], v => onPrefsChange({ language: v }))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Grade</div>
+                {pillSelect(prefs.grade, ['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` })), v => onPrefsChange({ grade: v }), null, true)}
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Language</div>
+                {pillSelect(prefs.language, ['English','Spanish','French','Mandarin','Arabic'], v => onPrefsChange({ language: v }), null, true)}
+              </div>
             </div>
           </>
         )}
 
         {editingSection === 'format' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Format</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
               </button>
             </div>
             {toolType === 'doc' && isSlidesDefault ? (
-              <>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8, marginBottom: 8 }}>
-                  <FormatDropdown
-                    options={FORMAT_OPTIONS.presentation}
-                    value={effectiveDocFormat}
-                    onChange={v => onPrefsChange({ docFormat: v })}
-                  />
-                  {pillSelect(String(prefs.numSlides ?? 10), ['5','8','10','15','20'].map(n => ({ value: n, label: `${n} slides` })), v => onPrefsChange({ numSlides: Number(v) }))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Platform</div>
+                  <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 13, color: '#344054' }}>Include images</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Slides</div>
+                  {pillSelect(String(prefs.numSlides ?? 10), ['5','8','10','15','20'].map(n => ({ value: n, label: `${n} slides` })), v => onPrefsChange({ numSlides: Number(v) }), null, true)}
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Images</div>
                   <button
                     onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })}
                     style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}
@@ -1721,27 +1727,29 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                     <span style={{ position: 'absolute', top: 2, left: prefs.includeImages ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
                   </button>
                 </div>
-              </>
+              </div>
             ) : toolType === 'doc' ? (
-              <FormatDropdown
-                options={FORMAT_OPTIONS.doc}
-                value={effectiveDocFormat}
-                onChange={v => onPrefsChange({ docFormat: v })}
-              />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Format</div>
+                  <FormatDropdown options={FORMAT_OPTIONS.doc} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
+                </div>
+              </div>
             ) : (
-              <>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8, marginBottom: 8 }}>
-                  <FormatDropdown
-                    options={FORMAT_OPTIONS.quiz}
-                    value={prefs.platform || 'Forms'}
-                    onChange={v => onPrefsChange({ platform: v })}
-                  />
-                  {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Platform</div>
+                  <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', rowGap: 8 }}>
-                  {pillSelect(String(prefs.numQuestions), ['5','10','15','20'].map(n => ({ value: n, label: `${n} questions` })), v => onPrefsChange({ numQuestions: Number(v) }))}
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Question Type</div>
+                  {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }), null, true)}
                 </div>
-              </>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Questions</div>
+                  {pillSelect(String(prefs.numQuestions), ['5','10','15','20'].map(n => ({ value: n, label: `${n} questions` })), v => onPrefsChange({ numQuestions: Number(v) }), null, true)}
+                </div>
+              </div>
             )}
           </>
         )}
