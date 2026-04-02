@@ -3405,7 +3405,7 @@ export default function Home() {
 
               const RecoRow = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
-                  <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
+                  <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 16px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
                     <img src={item.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
@@ -3680,7 +3680,7 @@ export default function Home() {
               );
               const RecoRowCS = ({ item }) => (
                 <div style={{ padding: '0 8px' }}>
-                  <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
+                  <button className="tool-row lib-row" onClick={item.onClick || undefined} style={{ width: '100%', padding: '8px 16px', border: 'none', borderRadius: 10, background: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: item.onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}>
                     <img src={item.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
