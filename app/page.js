@@ -4586,17 +4586,7 @@ export default function Home() {
             return <span style={{ minWidth: 22, height: 22, borderRadius: 999, background: '#06465C', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 500, flexShrink: 0, marginLeft: 4, padding: '0 5px' }}>{sourcesCount}</span>;
           }
           return (
-            <span style={{ position: 'relative', width: 24, height: 24, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 4, verticalAlign: 'middle' }}>
-              <style>{`@keyframes qg-arc{from{stroke-dashoffset:${CIRC}}to{stroke-dashoffset:0}}`}</style>
-              <svg width="24" height="24" viewBox="0 0 24 24" style={{ position: 'absolute' }}>
-                <circle cx="12" cy="12" r="9.5" fill="none" stroke="#E2E1DE" strokeWidth="2.5"/>
-                <circle cx="12" cy="12" r="9.5" fill="none" stroke="#06465C" strokeWidth="2.5"
-                  strokeDasharray={CIRC} strokeDashoffset={CIRC} strokeLinecap="round"
-                  transform="rotate(-90 12 12)"
-                  style={{ animation: 'qg-arc 12s linear forwards' }}/>
-              </svg>
-              <span style={{ fontSize: 9, fontWeight: 400, color: '#475467', lineHeight: 1, position: 'relative' }}>{sourcesCount}</span>
-            </span>
+            <span style={{ minWidth: 22, height: 22, borderRadius: 999, background: '#06465C', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 500, flexShrink: 0, marginLeft: 4, padding: '0 5px', animation: 'pulse 1.4s ease-in-out infinite' }}>{sourcesCount || '…'}</span>
           );
         })();
 
