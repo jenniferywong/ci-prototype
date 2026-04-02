@@ -2710,7 +2710,7 @@ export default function Home() {
             {(() => {
               const q = debouncedWelcomeSearch.trim();
               const topTools = [
-                { svg: '/icons/Create.svg',        label: 'Create',             sub: 'Make a presentation, quiz, etc.', onClick: () => setScreen('create') },
+                { svg: '/icons/Create.svg',        label: 'Create',             sub: 'Make a presentation, quiz, etc.', onClick: () => { setScreen('create'); setCreateScroll(0); } },
                 { svg: '/icons/Give Feedback.svg', label: 'Give Feedback',      sub: 'Comment on student work',         onClick: null },
                 { svg: '/icons/Inspect.svg',       label: 'Inspect Writing',    sub: 'Analyze structure and clarity',   onClick: null },
                 { svg: '/icons/Change Level.svg',  label: 'Change Level',       sub: 'Adjust reading complexity',       onClick: null },
@@ -2773,7 +2773,7 @@ export default function Home() {
                   ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setScreen(1); setInput(''); }
                   : (t.onClick === 'doc' || t.onClick === null) && t.label !== 'Boost Student Activity'
                     ? () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); }
-                    : () => setScreen('create'),
+                    : () => { setScreen('create'); setCreateScroll(0); },
               }));
               const allSearchableTools = [
                 ...topTools,
@@ -3002,7 +3002,7 @@ export default function Home() {
 
           {/* Collapsing heading — same position as Welcome */}
           <div style={{ overflow: 'hidden', maxHeight: createScroll > 40 ? 0 : 80, opacity: createScroll > 40 ? 0 : 1, padding: createScroll > 40 ? '0 14px' : '20px 14px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexShrink: 0, background: '#FAF9F6', transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <img src="/icons/Create.svg" width={28} height={28} alt="" style={{ flexShrink: 0, display: 'block' }} />
+            <img src="/icons/Create.svg" width={30} height={30} alt="" style={{ flexShrink: 0, display: 'block' }} />
             <div style={{ fontSize: 18, fontWeight: 700, color: C.slate900, letterSpacing: '-0.02em', lineHeight: '24px' }}>What do you want to create?</div>
           </div>
 
