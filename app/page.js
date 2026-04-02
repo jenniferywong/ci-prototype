@@ -1589,7 +1589,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     ? [`${prefs.numSlides ?? 10} slides`, prefs.includeImages !== false ? 'With images' : 'No images']
     : toolType === 'doc'
       ? [FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat]
-      : [prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
+      : [prefs.questionType === 'Multiple choice' ? 'Multi choice' : prefs.questionType, `${prefs.numQuestions ?? 10}`];
   const formatValueText = formatParts.join(' • ');
   // Show up to 2 text parts (icon is the 3rd visible element); overflow to +N
   const FORMAT_MAX_CHARS = 35;
@@ -1719,7 +1719,22 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: formatParts.length === 1 ? 4 : 6, minWidth: 0 }}>
                 <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
                 {formatParts.length > 1 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}>•</span>}
-                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatParts.slice(0, formatShownCount).join(' • ')}</span>
+                {formatParts.slice(0, formatShownCount).map((part, idx) => {
+                  const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
+                  return (
+                    <React.Fragment key={idx}>
+                      {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
+                      {isQuizCount ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                          <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
+                          <img src="/icons/Bulleted List.svg" width={16} height={16} alt="" style={{ display: 'block' }} />
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
                 {formatParts.length > formatShownCount && (
                   <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
                 )}
