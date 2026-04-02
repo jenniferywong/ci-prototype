@@ -1275,6 +1275,11 @@ function GoogleFormsPreview({ quiz, title, description, isIterating }) {
         {!quiz && (
           <div style={{ textAlign: 'center', color: '#b39ddb', fontSize: 14, padding: 64 }}>Quiz will appear here</div>
         )}
+        {quiz && quiz.questions?.length === 0 && !isIterating && (
+          <div style={{ textAlign: 'center', color: '#9e9e9e', fontSize: 14, padding: 40, lineHeight: 1.6 }}>
+            Couldn't load questions — go back and try again.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1345,6 +1350,7 @@ function GoogleDocPreview({ quiz, title, isIterating }) {
             </div>
           ))}
           {!quiz && <p style={{ color: '#aaa', fontSize: 11, paddingTop: 40, textAlign: 'center' }}>Document will appear here</p>}
+          {quiz && quiz.questions?.length === 0 && !isIterating && <p style={{ color: '#aaa', fontSize: 11, paddingTop: 40, textAlign: 'center' }}>Couldn't load content — go back and try again.</p>}
         </div>
       </div>
     </div>
