@@ -1253,11 +1253,6 @@ function GoogleFormsPreview({ quiz, title, description, isIterating }) {
             ) : (
               <div style={{ borderBottom: '1px solid #9e9e9e', paddingBottom: 4, color: '#9e9e9e', fontSize: 14 }}>Your answer</div>
             )}
-            {q.explanation && (
-              <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #f1f1f1', fontSize: 12, color: '#70757a', lineHeight: 1.5 }}>
-                <span style={{ fontWeight: 600, color: '#1B6B6B' }}>Explanation:</span> {q.explanation}
-              </div>
-            )}
           </div>
         ))}
 
@@ -2294,6 +2289,7 @@ export default function Home() {
   const chatScrollRef = useRef(null);
   const [qgUserReply, setQgUserReply] = useState('');
   const [qgIterationHistory, setQgIterationHistory] = useState([]); // [{msg}] — chip/prompt history
+  const [qgUsedChips, setQgUsedChips] = useState([]);
   const [qgNeedsText, setQgNeedsText] = useState('');
   const [qgQ1OtherText, setQgQ1OtherText] = useState('');
   const [qgQ1OtherActive, setQgQ1OtherActive] = useState(false);
@@ -4651,54 +4647,61 @@ export default function Home() {
                           })()}
                         </div>
 
-                        {/* Improvement chips */}
-                        <div style={{ marginBottom: 16 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: C.slate700, marginBottom: 12 }}>Anything you want to improve?</div>
-                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            {(isDocTool
-                              ? ['Make it shorter', 'Add more detail', 'Something else']
-                              : ['Make it shorter', 'Make it harder', 'Something else']
-                            ).map(pill => (
-                              <button key={pill} onClick={() => { if (!qgFormsLoading) { setQgIterationHistory(h => [...h, pill]); setQgUserReply(pill); setInput(pill); } }}
-                                style={{ padding: '6px 12px', border: `1px solid ${qgUserReply === pill ? C.slate400 : C.slate300}`, borderRadius: 20, background: qgUserReply === pill ? C.slate100 : '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: qgFormsLoading ? 'default' : 'pointer', lineHeight: '20px', opacity: qgFormsLoading && qgUserReply !== pill ? 0.5 : 1 }}>
-                                {pill}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* User iteration history bubbles */}
-                        {qgIterationHistory.map((msg, i) => (
-                          <div key={i} className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-                            <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
-                              {msg}
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* Iteration shimmer — newest, at very bottom */}
-                        {qgUserReply && qgFormsLoading && (() => {
-                          const r = qgUserReply.toLowerCase();
-                          const iterMsgs =
-                            /short|fewer|less/.test(r) ? ['Trimming the content…', 'Shortening for your class…', 'Almost done…'] :
-                            /hard|rigorous|challeng|difficult|advanced/.test(r) ? ['Raising the difficulty…', 'Adding more rigor…', 'Almost done…'] :
-                            /easier|simpl|reading level|lower|accessi|scaffold/.test(r) ? ['Simplifying the language…', 'Adjusting the reading level…', 'Almost done…'] :
-                            /longer|more detail|expand|add more|deeper/.test(r) ? ['Adding more depth…', 'Expanding the content…', 'Almost done…'] :
-                            /different|new|change|redo|try again/.test(r) ? ['Trying a different approach…', 'Reworking the content…', 'Almost done…'] :
-                            /vocab|word|term|definition/.test(r) ? ['Focusing on key vocabulary…', 'Updating the word choices…', 'Almost done…'] :
-                            /format|layout|structure/.test(r) ? ['Restructuring the layout…', 'Adjusting the format…', 'Almost done…'] :
-                            [`Applying: "${qgUserReply.length > 40 ? qgUserReply.slice(0, 40) + '…' : qgUserReply}"`, 'Revising the content…', 'Almost done…'];
+                        {/* Improvement chips — cycle through pool, removing used ones */}
+                        {(() => {
+                          const chipPool = isDocTool
+                            ? ['Make it shorter', 'Add more detail', 'Simplify the language', 'Add examples', 'Restructure it']
+                            : ['Make it shorter', 'Make it harder', 'Make it easier', 'Add more questions', 'Change to open-ended'];
+                          const available = chipPool.filter(c => !qgUsedChips.includes(c));
+                          const visibleChips = available.slice(0, 3);
+                          if (visibleChips.length === 0) return null;
                           return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: 8 }}>
-                              <BriskLogo size={20} style={{ opacity: 0.7 }} />
-                              <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
-                                {iterMsgs[quizGenLoadingIdx % iterMsgs.length]}
-                              </span>
+                            <div style={{ marginBottom: 16 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: C.slate700, marginBottom: 12 }}>Anything you want to improve?</div>
+                              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                {visibleChips.map(pill => (
+                                  <button key={pill} onClick={() => { if (!qgFormsLoading) { setQgUsedChips(u => [...u, pill]); setQgIterationHistory(h => [...h, pill]); setQgUserReply(pill); setInput(pill); } }}
+                                    style={{ padding: '6px 12px', border: `1px solid ${C.slate300}`, borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: qgFormsLoading ? 'default' : 'pointer', lineHeight: '20px', opacity: qgFormsLoading ? 0.5 : 1 }}>
+                                    {pill}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
                           );
                         })()}
                       </>
                     )}
+
+                    {/* User iteration history bubbles — always visible once populated */}
+                    {qgIterationHistory.map((msg, i) => (
+                      <div key={i} className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
+                          {msg}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Iteration shimmer — always visible during iteration loading */}
+                    {qgUserReply && qgFormsLoading && (() => {
+                      const r = qgUserReply.toLowerCase();
+                      const iterMsgs =
+                        /short|fewer|less/.test(r) ? ['Trimming the content…', 'Shortening for your class…', 'Almost done…'] :
+                        /hard|rigorous|challeng|difficult|advanced/.test(r) ? ['Raising the difficulty…', 'Adding more rigor…', 'Almost done…'] :
+                        /easier|simpl|reading level|lower|accessi|scaffold/.test(r) ? ['Simplifying the language…', 'Adjusting the reading level…', 'Almost done…'] :
+                        /longer|more detail|expand|add more|deeper/.test(r) ? ['Adding more depth…', 'Expanding the content…', 'Almost done…'] :
+                        /different|new|change|redo|try again/.test(r) ? ['Trying a different approach…', 'Reworking the content…', 'Almost done…'] :
+                        /vocab|word|term|definition/.test(r) ? ['Focusing on key vocabulary…', 'Updating the word choices…', 'Almost done…'] :
+                        /format|layout|structure/.test(r) ? ['Restructuring the layout…', 'Adjusting the format…', 'Almost done…'] :
+                        [`Applying: "${qgUserReply.length > 40 ? qgUserReply.slice(0, 40) + '…' : qgUserReply}"`, 'Revising the content…', 'Almost done…'];
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: 8 }}>
+                          <BriskLogo size={20} style={{ opacity: 0.7 }} />
+                          <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
+                            {iterMsgs[quizGenLoadingIdx % iterMsgs.length]}
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     {/* Scroll anchor — always at bottom */}
                     <div ref={qgBottomRef} style={{ height: 1 }} />
