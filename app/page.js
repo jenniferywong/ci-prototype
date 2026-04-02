@@ -288,13 +288,18 @@ const CREATE_ICONS = {
   ),
 };
 
-// Platform chips shown on Quiz row hover — SVG icons from public/icons/
-const QUIZ_CHIPS = [
-  { title: 'Forms',   icon: <img src="/icons/Forms.svg"   width={28} height={28} alt="Forms"   style={{ display: 'block' }} /> },
-  { title: 'Slides',  icon: <img src="/icons/Slides.svg"  width={28} height={28} alt="Slides"  style={{ display: 'block' }} /> },
-  { title: 'Kahoot',  icon: <img src="/icons/Kahoot.svg"  width={28} height={28} alt="Kahoot"  style={{ display: 'block' }} /> },
-  { title: 'Nearpod', icon: <img src="/icons/Nearpod.svg" width={28} height={28} alt="Nearpod" style={{ display: 'block' }} /> },
-];
+// Format chip constants — shown on tool row hover
+const FC_DOC     = { title: 'Docs',    icon: <img src="/icons/Docs.svg"    width={24} height={24} alt="Docs"    style={{ display: 'block' }} /> };
+const FC_SLIDES  = { title: 'Slides',  icon: <img src="/icons/Slides.svg"  width={24} height={24} alt="Slides"  style={{ display: 'block' }} /> };
+const FC_FORMS   = { title: 'Forms',   icon: <img src="/icons/Forms.svg"   width={24} height={24} alt="Forms"   style={{ display: 'block' }} /> };
+const FC_KAHOOT  = { title: 'Kahoot',  icon: <img src="/icons/Kahoot.svg"  width={24} height={24} alt="Kahoot"  style={{ display: 'block' }} /> };
+const FC_NEARPOD = { title: 'Nearpod', icon: <img src="/icons/Nearpod.svg" width={24} height={24} alt="Nearpod" style={{ display: 'block' }} /> };
+
+const CHIPS_DOC       = [FC_DOC];
+const CHIPS_PRES      = [FC_SLIDES, FC_DOC];
+const CHIPS_NEARPOD   = [FC_NEARPOD, FC_DOC];
+const CHIPS_QUIZ_ALL  = [FC_FORMS, FC_SLIDES, FC_KAHOOT, FC_NEARPOD];
+const CHIPS_ASSESS    = [FC_FORMS, FC_DOC];
 
 // Chat question sets per tool
 const CHAT_QUESTION_SETS = {
@@ -580,64 +585,68 @@ function generateLibraryItems(topic, grade, subjectLabel) {
 // Full create tool list, organized by section
 const CREATE_TOOL_SECTIONS = [
   { section: 'Popular Tools', tools: [
-    { label: 'Presentation',  svg: '/icons/Slides.svg',   sub: 'Slides for direct instruction or student projects', chips: null,   onClick: null },
-    { label: 'Quiz',          svg: '/icons/Quiz.svg',     sub: 'Formative assessments',                            chips: 'quiz', onClick: 'quiz' },
-    { label: 'Podcast',       svg: '/icons/Podcast.svg',  sub: 'Student-facing audio content or discussion starters', chips: null, onClick: null },
-    { label: 'Nearpod',       svg: '/icons/Nearpod.svg',  sub: 'Interactive lessons with student pacing',          chips: null,   onClick: null },
+    { label: 'Presentation',  emoji: '🖥️',  sub: 'Slides for direct instruction or student projects',    chips: CHIPS_PRES,     onClick: null },
+    { label: 'Quiz',          emoji: '✅',  sub: 'Formative assessments',                               chips: CHIPS_QUIZ_ALL, onClick: 'quiz' },
+    { label: 'Podcast',       emoji: '🎙️',  sub: 'Student-facing audio content or discussion starters', chips: CHIPS_DOC,      onClick: null },
+    { label: 'Nearpod',       emoji: '📱',  sub: 'Interactive lessons with student pacing',             chips: CHIPS_NEARPOD,  onClick: null },
   ]},
   { section: 'School-Specific Tools', tools: [
-    { label: 'CPS Teacher Facilitation', svg: '/icons/Docs.svg', sub: 'District-aligned facilitation guides',              chips: null, onClick: null },
-    { label: 'Regents - ELA',            svg: '/icons/Docs.svg', sub: 'New York Regents exam prep materials',              chips: null, onClick: null },
-    { label: 'Portrait of a Graduate',   svg: '/icons/Docs.svg', sub: 'Competency-aligned learning artifacts',             chips: null, onClick: null },
-    { label: 'English II EOC Practice',  svg: '/icons/Docs.svg', sub: 'End-of-course prep aligned to standards',          chips: null, onClick: null },
-    { label: 'MAP Practice Test Generator', svg: '/icons/Docs.svg', sub: 'NWEA-aligned growth practice questions',        chips: null, onClick: null },
-    { label: 'CBLI Observation Notes',   svg: '/icons/Docs.svg', sub: 'Classroom-based literacy intervention records',     chips: null, onClick: null },
+    { label: 'CPS Teacher Facilitation',    emoji: '🏫', sub: 'District-aligned facilitation guides',              chips: CHIPS_DOC,    onClick: null },
+    { label: 'Regents - ELA',               emoji: '📖', sub: 'New York Regents exam prep materials',              chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Portrait of a Graduate',      emoji: '🎓', sub: 'Competency-aligned learning artifacts',             chips: CHIPS_DOC,    onClick: null },
+    { label: 'English II EOC Practice',     emoji: '✏️', sub: 'End-of-course prep aligned to standards',          chips: CHIPS_ASSESS, onClick: null },
+    { label: 'MAP Practice Test Generator', emoji: '📊', sub: 'NWEA-aligned growth practice questions',           chips: CHIPS_ASSESS, onClick: null },
+    { label: 'CBLI Observation Notes',      emoji: '🔍', sub: 'Classroom-based literacy intervention records',     chips: CHIPS_DOC,    onClick: null },
   ]},
   { section: 'Curriculum Essentials', tools: [
-    { label: 'Boost Student Activity', svg: '/icons/Boost.svg', sub: 'Add scaffolds, prompts, or engagement to any task', chips: null, onClick: null },
-    { label: 'Rubric',                 svg: '/icons/Docs.svg',  sub: 'Criteria-based assessment for student work',        chips: null, onClick: 'doc' },
-    { label: 'Syllabus',               svg: '/icons/Docs.svg',  sub: 'Course overview, expectations, and schedule',      chips: null, onClick: 'doc' },
-    { label: 'Progress Report',        svg: '/icons/Docs.svg',  sub: 'Student performance summaries for families',       chips: null, onClick: 'doc' },
-    { label: 'Resource',               svg: '/icons/Docs.svg',  sub: 'Supplemental reading or reference materials',      chips: null, onClick: 'doc' },
-    { label: 'Exemplar',               svg: '/icons/Docs.svg',  sub: 'High-quality student work samples with annotation',chips: null, onClick: 'doc' },
-    { label: 'Lesson Plan',            svg: '/icons/Docs.svg',  sub: 'Standards-aligned daily or unit lessons',         chips: null, onClick: 'doc' },
-    { label: 'DOK Questions',          svg: '/icons/Docs.svg',  sub: 'Depth of Knowledge tiered question sets',         chips: null, onClick: null },
-    { label: 'Decodable Text',         svg: '/icons/Docs.svg',  sub: 'Phonics-controlled reading passages',             chips: null, onClick: null },
-    { label: 'Translation',            svg: '/icons/Docs.svg',  sub: 'Multilingual versions of classroom materials',    chips: null, onClick: null },
-    { label: 'Math Spiral Review',     svg: '/icons/Docs.svg',  sub: 'Cumulative practice across prior standards',      chips: null, onClick: null },
-    { label: 'Math Word Problems',     svg: '/icons/Docs.svg',  sub: 'Real-world application and contextual problems',  chips: null, onClick: null },
-    { label: 'Science Lab',            svg: '/icons/Docs.svg',  sub: 'Guided inquiry lab procedures and write-ups',     chips: null, onClick: null },
-    { label: 'Inquiry Task',           svg: '/icons/Docs.svg',  sub: 'Open-ended student-driven investigation',         chips: null, onClick: null },
-    { label: 'Guided Notes',           svg: '/icons/Docs.svg',  sub: 'Structured note-taking with fill-in scaffolds',   chips: null, onClick: null },
-    { label: 'Unit Plan',              svg: '/icons/Docs.svg',  sub: 'Multi-week scope and sequence with standards',    chips: null, onClick: null },
-    { label: 'Sub Plan',               svg: '/icons/Docs.svg',  sub: 'Detailed plans and materials for a substitute',  chips: null, onClick: null },
-    { label: 'SBAC Practice Test',     svg: '/icons/Docs.svg',  sub: 'Smarter Balanced assessment prep questions',      chips: null, onClick: null },
-    { label: 'STAAR Practice Test',    svg: '/icons/Docs.svg',  sub: 'Texas state assessment prep questions',           chips: null, onClick: null },
-    { label: 'UDL Lesson Plan',        svg: '/icons/Docs.svg',  sub: 'Universal Design for Learning framework lesson',  chips: null, onClick: null },
-    { label: 'Standards Unpacker',     svg: '/icons/Docs.svg',  sub: 'Break standards into learning targets and tasks', chips: null, onClick: null },
-    { label: 'SAT Practice Test',      svg: '/icons/Docs.svg',  sub: 'College Board SAT prep questions and strategies', chips: null, onClick: null },
-    { label: 'ACT Practice Test',      svg: '/icons/Docs.svg',  sub: 'ACT prep questions and test-taking strategies',  chips: null, onClick: null },
-    { label: 'Canvas QTI',             svg: '/icons/Docs.svg',  sub: 'Quiz import format compatible with Canvas LMS',  chips: null, onClick: null },
+    { label: 'Boost Student Activity', emoji: '⚡',  sub: 'Add scaffolds, prompts, or engagement to any task', chips: CHIPS_DOC,    onClick: null },
+    { label: 'Rubric',                 emoji: '📋',  sub: 'Criteria-based assessment for student work',        chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Syllabus',               emoji: '🗓️',  sub: 'Course overview, expectations, and schedule',      chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Progress Report',        emoji: '📈',  sub: 'Student performance summaries for families',       chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Resource',               emoji: '📚',  sub: 'Supplemental reading or reference materials',      chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Exemplar',               emoji: '⭐',  sub: 'High-quality student work samples with annotation',chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Lesson Plan',            emoji: '📅',  sub: 'Standards-aligned daily or unit lessons',         chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'DOK Questions',          emoji: '🧠',  sub: 'Depth of Knowledge tiered question sets',         chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Decodable Text',         emoji: '🔤',  sub: 'Phonics-controlled reading passages',             chips: CHIPS_DOC,    onClick: null },
+    { label: 'Translation',            emoji: '🌐',  sub: 'Multilingual versions of classroom materials',    chips: CHIPS_DOC,    onClick: null },
+    { label: 'Math Spiral Review',     emoji: '🔢',  sub: 'Cumulative practice across prior standards',      chips: CHIPS_DOC,    onClick: null },
+    { label: 'Math Word Problems',     emoji: '🧮',  sub: 'Real-world application and contextual problems',  chips: CHIPS_DOC,    onClick: null },
+    { label: 'Science Lab',            emoji: '🔬',  sub: 'Guided inquiry lab procedures and write-ups',     chips: CHIPS_DOC,    onClick: null },
+    { label: 'Inquiry Task',           emoji: '🔭',  sub: 'Open-ended student-driven investigation',         chips: CHIPS_DOC,    onClick: null },
+    { label: 'Guided Notes',           emoji: '📓',  sub: 'Structured note-taking with fill-in scaffolds',   chips: CHIPS_DOC,    onClick: null },
+    { label: 'Unit Plan',              emoji: '🗺️',  sub: 'Multi-week scope and sequence with standards',    chips: CHIPS_DOC,    onClick: null },
+    { label: 'Sub Plan',               emoji: '📄',  sub: 'Detailed plans and materials for a substitute',  chips: CHIPS_DOC,    onClick: null },
+    { label: 'SBAC Practice Test',     emoji: '🏆',  sub: 'Smarter Balanced assessment prep questions',      chips: CHIPS_ASSESS, onClick: null },
+    { label: 'STAAR Practice Test',    emoji: '🌟',  sub: 'Texas state assessment prep questions',           chips: CHIPS_ASSESS, onClick: null },
+    { label: 'UDL Lesson Plan',        emoji: '🌈',  sub: 'Universal Design for Learning framework lesson',  chips: CHIPS_DOC,    onClick: null },
+    { label: 'Standards Unpacker',     emoji: '📌',  sub: 'Break standards into learning targets and tasks', chips: CHIPS_DOC,    onClick: null },
+    { label: 'SAT Practice Test',      emoji: '🎯',  sub: 'College Board SAT prep questions and strategies', chips: CHIPS_ASSESS, onClick: null },
+    { label: 'ACT Practice Test',      emoji: '🏅',  sub: 'ACT prep questions and test-taking strategies',  chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Canvas QTI',             emoji: '💻',  sub: 'Quiz import format compatible with Canvas LMS',  chips: CHIPS_ASSESS, onClick: null },
   ]},
   { section: 'Administrative Tasks', tools: [
-    { label: 'Email',            svg: '/icons/Docs.svg', sub: 'Professional messages to families or colleagues', chips: null, onClick: null },
-    { label: 'Newsletter',       svg: '/icons/Docs.svg', sub: 'Class or school updates for stakeholders',       chips: null, onClick: null },
-    { label: 'Letter of Rec',    svg: '/icons/Docs.svg', sub: 'Personalized student recommendation letters',    chips: null, onClick: null },
-    { label: 'Observation Notes',svg: '/icons/Docs.svg', sub: 'Structured classroom observation records',       chips: null, onClick: null },
+    { label: 'Email',            emoji: '✉️',  sub: 'Professional messages to families or colleagues', chips: CHIPS_DOC, onClick: null },
+    { label: 'Newsletter',       emoji: '📰',  sub: 'Class or school updates for stakeholders',       chips: CHIPS_DOC, onClick: null },
+    { label: 'Letter of Rec',    emoji: '📜',  sub: 'Personalized student recommendation letters',    chips: CHIPS_DOC, onClick: null },
+    { label: 'Observation Notes',emoji: '👁️',  sub: 'Structured classroom observation records',       chips: CHIPS_DOC, onClick: null },
   ]},
   { section: 'Interventions', tools: [
-    { label: 'IEP Goal Plan',   svg: '/icons/Docs.svg', sub: 'Individualized Education Program goal documentation', chips: null, onClick: null },
-    { label: 'MTSS Strategy',   svg: '/icons/Docs.svg', sub: 'Multi-Tiered System of Supports strategy cards',     chips: null, onClick: null },
-    { label: 'MTSS Plan',       svg: '/icons/Docs.svg', sub: 'Tiered intervention plan for student support',       chips: null, onClick: null },
-    { label: '504 Plan',        svg: '/icons/Docs.svg', sub: 'Accommodation documentation for eligible students',  chips: null, onClick: null },
+    { label: 'IEP Goal Plan',  emoji: '🎯',  sub: 'Individualized Education Program goal documentation', chips: CHIPS_DOC, onClick: null },
+    { label: 'MTSS Strategy',  emoji: '🧩',  sub: 'Multi-Tiered System of Supports strategy cards',     chips: CHIPS_DOC, onClick: null },
+    { label: 'MTSS Plan',      emoji: '🗂️',  sub: 'Tiered intervention plan for student support',       chips: CHIPS_DOC, onClick: null },
+    { label: '504 Plan',       emoji: '♿',  sub: 'Accommodation documentation for eligible students',  chips: CHIPS_DOC, onClick: null },
   ]},
 ];
 
-function CreateToolRow({ svg, iconEl, label, sub, chips, onClick }) {
+function CreateToolRow({ emoji, svg, iconEl, label, sub, chips, onClick }) {
   const [hovered, setHovered] = useState(false);
-  const icon = svg
-    ? <img src={svg} width={28} height={28} alt={label} style={{ display: 'block', flexShrink: 0 }} />
-    : iconEl;
+  const icon = emoji
+    ? <span style={{ fontSize: 18, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{emoji}</span>
+    : svg
+      ? <img src={svg} width={28} height={28} alt={label} style={{ display: 'block', flexShrink: 0 }} />
+      : iconEl;
+  const visibleChips = chips ? chips.slice(0, 3) : [];
+  const overflowCount = chips ? chips.length - 3 : 0;
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ padding: '0 8px' }}>
       <button
@@ -648,13 +657,16 @@ function CreateToolRow({ svg, iconEl, label, sub, chips, onClick }) {
           <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.01em' }}>{label}</div>
           {hovered && sub && <div style={{ fontSize: 12, color: '#344054', lineHeight: '17px', marginTop: 1 }}>{sub}</div>}
         </div>
-        {hovered && chips && (
-          <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-            {chips.map((chip, i) => (
+        {hovered && visibleChips.length > 0 && (
+          <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center' }}>
+            {visibleChips.map((chip, i) => (
               <div key={i} title={chip.title} style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {chip.icon}
               </div>
             ))}
+            {overflowCount > 0 && (
+              <span style={{ fontSize: 11, color: '#74818E', fontWeight: 500, lineHeight: 1, paddingLeft: 2 }}>+{overflowCount}</span>
+            )}
           </div>
         )}
       </button>
@@ -2208,6 +2220,10 @@ export default function Home() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.platform));
+  }, []);
   const [pageChipVisible, setPageChipVisible] = useState(false);
   const [chipDismissing, setChipDismissing] = useState(false);
   function dismissChip() {
@@ -3491,13 +3507,11 @@ export default function Home() {
                 if (t.onClick === 'doc' || (t.onClick === null && t.label !== 'Boost Student Activity')) return () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); };
                 return t.onClick;
               };
-              const resolveChips = t => t.chips === 'quiz' ? QUIZ_CHIPS : t.chips;
-
               const allSections = CREATE_TOOL_SECTIONS.map(({ section, tools }) => (
                 <div key={section}>
                   {sectionLabel(section)}
                   {tools.map(t => (
-                    <CreateToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} chips={resolveChips(t)} onClick={resolveOnClick(t)} />
+                    <CreateToolRow key={t.label} emoji={t.emoji} label={t.label} sub={t.sub} chips={t.chips} onClick={resolveOnClick(t)} />
                   ))}
                 </div>
               ));
@@ -3517,7 +3531,7 @@ export default function Home() {
                 if (suggestedCreateTool) return (
                   <>
                     {sectionLabel('Suggested')}
-                    <CreateToolRow svg={suggestedCreateTool.svg} label={suggestedCreateTool.label} sub={suggestedCreateTool.sub} chips={resolveChips(suggestedCreateTool)} onClick={resolveOnClick(suggestedCreateTool)} />
+                    <CreateToolRow emoji={suggestedCreateTool.emoji} label={suggestedCreateTool.label} sub={suggestedCreateTool.sub} chips={suggestedCreateTool.chips} onClick={resolveOnClick(suggestedCreateTool)} />
                     <div style={{ height: 4 }} />
                   </>
                 );
@@ -3643,7 +3657,7 @@ export default function Home() {
                         {allMatchedCS.length > 0 && allMatchedCS.map(({ section, tools }) => (
                           <div key={section}>
                             {secCS(section)}
-                            {tools.map(t => <CreateToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} chips={resolveChips(t)} onClick={resolveOnClick(t)} />)}
+                            {tools.map(t => <CreateToolRow key={t.label} emoji={t.emoji} label={t.label} sub={t.sub} chips={t.chips} onClick={resolveOnClick(t)} />)}
                           </div>
                         ))}
                         {myLibCS.length > 0 && <>{secCS('My library')}{myLibCS.map(l => <LibRowCS key={l.label} item={l} />)}</>}
@@ -3661,7 +3675,7 @@ export default function Home() {
           {/* ⌘K shortcut hint */}
           <div style={{ flexShrink: 0, padding: '8px 24px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, color: '#B0AEA9', fontFamily: 'inherit', lineHeight: 1 }}>
-              <kbd style={{ fontFamily: 'inherit', fontSize: 11, color: '#B0AEA9', background: 'none', border: 'none', padding: 0, lineHeight: 1 }}>⌘K</kbd>
+              <kbd style={{ fontFamily: 'inherit', fontSize: 11, color: '#B0AEA9', background: 'none', border: 'none', padding: 0, lineHeight: 1 }}>{isMac ? '⌘K' : 'Ctrl+K'}</kbd>
               <span>to open</span>
             </span>
           </div>
@@ -5271,7 +5285,7 @@ export default function Home() {
         <>
           <button
             onClick={() => setIsOpen(true)}
-            title="Open Brisk (⌘K)"
+            title={`Open Brisk (${isMac ? '⌘K' : 'Ctrl+K'})`}
             style={{ position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', border: 'none', background: '#0E151C', boxShadow: '0 4px 16px rgba(0,0,0,0.28)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, padding: 4 }}>
             <img src="/icons/Brisk Logo.svg" width={28} height={28} alt="Brisk" style={{ display: 'block' }} />
           </button>
