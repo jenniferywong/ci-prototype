@@ -2446,14 +2446,6 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizGenPhase]);
 
-  // Quiz-gen: auto-switch to Output tab when initial generation finishes
-  useEffect(() => {
-    if (screen === 'quiz-gen' && quizGenPhase === 'done' && !qgFormsLoading && qgIterationHistory.length === 0) {
-      setQuizGenTab('Output');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, quizGenPhase, qgFormsLoading]);
-
   // Quiz-gen: re-generate forms when user submits a refinement request
   useEffect(() => {
     if (!qgUserReply) return;
@@ -4626,7 +4618,7 @@ export default function Home() {
               {/* Segmented control — inside header */}
               <div style={{ padding: '0 24px 12px' }}>
                 <div style={{ display: 'flex', background: '#EEEDE9', borderRadius: 10, padding: 4, height: 40 }}>
-                  {['Overview', ...(quizGenPhase === 'done' && sourcesReady ? ['Output'] : []), 'Sources'].map(tab => {
+                  {['Overview', 'Sources'].map(tab => {
                     const isActive = quizGenTab === tab;
                     return (
                       <button key={tab} onClick={() => { setQuizGenTab(tab); if (tab === 'Sources') setSourcesViewed(true); }}
@@ -4949,31 +4941,6 @@ export default function Home() {
                 )}
               </>
             )}
-
-            {/* OUTPUT TAB — shows the quiz/form/slides preview inline */}
-            {quizGenTab === 'Output' && (() => {
-              const slidesDefault = screenOneToolLabel?.toLowerCase().includes('presentation') || screenOneToolLabel?.toLowerCase().includes('slide');
-              const effectiveDocFmt = prefs.docFormat || (slidesDefault ? 'Slides' : 'Docs');
-              const isSlidesTool = screenOneToolType === 'doc' && effectiveDocFmt === 'Slides';
-              const platform = prefs.platform || 'Forms';
-              const isDocOut = screenOneToolType === 'doc' || platform === 'Docs';
-              const isKahootOut = screenOneToolType !== 'doc' && platform === 'Kahoot';
-              const isNearpodOut = screenOneToolType !== 'doc' && platform === 'Nearpod';
-              const outTitle = qgQuizData?.title || `${topic} ${screenOneToolLabel || 'Quiz'}`;
-              const outCls = CLASSES.find(c => c.id === selectedClass);
-              const outGrade = outCls?.grade || prefs.grade || '8th';
-              const outSubj = outCls?.subject || detectedSubject || 'ELA';
-              const formDesc = topic ? `${outGrade} Grade · ${outSubj} · ${qgQuizData?.questions?.length ?? (prefs.numQuestions ?? 10)} questions` : null;
-              return (
-                <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: isSlidesTool ? '#1e1e1e' : isDocOut ? '#f1f3f4' : isKahootOut ? '#46178f' : isNearpodOut ? '#F5F7FA' : '#f0ebff' }}>
-                  {isSlidesTool ? <GoogleSlidesPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
-                    : isDocOut ? <GoogleDocPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
-                    : isKahootOut ? <KahootPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
-                    : isNearpodOut ? <NearpodPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
-                    : <GoogleFormsPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} description={formDesc} />}
-                </div>
-              );
-            })()}
 
             {/* SOURCES TAB */}
             {quizGenTab === 'Sources' && (
