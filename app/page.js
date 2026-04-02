@@ -2012,8 +2012,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         />
       </div>
 
-      {/* Settings body — accordion rows */}
-      <div className="scroll-area" style={{ flexShrink: 0, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
+      {/* Settings body — accordion rows; flex: 1 so it fills space and scrolls, keeping Brisk It pinned */}
+      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
         {/* Curriculum row — edit button placeholder (no destination yet) */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
           <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0, opacity: curriculumHover ? 0 : 1, transition: 'opacity 0.18s ease' }}>Curriculum</span>
@@ -2136,9 +2136,6 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           </div>
         </div>
       </div>
-
-      {/* Spacer — absorbs remaining vertical space, collapses to 0 if layout is tight */}
-      <div style={{ flex: 1, background: '#FAF9F6' }} />
 
       {/* Action buttons — pinned to bottom */}
       <div style={{ flexShrink: 0, padding: '8px 24px 20px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
