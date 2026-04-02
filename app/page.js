@@ -1585,11 +1585,22 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg`
     : `/icons/${prefs.platform || 'Forms'}.svg`;
   const formatParts = toolType === 'doc' && isSlidesDefault
-    ? [FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat, `${prefs.numSlides ?? 10} slides`]
+    ? [FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat, `${prefs.numSlides ?? 10} slides`, prefs.includeImages !== false ? 'With images' : 'No images']
     : toolType === 'doc'
       ? [FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat]
-      : [prefs.platform || 'Forms', prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
+      : [FORMAT_OPTIONS.quiz.find(o => o.value === (prefs.platform || 'Forms'))?.label || prefs.platform || 'Forms', prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
   const formatValueText = formatParts.join(' • ');
+  // Compute how many formatParts to show before overflowing to +N (char-count based)
+  const FORMAT_MAX_CHARS = 40;
+  const formatShownCount = (() => {
+    let shown = 0; let chars = 0;
+    for (let i = 0; i < formatParts.length; i++) {
+      const add = (i === 0 ? 0 : 3) + formatParts[i].length;
+      if (chars + add > FORMAT_MAX_CHARS && i > 0) break;
+      chars += add; shown++;
+    }
+    return shown;
+  })();
 
   const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block', opacity: 0.5 }} />;
   const chevron = (
@@ -1706,9 +1717,9 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
                 <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatParts.slice(0, 2).join(' • ')}</span>
-                {formatParts.length > 2 && (
-                  <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - 2}</span>
+                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatParts.slice(0, formatShownCount).join(' • ')}</span>
+                {formatParts.length > formatShownCount && (
+                  <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
                 )}
                 <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
@@ -1718,7 +1729,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
         {editingSection === 'audience' && (
           <>
-            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 8 }} />
+            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 12 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Audience</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
@@ -1740,7 +1751,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
         {editingSection === 'format' && (
           <>
-            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 8 }} />
+            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 12 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Format</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
