@@ -2455,8 +2455,8 @@ export default function Home() {
       }),
     })
       .then(r => r.json())
-      .then(data => { if (data.questions) setQgQuizData(data); })
-      .catch(() => {})
+      .then(data => { setQgQuizData(data.questions ? data : { questions: [], title: topic }); })
+      .catch(() => { setQgQuizData({ questions: [], title: topic }); })
       .finally(() => setQgFormsLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizGenPhase]);
@@ -3055,8 +3055,8 @@ export default function Home() {
   // ── Styles ────────────────────────────────────────────────────
   const outerStyle = { minHeight: '100vh' };
 
-  // sourcesReady: true once API has returned data (resource panel shows skeleton until then)
-  const sourcesReady = !!qgQuizData;
+  // sourcesReady: true once phase is done AND generate call has finished (with or without data)
+  const sourcesReady = quizGenPhase === 'done' && !qgFormsLoading;
   const isDockedRight = !isMobile && screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
   const panelStyle = isMobile ? {
     background: '#FAF9F6',
