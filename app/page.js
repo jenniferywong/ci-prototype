@@ -1718,7 +1718,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
         {editingSection === 'audience' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 8 }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Audience</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
@@ -1739,7 +1740,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
         {editingSection === 'format' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 8 }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px' }}>Format</span>
               <button onClick={() => setEditingSection(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', padding: 4 }}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
