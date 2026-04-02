@@ -4230,22 +4230,22 @@ export default function Home() {
         const isDocTool = screenOneToolType === 'doc';
         const resourceLabel = screenOneToolLabel || 'Quiz';
         const QUIZ_GEN_LOADING_MSGS = isDocTool ? [
-          qgPageTitle ? `Reading "${qgPageTitle}"…` : `Analyzing ${qgShortTopic}…`,
-          'Loading district guidance…',
-          `Checking ${qgGrade} grade standards…`,
-          `Almost ready — wrapping up your ${resourceLabel}…`,
+          qgPageTitle ? `Reading page…` : `Analyzing topic…`,
+          'Checking district guidance…',
+          `Pulling ${qgGrade} grade standards…`,
+          `Wrapping up…`,
         ] : [
-          qgPageTitle ? `Reading "${qgPageTitle}"…` : `Analyzing ${qgShortTopic}…`,
-          'Loading district guidance…',
-          `Checking ${qgGrade} grade student data…`,
-          `Almost ready — wrapping up your ${resourceLabel}…`,
+          qgPageTitle ? `Reading page…` : `Analyzing topic…`,
+          'Checking district guidance…',
+          `Pulling ${qgGrade} grade data…`,
+          `Wrapping up…`,
         ];
         const FINALIZING_MSGS = [
-          `Almost ready — finalizing your ${resourceLabel}…`,
-          `Personalizing for your ${qgGrade} grade class…`,
-          `Aligning with grade-level standards…`,
-          `Adding finishing touches…`,
-          `Just a moment longer…`,
+          `Finalizing your ${resourceLabel}…`,
+          `Personalizing for ${qgGrade} grade…`,
+          `Aligning to standards…`,
+          `Almost there…`,
+          `One moment…`,
         ];
 
         // Resource-specific Q1/Q2 for doc tools; subject-aware fallback for quiz tools
@@ -4503,7 +4503,7 @@ export default function Home() {
             return <span style={{ minWidth: 22, height: 22, borderRadius: 999, background: '#DAD9D4', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#475467', fontWeight: 400, flexShrink: 0, marginLeft: 4, padding: '0 5px' }}>{sourcesCount}</span>;
           }
           if (sourcesReady) {
-            return <span style={{ minWidth: 22, height: 22, borderRadius: 999, background: sourcesTabActive ? '#DAD9D4' : '#06465C', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: sourcesTabActive ? '#475467' : '#fff', fontWeight: 600, flexShrink: 0, marginLeft: 4, padding: '0 5px', transition: 'background 0.2s, color 0.2s' }}>{sourcesCount}</span>;
+            return <span style={{ minWidth: 22, height: 22, borderRadius: 999, background: '#06465C', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 500, flexShrink: 0, marginLeft: 4, padding: '0 5px' }}>{sourcesCount}</span>;
           }
           return (
             <span style={{ position: 'relative', width: 24, height: 24, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 4, verticalAlign: 'middle' }}>
@@ -4577,7 +4577,7 @@ export default function Home() {
                     {showLoading && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingTop: 8 }}>
                         <BriskLogo size={20} style={{ animation: 'shimmer 1.6s ease-in-out infinite', opacity: 0.7 }} />
-                        <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
+                        <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
                           {(quizGenPhase === 'answered' || quizGenPhase === 'done')
                             ? FINALIZING_MSGS[quizGenLoadingIdx % FINALIZING_MSGS.length]
                             : QUIZ_GEN_LOADING_MSGS[quizGenLoadingIdx % QUIZ_GEN_LOADING_MSGS.length]}
@@ -4691,7 +4691,7 @@ export default function Home() {
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: 8 }}>
                               <BriskLogo size={20} style={{ opacity: 0.7 }} />
-                              <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
+                              <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
                                 {iterMsgs[quizGenLoadingIdx % iterMsgs.length]}
                               </span>
                             </div>
@@ -4707,10 +4707,10 @@ export default function Home() {
 
                 {/* Bottom: question card or input bar */}
                 {currentCard ? (
-                  <div style={{ flexShrink: 0, padding: '4px 24px 16px' }}>
+                  <div style={{ flexShrink: 0, padding: '6px 24px 16px' }}>
                     <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 16px' }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px' }}>{currentCard.text}</div>
-                      <div style={{ fontSize: 12, lineHeight: '18px', color: '#475467', fontWeight: 400, marginTop: 2, marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, lineHeight: '18px', color: '#475467', fontWeight: 400, marginTop: 2, marginBottom: 6 }}>
                         {quizGenPhase === 'q1' ? '1' : '2'} of 2
                       </div>
 
@@ -4721,8 +4721,8 @@ export default function Home() {
                             const sel = quizGenQ1Sels.includes(opt);
                             return (
                               <button key={opt} onClick={() => setQuizGenQ1Sels(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])}
-                                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '10px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                                <div style={{ width: 18, height: 18, borderRadius: 2, border: sel ? 'none' : '1.5px solid #CACED1', background: sel ? '#1B6B6B' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                style={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 8, justifyContent: 'flex-start', padding: '10px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                                <div style={{ width: 18, height: 18, borderRadius: 2, border: sel ? 'none' : '1.5px solid #CACED1', background: sel ? '#06465C' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                                   {sel && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                                 </div>
                                 <span style={{ flex: 1 }}>{opt}</span>
