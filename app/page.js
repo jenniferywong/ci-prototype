@@ -1693,7 +1693,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       />
 
       {/* Scrollable body */}
-      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '12px 24px 12px' }}>
+      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 24px 12px' }}>
 
         {editingSection === null && (
           <div>
