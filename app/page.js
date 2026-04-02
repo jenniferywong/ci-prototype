@@ -1584,11 +1584,12 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
   const formatIconSrc = toolType === 'doc'
     ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg`
     : `/icons/${prefs.platform || 'Forms'}.svg`;
-  const formatValueText = toolType === 'doc' && isSlidesDefault
-    ? `${FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat} • ${prefs.numSlides ?? 10} slides`
+  const formatParts = toolType === 'doc' && isSlidesDefault
+    ? [FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat, `${prefs.numSlides ?? 10} slides`]
     : toolType === 'doc'
-      ? FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat
-      : `${prefs.platform || 'Forms'} • ${prefs.questionType} • ${prefs.numQuestions ?? 10} questions`;
+      ? [FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat]
+      : [prefs.platform || 'Forms', prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
+  const formatValueText = formatParts.join(' • ');
 
   const pencilIcon = <img src="/icons/Edit.svg" width={14} height={14} alt="Edit" style={{ display: 'block', opacity: 0.5 }} />;
   const chevron = (
@@ -1686,26 +1687,29 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           <div>
             {/* Curriculum row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F2F0', gap: 24 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Curriculum</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Curriculum</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-                <span title={curriculumValue} style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
+                <span title={curriculumValue} style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
                 <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Audience row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F2F0', gap: 24 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Audience</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-                <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
+                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
                 <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Format row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Format</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
                 <img src={formatIconSrc} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatValueText}</span>
+                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatParts.slice(0, 2).join(' • ')}</span>
+                {formatParts.length > 2 && (
+                  <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - 2}</span>
+                )}
                 <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
