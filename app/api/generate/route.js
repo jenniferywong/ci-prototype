@@ -16,6 +16,52 @@ async function callClaude(client, systemPrompt, userMsg = 'Generate now.') {
   return parseJSON(message.content[0].text);
 }
 
+// Maps a tool name to specific content instructions for the `questions` array
+function docContentInstructions(toolName) {
+  const t = (toolName || '').toLowerCase();
+  if (t.includes('guided notes') || t.includes('guided note')) return {
+    contentInstruction: `Generate ${10} fill-in-the-blank guided note items. Each item should be a key concept sentence with ___ blanks for students to fill in (e.g. "The ___ is the powerhouse of the cell."). The "explanation" field is the complete, filled-in answer. Use "options": [].`,
+    numItems: 10,
+  };
+  if (t.includes('syllabus')) return {
+    contentInstruction: `Generate 8–10 syllabus sections. Each "question" is a section header (e.g. "Course Overview", "Grading Policy"). The "explanation" is 2–3 sentences of content for that section. Use "options": [].`,
+    numItems: 8,
+  };
+  if (t.includes('rubric')) return {
+    contentInstruction: `Generate 5–6 rubric criteria rows. Each "question" is a criterion name (e.g. "Content & Accuracy"). The "explanation" describes what proficient work looks like for that criterion. Use "options": [].`,
+    numItems: 5,
+  };
+  if (t.includes('lesson plan') || t.includes('lesson')) return {
+    contentInstruction: `Generate 8–10 lesson plan components. Each "question" is a section label (e.g. "Objective", "Hook / Warm-Up", "Direct Instruction", "Guided Practice", "Closure"). The "explanation" is 2–3 sentences describing what happens in that phase. Use "options": [].`,
+    numItems: 8,
+  };
+  if (t.includes('unit plan') || t.includes('unit')) return {
+    contentInstruction: `Generate 8–10 unit plan sections. Each "question" is a section label (e.g. "Unit Overview", "Essential Questions", "Week 1 Focus"). The "explanation" is 2–3 sentences describing that section's content. Use "options": [].`,
+    numItems: 8,
+  };
+  if (t.includes('discussion') || t.includes('facilitation')) return {
+    contentInstruction: `Generate 8–10 discussion questions or facilitation prompts. Each "question" is a discussion prompt students or the teacher can use. The "explanation" is a brief note on what good responses might include. Use "options": [].`,
+    numItems: 8,
+  };
+  if (t.includes('slide') || t.includes('presentation')) return {
+    contentInstruction: `Generate 8–10 slide outlines. Each "question" is a slide title. The "explanation" is 2–3 bullet points of content for that slide. Use "options": [].`,
+    numItems: 8,
+  };
+  if (t.includes('podcast')) return {
+    contentInstruction: `Generate 6–8 podcast script segments. Each "question" is a segment label (e.g. "Intro Hook", "Segment 1: Background", "Expert Insight"). The "explanation" is 2–3 sentences of talking points or script for that segment. Use "options": [].`,
+    numItems: 6,
+  };
+  if (t.includes('science lab') || t.includes('lab')) return {
+    contentInstruction: `Generate 8–10 lab procedure steps or sections. Each "question" is a section label (e.g. "Materials", "Hypothesis", "Step 1: Setup", "Observations", "Conclusion"). The "explanation" is 2–3 sentences describing what students do or record. Use "options": [].`,
+    numItems: 8,
+  };
+  // Generic doc fallback
+  return {
+    contentInstruction: `Generate 8–10 content items for this document. Each "question" is a section header or key point. The "explanation" is 2–3 sentences of content for that section. Use "options": [].`,
+    numItems: 8,
+  };
+}
+
 // Maps a strategy name to how the warm-up should be structured
 function warmupInstructions(strategyName, strategyDesc) {
   const s = (strategyName || '').toLowerCase();
@@ -78,6 +124,7 @@ export async function POST(request) {
     : '';
 
   const { label: warmupLabel, instruction: warmupInstruction } = warmupInstructions(scaffoldStrategy, scaffoldStrategyDesc);
+  const { contentInstruction } = isQuizTool ? {} : docContentInstructions(resolvedToolName);
 
   const hasTeacherScaffolds = Array.isArray(teacherScaffolds) && teacherScaffolds.filter(Boolean).length > 0;
   const teacherScaffoldList = hasTeacherScaffolds ? teacherScaffolds.filter(Boolean).join('; ') : null;
@@ -125,12 +172,10 @@ ${scaffoldSection}
 WARM-UP (required): ${warmupInstruction}
 The warmupLabel for this document is: "${warmupLabel}"
 
-DOCUMENT DESIGN:
-- Make content rigorous, clear, and grade-appropriate
-- Use logical sections with helpful headers
-- Include actionable, specific guidance${pageCtx}
+CONTENT (required): ${contentInstruction}
+You MUST populate the "questions" array with real content — do not return an empty array.${pageCtx}
 
-TITLE: Must be specific to the topic — e.g. "ELA 8 Syllabus: Reading for Meaning" or "Portrait of a Graduate: Critical Thinker Framework". Never use a website name, URL, or generic title.
+TITLE: Must be specific to the topic — e.g. "ELA 8 Syllabus: Reading for Meaning" or "Guided Notes: The Water Cycle". Never use a website name, URL, or generic title.
 
 Return JSON only, no markdown backticks:
 { "title": string, "warmupLabel": string, "warmup": [{"term": string, "definition": string}], "questions": [{"question": string, "options": [], "correct": "", "explanation": string}] }`;
