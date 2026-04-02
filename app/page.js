@@ -1727,7 +1727,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                       {isQuizCount ? (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
                           <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
-                          <img src="/icons/Bulleted List.svg" width={16} height={16} alt="" style={{ display: 'block' }} />
+                          <img src="/icons/Bulleted List.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
                         </span>
                       ) : (
                         <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
