@@ -4556,11 +4556,9 @@ export default function Home() {
             <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '16px 24px 8px' }}>
               {/* Ask Anything: Brisk starter message */}
               {chatToolName === 'Ask Anything' && !chatInitialPrompt && chatAnswers.length === 0 && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                   <BriskLogo size={20} />
-                  <div style={{ background: '#fff', border: `1px solid ${C.slate200}`, borderRadius: '0 12px 12px 12px', padding: '10px 14px', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
-                    What do you need help with?
-                  </div>
+                  <span style={{ fontSize: 14, color: C.slate900, lineHeight: '21px' }}>What do you need help with?</span>
                 </div>
               )}
 
