@@ -2440,6 +2440,14 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizGenPhase]);
 
+  // Quiz-gen: auto-switch to Output tab when initial generation finishes
+  useEffect(() => {
+    if (screen === 'quiz-gen' && quizGenPhase === 'done' && !qgFormsLoading && qgIterationHistory.length === 0) {
+      setQuizGenTab('Output');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, quizGenPhase, qgFormsLoading]);
+
   // Quiz-gen: re-generate forms when user submits a refinement request
   useEffect(() => {
     if (!qgUserReply) return;
@@ -4608,7 +4616,7 @@ export default function Home() {
               {/* Segmented control — inside header */}
               <div style={{ padding: '0 24px 12px' }}>
                 <div style={{ display: 'flex', background: '#EEEDE9', borderRadius: 10, padding: 4, height: 40 }}>
-                  {['Overview', ...(isMobile && quizGenPhase === 'done' && sourcesReady ? ['Output'] : []), 'Sources'].map(tab => {
+                  {['Overview', ...(quizGenPhase === 'done' && sourcesReady ? ['Output'] : []), 'Sources'].map(tab => {
                     const isActive = quizGenTab === tab;
                     return (
                       <button key={tab} onClick={() => { setQuizGenTab(tab); if (tab === 'Sources') setSourcesViewed(true); }}
@@ -4932,8 +4940,8 @@ export default function Home() {
               </>
             )}
 
-            {/* OUTPUT TAB — mobile only, shows the quiz/form/slides preview inline */}
-            {quizGenTab === 'Output' && isMobile && (() => {
+            {/* OUTPUT TAB — shows the quiz/form/slides preview inline */}
+            {quizGenTab === 'Output' && (() => {
               const slidesDefault = screenOneToolLabel?.toLowerCase().includes('presentation') || screenOneToolLabel?.toLowerCase().includes('slide');
               const effectiveDocFmt = prefs.docFormat || (slidesDefault ? 'Slides' : 'Docs');
               const isSlidesTool = screenOneToolType === 'doc' && effectiveDocFmt === 'Slides';
