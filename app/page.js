@@ -1584,14 +1584,15 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
   const formatIconSrc = toolType === 'doc'
     ? `/icons/${effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs'}.svg`
     : `/icons/${prefs.platform || 'Forms'}.svg`;
+  // Icon handles platform identity — text parts are the remaining descriptive values
   const formatParts = toolType === 'doc' && isSlidesDefault
-    ? [FORMAT_OPTIONS.presentation.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat, `${prefs.numSlides ?? 10} slides`, prefs.includeImages !== false ? 'With images' : 'No images']
+    ? [`${prefs.numSlides ?? 10} slides`, prefs.includeImages !== false ? 'With images' : 'No images']
     : toolType === 'doc'
       ? [FORMAT_OPTIONS.doc.find(o => o.value === effectiveDocFormat)?.label || effectiveDocFormat]
-      : [FORMAT_OPTIONS.quiz.find(o => o.value === (prefs.platform || 'Forms'))?.label || prefs.platform || 'Forms', prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
+      : [prefs.questionType, `${prefs.numQuestions ?? 10} questions`];
   const formatValueText = formatParts.join(' • ');
-  // Compute how many formatParts to show before overflowing to +N (char-count based)
-  const FORMAT_MAX_CHARS = 40;
+  // Show up to 2 text parts (icon is the 3rd visible element); overflow to +N
+  const FORMAT_MAX_CHARS = 35;
   const formatShownCount = (() => {
     let shown = 0; let chars = 0;
     for (let i = 0; i < formatParts.length; i++) {
