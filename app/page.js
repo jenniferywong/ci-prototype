@@ -1738,16 +1738,20 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Platform</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>File Type</div>
                   <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Question Type</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Response Type</div>
                   {pillSelect(prefs.questionType, ['Multiple choice','Short Answer','True/False'], v => onPrefsChange({ questionType: v }), null, true)}
                 </div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#78716c', marginBottom: 8 }}>Questions</div>
-                  {pillSelect(String(prefs.numQuestions), ['5','10','15','20'].map(n => ({ value: n, label: `${n} questions` })), v => onPrefsChange({ numQuestions: Number(v) }), null, true)}
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E2E1DE', borderRadius: 8, height: 34, overflow: 'hidden', background: 'transparent' }}>
+                    <button onClick={() => onPrefsChange({ numQuestions: Math.max(1, (prefs.numQuestions || 10) - 1) })} style={{ width: 34, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                    <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#0E151C', lineHeight: '34px' }}>{prefs.numQuestions ?? 10}</span>
+                    <button onClick={() => onPrefsChange({ numQuestions: Math.min(50, (prefs.numQuestions || 10) + 1) })} style={{ width: 34, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+                  </div>
                 </div>
               </div>
             )}
