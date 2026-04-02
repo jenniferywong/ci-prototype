@@ -292,16 +292,17 @@ const CREATE_ICONS = {
 };
 
 // Format chip constants — shown on tool row hover
-const FC_DOC     = { title: 'Docs',    icon: <img src="/icons/Docs.svg"    width={24} height={24} alt="Docs"    style={{ display: 'block' }} /> };
-const FC_SLIDES  = { title: 'Slides',  icon: <img src="/icons/Slides.svg"  width={24} height={24} alt="Slides"  style={{ display: 'block' }} /> };
-const FC_FORMS   = { title: 'Forms',   icon: <img src="/icons/Forms.svg"   width={24} height={24} alt="Forms"   style={{ display: 'block' }} /> };
-const FC_KAHOOT  = { title: 'Kahoot',  icon: <img src="/icons/Kahoot.svg"  width={24} height={24} alt="Kahoot"  style={{ display: 'block' }} /> };
-const FC_NEARPOD = { title: 'Nearpod', icon: <img src="/icons/Nearpod.svg" width={24} height={24} alt="Nearpod" style={{ display: 'block' }} /> };
+const FC_DOC     = { title: 'Docs',       icon: <img src="/icons/Docs.svg"    width={24} height={24} alt="Docs"       style={{ display: 'block' }} /> };
+const FC_SLIDES  = { title: 'Slides',     icon: <img src="/icons/Slides.svg"  width={24} height={24} alt="Slides"     style={{ display: 'block' }} /> };
+const FC_FORMS   = { title: 'Forms',      icon: <img src="/icons/Forms.svg"   width={24} height={24} alt="Forms"      style={{ display: 'block' }} /> };
+const FC_KAHOOT  = { title: 'Kahoot',     icon: <img src="/icons/Kahoot.svg"  width={24} height={24} alt="Kahoot"     style={{ display: 'block' }} /> };
+const FC_NEARPOD = { title: 'Nearpod',    icon: <img src="/icons/Nearpod.svg" width={24} height={24} alt="Nearpod"    style={{ display: 'block' }} /> };
+const FC_CANVAS  = { title: 'Canvas QTI', icon: <img src="/icons/Canvas.svg"  width={24} height={24} alt="Canvas QTI" style={{ display: 'block' }} /> };
 
 const CHIPS_DOC       = [FC_DOC];
 const CHIPS_PRES      = [FC_SLIDES, FC_DOC];
 const CHIPS_NEARPOD   = [FC_NEARPOD, FC_DOC];
-const CHIPS_QUIZ_ALL  = [FC_FORMS, FC_SLIDES, FC_KAHOOT, FC_NEARPOD];
+const CHIPS_QUIZ_ALL  = [FC_FORMS, FC_SLIDES, FC_KAHOOT, FC_NEARPOD, FC_CANVAS];
 const CHIPS_ASSESS    = [FC_FORMS, FC_DOC];
 
 // Chat question sets per tool
@@ -1672,10 +1673,11 @@ function ReaderModeBackground({ ctx }) {
 // ══════════════════════════════════════════════════════════════
 const FORMAT_OPTIONS = {
   quiz: [
-    { value: 'Forms',   label: 'Google Forms',   icon: '/icons/Forms.svg'   },
-    { value: 'Docs',    label: 'Google Doc',      icon: '/icons/Docs.svg'    },
-    { value: 'Kahoot',  label: 'Kahoot',          icon: '/icons/Kahoot.svg'  },
-    { value: 'Nearpod', label: 'Nearpod',         icon: '/icons/Nearpod.svg' },
+    { value: 'Forms',      label: 'Google Forms',  icon: '/icons/Forms.svg'   },
+    { value: 'Docs',       label: 'Google Doc',    icon: '/icons/Docs.svg'    },
+    { value: 'Kahoot',     label: 'Kahoot',        icon: '/icons/Kahoot.svg'  },
+    { value: 'Nearpod',    label: 'Nearpod',       icon: '/icons/Nearpod.svg' },
+    { value: 'Canvas QTI', label: 'Canvas QTI',   icon: '/icons/Canvas.svg'  },
   ],
   doc: [
     { value: 'Docs',   label: 'Google Doc',      icon: '/icons/Docs.svg'   },
@@ -1999,13 +2001,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         </div>
       </div>
 
-      <div style={{
-        overflow: 'hidden',
-        maxHeight: editingSection ? 0 : 80,
-        opacity: editingSection ? 0 : 1,
-        transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.15s ease',
-        flexShrink: 0,
-      }}>
+      <div style={{ flexShrink: 0 }}>
         <IntentChips
           toolName={toolName}
           input={input}
@@ -2016,143 +2012,128 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         />
       </div>
 
-      {/* Settings body — shrinks to fit content; spacer below absorbs leftover space */}
+      {/* Settings body — accordion rows */}
       <div className="scroll-area" style={{ flexShrink: 0, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
+        {/* Curriculum row — no accordion */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0, opacity: curriculumHover ? 0 : 1, transition: 'opacity 0.18s ease' }}>Curriculum</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
+            <CurriculumMarquee name={curriculumBaseName} onHoverChange={setCurriculumHover} />
+          </div>
+        </div>
 
-        {editingSection === null && (
-          <div>
-            {/* Curriculum row */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0, opacity: curriculumHover ? 0 : 1, transition: 'opacity 0.18s ease' }}>Curriculum</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
-                {/* Marquee name + fixed (all) */}
-                <CurriculumMarquee name={curriculumBaseName} onHoverChange={setCurriculumHover} />
-                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
-              </div>
+        {/* Audience row — accordion */}
+        <div style={{ borderBottom: '1px solid #DDE0E3' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
+              <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
+              <button onClick={() => setEditingSection(editingSection === 'audience' ? null : 'audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
+                <img src={editingSection === 'audience' ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={20} height={20} alt="" style={{ display: 'block' }} />
+              </button>
             </div>
-            {/* Audience row */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
-                <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
-                <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
-              </div>
-            </div>
-            {/* Format row */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-                <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                {formatParts.slice(0, formatShownCount).map((part, idx) => {
-                  const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
-                  return (
-                    <Fragment key={idx}>
-                      {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
-                      {isQuizCount ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-                          <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
-                          <img src="/icons/Bulleted List.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
-                      )}
-                    </Fragment>
-                  );
-                })}
-                {formatParts.length > formatShownCount && (
-                  <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
-                )}
-                <button onClick={!isPodcast ? () => setEditingSection('format') : undefined} className="icon-btn" style={{ background: 'none', border: 'none', cursor: isPodcast ? 'default' : 'pointer', padding: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, marginLeft: 2, opacity: isPodcast ? 0 : 1, pointerEvents: isPodcast ? 'none' : 'auto' }}>{pencilIcon}</button>
+          </div>
+          <div style={{ overflow: 'hidden', maxHeight: editingSection === 'audience' ? 200 : 0, transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
+            <div style={{ paddingBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade</div>
+                  <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Language</div>
+                  <PillSelect value={prefs.language} options={['English','Spanish','French','Mandarin','Arabic']} onChange={v => onPrefsChange({ language: v })} fullWidth />
+                </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {editingSection === 'audience' && (
-          <>
-            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 12 }} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px' }}>Audience</span>
-              <button onClick={() => setEditingSection(null)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 8, width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }}>
-                <img src="/icons/Close.svg" width={20} height={20} alt="Close" style={{ display: 'block' }} />
-              </button>
+        {/* Format row — accordion */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+              <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
+              {formatParts.slice(0, formatShownCount).map((part, idx) => {
+                const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
+                return (
+                  <Fragment key={idx}>
+                    {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
+                    {isQuizCount ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                        <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
+                        <img src="/icons/Bulleted List.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
+                    )}
+                  </Fragment>
+                );
+              })}
+              {formatParts.length > formatShownCount && (
+                <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
+              )}
+              {!isPodcast && (
+                <button onClick={() => setEditingSection(editingSection === 'format' ? null : 'format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, marginLeft: 2 }}>
+                  <img src={editingSection === 'format' ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={20} height={20} alt="" style={{ display: 'block' }} />
+                </button>
+              )}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade</div>
-                <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Language</div>
-                <PillSelect value={prefs.language} options={['English','Spanish','French','Mandarin','Arabic']} onChange={v => onPrefsChange({ language: v })} fullWidth />
-              </div>
-            </div>
-          </>
-        )}
-
-        {editingSection === 'format' && (
-          <>
-            <div style={{ borderTop: '1px solid #DDE0E3', marginBottom: 12 }} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px' }}>Format</span>
-              <button onClick={() => setEditingSection(null)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 8, width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }}>
-                <img src="/icons/Close.svg" width={20} height={20} alt="Close" style={{ display: 'block' }} />
-              </button>
-            </div>
-            {toolType === 'doc' && isSlidesDefault ? (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Platform</div>
-                  <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Slides</div>
-                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, overflow: 'hidden', background: 'transparent' }}>
-                    <button onClick={() => { const v = Math.max(1, (prefs.numSlides || 10) - 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-                    <input type="text" inputMode="numeric" className="counter-input" value={numSRaw} onChange={e => { setNumSRaw(e.target.value); const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 50) onPrefsChange({ numSlides: v }); }} onBlur={() => { const v = parseInt(numSRaw); setNumSRaw(String(isNaN(v) ? prefs.numSlides ?? 10 : Math.min(50, Math.max(1, v)))); }} style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 500, color: '#0E151C', border: 'none', background: 'none', fontFamily: 'inherit', width: 0, padding: '0 4px' }} />
-                    <button onClick={() => { const v = Math.min(50, (prefs.numSlides || 10) + 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+          </div>
+          <div style={{ overflow: 'hidden', maxHeight: editingSection === 'format' ? 320 : 0, transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
+            <div style={{ paddingBottom: 14 }}>
+              {toolType === 'doc' && isSlidesDefault ? (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Platform</div>
+                    <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Slides</div>
+                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, overflow: 'hidden', background: 'transparent' }}>
+                      <button onClick={() => { const v = Math.max(1, (prefs.numSlides || 10) - 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                      <input type="text" inputMode="numeric" className="counter-input" value={numSRaw} onChange={e => { setNumSRaw(e.target.value); const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 50) onPrefsChange({ numSlides: v }); }} onBlur={() => { const v = parseInt(numSRaw); setNumSRaw(String(isNaN(v) ? prefs.numSlides ?? 10 : Math.min(50, Math.max(1, v)))); }} style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 500, color: '#0E151C', border: 'none', background: 'none', fontFamily: 'inherit', width: 0, padding: '0 4px' }} />
+                      <button onClick={() => { const v = Math.min(50, (prefs.numSlides || 10) + 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Images</div>
+                    <button onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })} style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}>
+                      <span style={{ position: 'absolute', top: 2, left: prefs.includeImages ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
+                    </button>
                   </div>
                 </div>
-                <div style={{ marginTop: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Images</div>
-                  <button
-                    onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })}
-                    style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}
-                  >
-                    <span style={{ position: 'absolute', top: 2, left: prefs.includeImages ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
-                  </button>
-                </div>
-              </div>
-            ) : toolType === 'doc' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Format</div>
-                  <FormatDropdown options={FORMAT_OPTIONS.doc} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>File Type</div>
-                  <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Response Type</div>
-                  <PillSelect value={prefs.questionType} options={['Multiple choice','Short Answer','True/False']} onChange={v => onPrefsChange({ questionType: v })} fullWidth />
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Questions</div>
-                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, overflow: 'hidden', background: 'transparent' }}>
-                    <button onClick={() => { const v = Math.max(1, (prefs.numQuestions || 10) - 1); onPrefsChange({ numQuestions: v }); setNumQRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-                    <input type="text" inputMode="numeric" className="counter-input" value={numQRaw} onChange={e => { setNumQRaw(e.target.value); const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 50) onPrefsChange({ numQuestions: v }); }} onBlur={() => { const v = parseInt(numQRaw); setNumQRaw(String(isNaN(v) ? prefs.numQuestions ?? 10 : Math.min(50, Math.max(1, v)))); }} style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 500, color: '#0E151C', border: 'none', background: 'none', fontFamily: 'inherit', width: 0, padding: '0 4px' }} />
-                    <button onClick={() => { const v = Math.min(50, (prefs.numQuestions || 10) + 1); onPrefsChange({ numQuestions: v }); setNumQRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+              ) : toolType === 'doc' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Format</div>
+                    <FormatDropdown options={FORMAT_OPTIONS.doc} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                   </div>
                 </div>
-              </div>
-            )}
-          </>
-        )}
-
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>File Type</div>
+                    <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Response Type</div>
+                    <PillSelect value={prefs.questionType} options={['Multiple choice','Short Answer','True/False']} onChange={v => onPrefsChange({ questionType: v })} fullWidth />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Questions</div>
+                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, overflow: 'hidden', background: 'transparent' }}>
+                      <button onClick={() => { const v = Math.max(1, (prefs.numQuestions || 10) - 1); onPrefsChange({ numQuestions: v }); setNumQRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                      <input type="text" inputMode="numeric" className="counter-input" value={numQRaw} onChange={e => { setNumQRaw(e.target.value); const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 50) onPrefsChange({ numQuestions: v }); }} onBlur={() => { const v = parseInt(numQRaw); setNumQRaw(String(isNaN(v) ? prefs.numQuestions ?? 10 : Math.min(50, Math.max(1, v)))); }} style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 500, color: '#0E151C', border: 'none', background: 'none', fontFamily: 'inherit', width: 0, padding: '0 4px' }} />
+                      <button onClick={() => { const v = Math.min(50, (prefs.numQuestions || 10) + 1); onPrefsChange({ numQuestions: v }); setNumQRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Spacer — absorbs remaining vertical space, collapses to 0 if layout is tight */}
