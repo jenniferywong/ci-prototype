@@ -1576,7 +1576,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
       {leftIcon && <div style={{ position: 'absolute', left: 10, pointerEvents: 'none', display: 'flex', alignItems: 'center', zIndex: 1 }}>{leftIcon}</div>}
       <select value={value} onChange={e => onChange(e.target.value)}
-        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 20, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: '#fff', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none' }}>
+        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 4, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: 'transparent', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none' }}>
         {options.map(o => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
       </select>
       {chevron}
