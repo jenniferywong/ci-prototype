@@ -1601,7 +1601,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Fixed prompt box — min 185px tall so the input area feels spacious */}
       <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 24px 12px' }}>
-        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 185, display: 'flex', flexDirection: 'column' }}>
+        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 167, display: 'flex', flexDirection: 'column' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
               <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
