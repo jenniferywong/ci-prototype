@@ -2028,7 +2028,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
             <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
-              <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
+              {editingSection !== 'audience' && <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>}
               <button onClick={() => setEditingSection(editingSection === 'audience' ? null : 'audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
                 <img src={editingSection === 'audience' ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={20} height={20} alt="" style={{ display: 'block' }} />
               </button>
@@ -2055,8 +2055,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
             <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-              <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-              {formatParts.slice(0, formatShownCount).map((part, idx) => {
+              {editingSection !== 'format' && <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />}
+              {editingSection !== 'format' && formatParts.slice(0, formatShownCount).map((part, idx) => {
                 const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
                 return (
                   <Fragment key={idx}>
@@ -2072,7 +2072,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                   </Fragment>
                 );
               })}
-              {formatParts.length > formatShownCount && (
+              {editingSection !== 'format' && formatParts.length > formatShownCount && (
                 <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
               )}
               {!isPodcast && (
