@@ -120,7 +120,22 @@ function buildPromptPlaceholder(toolType, toolLabel, pageContext) {
   const preview  = (pageContext?.preview || '').trim();
 
   if (!rawTitle && !preview) {
-    return 'Describe your topic or what you need';
+    const ll = (toolLabel || '').toLowerCase();
+    if (toolType === 'doc') {
+      if (ll.includes('rubric'))    return 'e.g. argumentative essay rubric for 8th grade ELA';
+      if (ll.includes('syllabus'))  return 'e.g. AP US History syllabus, fall semester';
+      if (ll.includes('lesson'))    return 'e.g. lesson on photosynthesis for 6th grade science';
+      if (ll.includes('unit'))      return 'e.g. unit plan on the Civil Rights Movement';
+      if (ll.includes('sub'))       return 'e.g. sub plan for a persuasive writing day';
+      if (ll.includes('worksheet')) return 'e.g. worksheet on solving two-step equations';
+      if (ll.includes('slide') || ll.includes('presentation')) return 'e.g. intro to fractions for 4th grade math';
+      if (ll.includes('podcast'))   return 'e.g. podcast episode on the water cycle';
+      return 'e.g. study guide on the American Revolution';
+    }
+    // quiz tools
+    if (ll.includes('kahoot'))   return 'e.g. quiz on the causes of World War I';
+    if (ll.includes('nearpod'))  return 'e.g. interactive lesson on cell division';
+    return 'e.g. quiz on figurative language in poetry';
   }
 
   // Strip site-name suffixes from the title
@@ -2135,9 +2150,15 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Action buttons — pinned to bottom */}
       <div style={{ flexShrink: 0, padding: '8px 24px 20px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-        <button onClick={onBriskIt} style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: '#06465C', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>
-          Brisk It
-        </button>
+        {(() => {
+          const canBrisk = !!input.trim() || pageChipVisible;
+          return (
+            <button onClick={canBrisk ? onBriskIt : undefined} disabled={!canBrisk}
+              style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: canBrisk ? '#06465C' : '#D1CFC9', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: canBrisk ? 'pointer' : 'default', transition: 'background 0.15s' }}>
+              Brisk It
+            </button>
+          );
+        })()}
       </div>
     </>
   );
