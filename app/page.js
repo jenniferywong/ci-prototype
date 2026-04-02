@@ -1812,7 +1812,7 @@ export default function Home() {
   const welcomeTextareaRef = useRef(null);
   const createTextareaRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [pageChipVisible, setPageChipVisible] = useState(true);
+  const [pageChipVisible, setPageChipVisible] = useState(false);
   const [chipDismissing, setChipDismissing] = useState(false);
   function dismissChip() {
     setChipDismissing(true);
