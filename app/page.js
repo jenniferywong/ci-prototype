@@ -120,7 +120,7 @@ function buildPromptPlaceholder(toolType, toolLabel, pageContext) {
   const preview  = (pageContext?.preview || '').trim();
 
   if (!rawTitle && !preview) {
-    return 'Describe your topic or what you need…';
+    return 'Describe your topic or what you need';
   }
 
   // Strip site-name suffixes from the title
