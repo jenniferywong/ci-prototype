@@ -1700,17 +1700,17 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             {/* Curriculum row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Curriculum</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
                 <span title={curriculumValue} style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
-                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
+                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'default', padding: 6.4, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Audience row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
                 <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>
-                <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
+                <button onClick={() => setEditingSection('audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6.4, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
             {/* Format row */}
@@ -1723,7 +1723,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 {formatParts.length > formatShownCount && (
                   <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
                 )}
-                <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
+                <button onClick={() => setEditingSection('format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6.4, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, marginLeft: 2 }}>{pencilIcon}</button>
               </div>
             </div>
           </div>

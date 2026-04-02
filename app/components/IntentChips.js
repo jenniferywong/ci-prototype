@@ -72,7 +72,7 @@ export default function IntentChips({ toolName, input, onInputChange, pageContex
   return (
     <div ref={containerRef} style={{ flexShrink: 0, padding: '4px 24px 12px' }}>
       {/* Chip row */}
-      <div style={{ display: 'flex', gap: 4 }}>
+      <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
         {chips.map((chip, i) => {
           const active = openIdx === i;
           return (
