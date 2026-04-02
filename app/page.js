@@ -668,17 +668,7 @@ function Header({ onClose, selectedClass: selCls, classBtnRef: cRef, onClassClic
           <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{cls?.label || 'Select Class'}</span>
           <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M2 5.5L5 2.5L8 5.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 8.5L5 11.5L8 8.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 13, fontWeight: 400, color: '#475467', lineHeight: 1 }}>
-            <img src="/icons/Help.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
-            Help
-          </button>
-          <img src="/icons/Home.svg" width={16} height={16} alt="Home" style={{ display: 'block', cursor: 'pointer' }} />
-          <img src="/icons/More.svg" width={16} height={16} alt="More" style={{ display: 'block', cursor: 'pointer' }} />
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
-            <img src="/icons/Close.svg" width={16} height={16} alt="Close" style={{ display: 'block' }} />
-          </button>
-        </div>
+        <div style={{ marginLeft: 'auto' }}><HeaderActions onClose={onClose} /></div>
       </div>
     </div>
   );
@@ -694,17 +684,7 @@ function HeaderFlat({ onClose, selectedClass: selCls, classBtnRef: cRef, onClass
           <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{cls?.label || 'Select Class'}</span>
           <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M2 5.5L5 2.5L8 5.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 8.5L5 11.5L8 8.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 13, fontWeight: 400, color: '#475467', lineHeight: 1 }}>
-            <img src="/icons/Help.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
-            Help
-          </button>
-          <img src="/icons/Home.svg" width={16} height={16} alt="Home" style={{ display: 'block', cursor: 'pointer' }} />
-          <img src="/icons/More.svg" width={16} height={16} alt="More" style={{ display: 'block', cursor: 'pointer' }} />
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
-            <img src="/icons/Close.svg" width={16} height={16} alt="Close" style={{ display: 'block' }} />
-          </button>
-        </div>
+        <div style={{ marginLeft: 'auto' }}><HeaderActions onClose={onClose} /></div>
       </div>
     </div>
   );
@@ -724,6 +704,17 @@ const ModalBackBtn = ({ onClick }) => (
 );
 const ModalMenuBtn = () => (
   <img src="/icons/More.svg" width={16} height={16} alt="More" style={{ display: 'block', cursor: 'pointer', flexShrink: 0 }} />
+);
+const HeaderActions = ({ onClose }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+    <button style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 13, fontWeight: 400, color: '#475467', lineHeight: 1 }}>
+      <img src="/icons/Help.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
+      Help
+    </button>
+    <img src="/icons/Home.svg" width={16} height={16} alt="Home" style={{ display: 'block', cursor: 'pointer' }} />
+    <ModalMenuBtn />
+    <ModalCloseBtn onClick={onClose} />
+  </div>
 );
 
 // Header used for quiz creation flow and iteration — with back, title, tabs
@@ -1576,7 +1567,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
       {leftIcon && <div style={{ position: 'absolute', left: 10, pointerEvents: 'none', display: 'flex', alignItems: 'center', zIndex: 1 }}>{leftIcon}</div>}
       <select value={value} onChange={e => onChange(e.target.value)}
-        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 4, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: 'transparent', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none' }}>
+        style={{ padding: `7px 28px 7px ${leftIcon ? '34px' : '12px'}`, border: '1px solid #E2E1DE', borderRadius: 8, fontFamily: 'inherit', fontSize: 13, color: '#0E151C', background: 'transparent', cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none' }}>
         {options.map(o => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
       </select>
       {chevron}
@@ -1589,12 +1580,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px', height: 52, gap: 8 }}>
           <ModalBackBtn onClick={onBack} />
           <div style={{ flex: 1 }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <img src="/icons/Help.svg" width={20} height={20} alt="Help" style={{ display: 'block', cursor: 'pointer' }} />
-            <img src="/icons/Home.svg" width={16} height={16} alt="Home" style={{ display: 'block', cursor: 'pointer' }} />
-            <ModalMenuBtn />
-            <ModalCloseBtn onClick={onClose} />
-          </div>
+          <HeaderActions onClose={onClose} />
         </div>
       </div>
 
@@ -2991,12 +2977,7 @@ export default function Home() {
                 <span style={{ fontSize: 12, color: '#475467', fontWeight: 500, letterSpacing: '-0.01em' }}>{selectedClass ? CLASSES.find(c => c.id === selectedClass)?.label : 'Select Class'}</span>
                 <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M2 5.5L5 2.5L8 5.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 8.5L5 11.5L8 8.5" stroke={C.slate500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <img src="/icons/Help.svg" width={20} height={20} alt="Help" style={{ display: 'block', cursor: 'pointer' }} />
-                <img src="/icons/Home.svg" width={16} height={16} alt="Home" style={{ display: 'block', cursor: 'pointer' }} />
-                <ModalMenuBtn />
-                <ModalCloseBtn onClick={handleClose} />
-              </div>
+              <div style={{ marginLeft: 'auto' }}><HeaderActions onClose={handleClose} /></div>
             </div>
           </div>
 
