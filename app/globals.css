@@ -77,6 +77,20 @@ textarea::placeholder { color: #74818E; font-weight: 400; }
 .lib-sub { display: none; font-size: 12px; color: #344054; line-height: 17px; margin-top: 1px; }
 .lib-row:hover .lib-sub { display: block; }
 
+/* ── Mobile (≤475px) — full-width layout, no bubble ── */
+@media (max-width: 475px) {
+  /* Dropdown grids collapse to single column */
+  .two-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Intent chips row: allow more wrapping room */
+  .intent-chip { font-size: 13px !important; padding: 6px 10px !important; }
+  /* Tabs: ensure they don't clip on narrow screens */
+  .qg-tab-strip { padding: 0 16px 10px !important; }
+  /* Tooltip hovers don't work on touch — hide them */
+  .tooltip-row[data-tooltip]:hover::before { display: none; }
+}
+
 .tooltip-row { position: relative; }
 .tooltip-row[data-tooltip]:hover::before {
   content: attr(data-tooltip);

@@ -1860,7 +1860,7 @@ function CurriculumMarquee({ name, onHoverChange }) {
   );
 }
 
-function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum }) {
+function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile }) {
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
   const promptBoxRef = useRef(null);
@@ -2062,7 +2062,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 <img src="/icons/Close.svg" width={20} height={20} alt="Close" style={{ display: 'block' }} />
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade</div>
                 <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
@@ -2085,7 +2085,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               </button>
             </div>
             {toolType === 'doc' && isSlidesDefault ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Platform</div>
                   <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
@@ -2109,14 +2109,14 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 </div>
               </div>
             ) : toolType === 'doc' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Format</div>
                   <FormatDropdown options={FORMAT_OPTIONS.doc} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 8, rowGap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>File Type</div>
                   <FormatDropdown options={FORMAT_OPTIONS.quiz} value={prefs.platform || 'Forms'} onChange={v => onPrefsChange({ platform: v })} fullWidth />
@@ -2201,6 +2201,13 @@ export default function Home() {
   const welcomeTextareaRef = useRef(null);
   const createTextareaRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 475);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const [pageChipVisible, setPageChipVisible] = useState(false);
   const [chipDismissing, setChipDismissing] = useState(false);
   function dismissChip() {
@@ -3027,8 +3034,13 @@ export default function Home() {
 
   // sourcesReady: true once API has returned data (resource panel shows skeleton until then)
   const sourcesReady = !!qgQuizData;
-  const isDockedRight = screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
-  const panelStyle = {
+  const isDockedRight = !isMobile && screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
+  const panelStyle = isMobile ? {
+    background: '#FAF9F6',
+    display: 'flex', flexDirection: 'column',
+    overflow: 'hidden', position: 'fixed', zIndex: 10,
+    inset: 0,
+  } : {
     background: '#FAF9F6',
     borderRadius: 12,
     border: '1px solid #E5E4E2',
@@ -3752,6 +3764,7 @@ export default function Home() {
           onPrefsChange={delta => setPrefs(p => ({ ...p, ...delta }))}
           pageContext={pageContext}
           pageChipVisible={pageChipVisible}
+          isMobile={isMobile}
           onDismissChip={dismissChip}
           onAddClick={({ top, left }) => { setAddMenuPos({ top, left }); setAddMenuOpen(v => !v); }}
           onBriskIt={handleQuizBriskIt}
@@ -4519,7 +4532,7 @@ export default function Home() {
         return (
           <>
             {/* Header bar + segmented control */}
-            <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', flexShrink: 0, borderBottom: `1px solid ${C.slate200}` }}>
+            <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0, borderBottom: `1px solid ${C.slate200}` }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8 }}>
                 <ModalBackBtn onClick={() => setScreen(1)} />
                 <span style={{ flex: 1, fontWeight: 700, fontSize: 14, color: C.slate900, textAlign: 'center', letterSpacing: '-0.01em' }}>{resourceLabel}</span>
@@ -4531,7 +4544,7 @@ export default function Home() {
               {/* Segmented control — inside header */}
               <div style={{ padding: '0 24px 12px' }}>
                 <div style={{ display: 'flex', background: '#EEEDE9', borderRadius: 10, padding: 4, height: 40 }}>
-                  {['Overview', 'Sources'].map(tab => {
+                  {['Overview', ...(isMobile && quizGenPhase === 'done' && sourcesReady ? ['Output'] : []), 'Sources'].map(tab => {
                     const isActive = quizGenTab === tab;
                     return (
                       <button key={tab} onClick={() => { setQuizGenTab(tab); if (tab === 'Sources') setSourcesViewed(true); }}
@@ -4854,6 +4867,31 @@ export default function Home() {
                 )}
               </>
             )}
+
+            {/* OUTPUT TAB — mobile only, shows the quiz/form/slides preview inline */}
+            {quizGenTab === 'Output' && isMobile && (() => {
+              const slidesDefault = screenOneToolLabel?.toLowerCase().includes('presentation') || screenOneToolLabel?.toLowerCase().includes('slide');
+              const effectiveDocFmt = prefs.docFormat || (slidesDefault ? 'Slides' : 'Docs');
+              const isSlidesTool = screenOneToolType === 'doc' && effectiveDocFmt === 'Slides';
+              const platform = prefs.platform || 'Forms';
+              const isDocOut = screenOneToolType === 'doc' || platform === 'Docs';
+              const isKahootOut = screenOneToolType !== 'doc' && platform === 'Kahoot';
+              const isNearpodOut = screenOneToolType !== 'doc' && platform === 'Nearpod';
+              const outTitle = qgQuizData?.title || `${topic} ${screenOneToolLabel || 'Quiz'}`;
+              const outCls = CLASSES.find(c => c.id === selectedClass);
+              const outGrade = outCls?.grade || prefs.grade || '8th';
+              const outSubj = outCls?.subject || detectedSubject || 'ELA';
+              const formDesc = topic ? `${outGrade} Grade · ${outSubj} · ${qgQuizData?.questions?.length ?? (prefs.numQuestions ?? 10)} questions` : null;
+              return (
+                <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: isSlidesTool ? '#1e1e1e' : isDocOut ? '#f1f3f4' : isKahootOut ? '#46178f' : isNearpodOut ? '#F5F7FA' : '#f0ebff' }}>
+                  {isSlidesTool ? <GoogleSlidesPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
+                    : isDocOut ? <GoogleDocPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
+                    : isKahootOut ? <KahootPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
+                    : isNearpodOut ? <NearpodPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} />
+                    : <GoogleFormsPreview quiz={qgQuizData} title={outTitle} isIterating={!!qgFormsLoading} description={formDesc} />}
+                </div>
+              );
+            })()}
 
             {/* SOURCES TAB */}
             {quizGenTab === 'Sources' && (
@@ -5191,14 +5229,14 @@ export default function Home() {
       })()}
 
       {/* Quiz (old flow) — fixed full-screen scrollable behind panel */}
-      {quizExists && !isDockedRight && (
+      {quizExists && !isDockedRight && !isMobile && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1, overflowY: 'auto' }}>
           <GoogleFormsPreview quiz={activeQuiz} title={quizTitle} key={activeVersionIdx} />
         </div>
       )}
 
-      {/* Background (only when no quiz yet) */}
-      {!quizExists && (
+      {/* Background (only when no quiz yet, desktop only) */}
+      {!quizExists && !isMobile && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
           {pageContext?.type === 'screenshot' ? (
             <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
@@ -5220,8 +5258,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* Brisk FAB + context bar — visible when panel is closed */}
-      {!isOpen && (
+      {/* Brisk FAB + context bar — visible when panel is closed (desktop only) */}
+      {!isOpen && !isMobile && (
         <>
           <button
             onClick={() => setIsOpen(true)}
@@ -5273,11 +5311,11 @@ export default function Home() {
         </>
       )}
 
-      {/* Spotlight — overlay + context bar + panel, shown when open */}
-      {isOpen && (
+      {/* Spotlight — overlay + context bar + panel, shown when open or always on mobile */}
+      {(isOpen || isMobile) && (
         <>
-          {/* Dark overlay — hidden when docked right or quiz exists */}
-          {!quizExists && !isDockedRight && (
+          {/* Dark overlay — desktop only, hidden when docked right or quiz exists */}
+          {!isMobile && !quizExists && !isDockedRight && (
             <div onClick={() => setIsOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 9 }} />
           )}
 
