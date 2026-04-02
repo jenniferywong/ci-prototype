@@ -1716,7 +1716,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             {/* Format row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
               <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: formatParts.length === 1 ? 8 : 6, minWidth: 0 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: formatParts.length === 1 ? 4 : 6, minWidth: 0 }}>
                 <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
                 {formatParts.length > 1 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}>·</span>}
                 <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{formatParts.slice(0, formatShownCount).join(' • ')}</span>
