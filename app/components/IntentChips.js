@@ -6,16 +6,26 @@ function hydrate(template, topic) {
   return template.replace(/\{topic\}/g, topic || 'your topic');
 }
 
+function cleanPageTitle(title) {
+  return (title || '')
+    .replace(/\s*[-–|]\s*(Wikipedia|Khan Academy|YouTube|Quizlet|BrainPOP|Britannica|Newsela|CommonLit|IXL|Desmos|ReadWorks|PBS|National Geographic)[^\n]*/i, '')
+    .replace(/\s*[-–|]\s*[^-–|]{3,}$/, '')
+    .trim()
+    .slice(0, 50);
+}
+
 function deriveTopic(input, pageContext, pageChipVisible, toolName) {
-  if (input && input.trim().split(/\s+/).filter(Boolean).length >= 3) {
-    return input.trim().slice(0, 60);
+  const typed = (input || '').trim();
+  const pageTitle = pageChipVisible ? cleanPageTitle(pageContext?.title) : '';
+
+  // Both typed input AND page context — combine them
+  if (typed && pageTitle) {
+    return typed.length > 30 ? typed.slice(0, 60) : `${typed} (${pageTitle})`;
   }
-  if (pageChipVisible && pageContext?.title) {
-    return pageContext.title
-      .replace(/\s*[-–|]\s*[^-–|]{3,}$/, '')
-      .trim()
-      .slice(0, 60) || pageContext.title;
-  }
+  // Just typed input — any length counts
+  if (typed) return typed.slice(0, 60);
+  // Just page context
+  if (pageTitle) return pageTitle;
   return `your ${(toolName || 'content').toLowerCase()}`;
 }
 
