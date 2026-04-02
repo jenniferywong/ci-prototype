@@ -252,8 +252,11 @@ function MicButton({ onTranscript, size = 20, btnStyle, className }) {
   );
 }
 
-function ToolRow({ svg, label, sub, onClick }) {
+function ToolRow({ svg, emoji, label, sub, onClick }) {
   const [hovered, setHovered] = useState(false);
+  const icon = emoji
+    ? <span style={{ fontSize: 18, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{emoji}</span>
+    : <img src={svg} width={28} height={28} alt="" style={{ flexShrink: 0, display: 'block' }} />;
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -262,7 +265,7 @@ function ToolRow({ svg, label, sub, onClick }) {
       <button
         onClick={onClick || undefined}
         style={{ width: '100%', height: 58, padding: '0 16px', border: 'none', borderRadius: 10, background: hovered ? '#EBE9E6' : 'transparent', display: 'flex', alignItems: 'center', gap: 8, cursor: onClick ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left', transition: 'background 0.12s', flexShrink: 0 }}>
-        <img src={svg} width={28} height={28} alt="" style={{ flexShrink: 0, display: 'block' }} />
+        {icon}
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, color: C.slate900, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.01em' }}>{label}</div>
           {hovered && <div style={{ fontSize: 12, color: '#344054', lineHeight: '17px', marginTop: 1 }}>{sub}</div>}
@@ -3177,15 +3180,31 @@ export default function Home() {
 
               if (!q) return <>{allToolRows}<div style={{ height: 4 }} /></>;
 
+              // Also surface individual create tools (Quiz, Presentation, etc.) when searched directly
+              const flatCreateTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools).map(t => ({
+                emoji: t.emoji, label: t.label, sub: t.sub,
+                onClick: t.onClick === 'quiz'
+                  ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setScreen(1); setInput(''); }
+                  : t.label === 'Nearpod'
+                    ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(''); }
+                    : (t.onClick === 'doc' || t.onClick === null) && t.label !== 'Boost Student Activity'
+                      ? () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); }
+                      : () => { setScreen('create'); setCreateScroll(0); },
+              }));
+
               // PROMPT MODE — only show a suggested tool if there's a confident keyword match
               if (wsIsPromptMode) {
-                const TOOL_KW = /\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|podcast)\b/i;
+                const TOOL_KW = /\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|deck|podcast)\b/i;
                 const kwMatch = TOOL_KW.exec(q);
                 let suggestedTool = null;
                 if (kwMatch) {
                   const kw = kwMatch[1].toLowerCase();
+                  const findCreate = label => flatCreateTools.find(t => t.label === label) || null;
                   if (/feedback|comment|review|grade/.test(kw)) suggestedTool = topTools[1];
-                  else if (/quiz|test|question|create|make|build|presentation|slide|podcast/.test(kw)) suggestedTool = topTools[0];
+                  else if (/quiz|test|question/.test(kw)) suggestedTool = findCreate('Quiz');
+                  else if (/presentation|slide|deck/.test(kw)) suggestedTool = findCreate('Presentation');
+                  else if (/podcast/.test(kw)) suggestedTool = findCreate('Podcast');
+                  else if (/create|make|build/.test(kw)) suggestedTool = topTools[0];
                   else if (/inspect|analy/.test(kw)) suggestedTool = topTools[2];
                   else if (/level|simplif|complex/.test(kw)) suggestedTool = topTools[3];
                   else if (/boost|engag/.test(kw)) suggestedTool = topTools[4];
@@ -3194,7 +3213,7 @@ export default function Home() {
                 if (suggestedTool) return (
                   <>
                     <div style={{ padding: '10px 16px 4px', fontSize: 12, fontWeight: 500, color: '#475467', lineHeight: '18px' }}>Suggested</div>
-                    <ToolRow svg={suggestedTool.svg} label={suggestedTool.label} sub={suggestedTool.sub} onClick={suggestedTool.onClick} />
+                    <ToolRow svg={suggestedTool.svg} emoji={suggestedTool.emoji} label={suggestedTool.label} sub={suggestedTool.sub} onClick={suggestedTool.onClick} />
                     <div style={{ height: 4 }} />
                   </>
                 );
@@ -3202,7 +3221,7 @@ export default function Home() {
               }
 
               // SEARCH MODE
-              const TOOL_KW_RE = /\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|podcast)\b/gi;
+              const TOOL_KW_RE = /\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|deck|podcast)\b/gi;
               const FILLER_RE  = /\b(give|get|make|do|use|add|set|the|a|an|for|on|in|of|to|my|i|want|need|some|this|that|with|and|or)\b/gi;
               const rawTopicPart = q.replace(TOOL_KW_RE, '').replace(/\s+/g, ' ').trim();
               const topicPart = rawTopicPart.replace(FILLER_RE, '').replace(/\s+/g, ' ').trim();
@@ -3219,22 +3238,34 @@ export default function Home() {
               const subjectIsHistory = /social studies|history/.test(rawSubject);
               const subjectIsScience = /science|biology|chemistry|physics/.test(rawSubject);
 
-              // Also surface individual create tools (Quiz, Presentation, etc.) when searched directly
-              const flatCreateTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools).map(t => ({
-                svg: t.svg, label: t.label, sub: t.sub,
-                onClick: t.onClick === 'quiz'
-                  ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setScreen(1); setInput(''); }
-                  : t.label === 'Nearpod'
-                    ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(''); }
-                    : (t.onClick === 'doc' || t.onClick === null) && t.label !== 'Boost Student Activity'
-                      ? () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); }
-                      : () => { setScreen('create'); setCreateScroll(0); },
-              }));
+              // Synonym map for tool label matching (e.g. "slide deck" → Presentation)
+              const TOOL_SYNONYMS = {
+                'Presentation': ['slide', 'slides', 'slide deck', 'deck', 'slideshow'],
+                'Quiz': ['test', 'assessment', 'formative', 'exam', 'exit ticket'],
+                'Lesson Plan': ['lesson'],
+                'Unit Plan': ['unit'],
+                'Science Lab': ['lab', 'experiment'],
+                'DOK Questions': ['dok'],
+                'Guided Notes': ['notes'],
+              };
               const allSearchableTools = [
                 ...topTools,
                 ...flatCreateTools.filter(ct => !topTools.some(tt => tt.label === ct.label)),
               ];
-              const matchedTop = topMatches(q, allSearchableTools, t => t.label, 3);
+              // Score with synonyms: if label doesn't match, check synonym aliases
+              const scoreWithSyn = (query, item) => {
+                const base = scoreMatch(query, item.label);
+                if (base >= 40) return base;
+                const syns = TOOL_SYNONYMS[item.label] || [];
+                const synBest = syns.reduce((best, s) => { const sc = scoreMatch(query, s); return sc > best ? sc : best; }, 0);
+                return synBest >= 40 ? synBest : 0;
+              };
+              const matchedTop = allSearchableTools
+                .map(item => ({ item, score: scoreWithSyn(q, item) }))
+                .filter(x => x.score >= 40)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3)
+                .map(x => x.item);
               // Also try matching tools on extracted topic (e.g. "create a syllabus" → topicPart="syllabus" → Syllabus tool)
               const matchedTopTopic = (hasTopicComponent && topicPart !== q)
                 ? topMatches(topicPart, allSearchableTools, t => t.label, 3).filter(t => !matchedTop.some(m => m.label === t.label))
@@ -3307,8 +3338,9 @@ export default function Home() {
                 { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
               ] : [];
 
-              const hardcodedMy   = semanticLibResults.my;
-              const hardcodedDist = semanticLibResults.district;
+              // When a class is selected, filter semantic results to that class's subject
+              const hardcodedMy   = selectedClass ? semanticLibResults.my.filter(subjectFilter)   : semanticLibResults.my;
+              const hardcodedDist = selectedClass ? semanticLibResults.district.filter(subjectFilter) : semanticLibResults.district;
               const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
               const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
 
@@ -3397,7 +3429,9 @@ export default function Home() {
                     <button
                       onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(q); setScreen(1); }}
                       style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', border: '1.5px solid #D0E8F0', borderRadius: 10, background: '#F0F8FB', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                      <img src={chainedTool.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                      {chainedTool.emoji
+                        ? <span style={{ fontSize: 18, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{chainedTool.emoji}</span>
+                        : <img src={chainedTool.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 14, color: '#0E151C', fontWeight: 500, lineHeight: '20px' }}>Create: {displayTopic} {chainedTool.label}</div>
                         <div style={{ fontSize: 12, color: '#475467', lineHeight: '17px', marginTop: 1 }}>Jump straight in — topic pre-loaded</div>
@@ -3418,7 +3452,7 @@ export default function Home() {
                     return (
                       <>
                         {chainedPromptBtn}
-                        {allMatchedTools.length > 0 && <>{sec('Brisk tools')}{allMatchedTools.map(t => <ToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} onClick={t.onClick} />)}</>}
+                        {allMatchedTools.length > 0 && <>{sec('Brisk tools')}{allMatchedTools.map(t => <ToolRow key={t.label} svg={t.svg} emoji={t.emoji} label={t.label} sub={t.sub} onClick={t.onClick} />)}</>}
                         {assignmentsToGrade.length > 0 && <>{sec('Assignments to grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
                         {myLibrary.length > 0 && <>{sec('My library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
                         {districtLibrary.length > 0 && <>{sec('District library')}{districtLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
