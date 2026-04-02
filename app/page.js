@@ -4594,10 +4594,10 @@ export default function Home() {
           <>
             {/* Header bar + segmented control */}
             <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0, borderBottom: `1px solid ${C.slate200}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
                 <ModalBackBtn onClick={() => setScreen(1)} />
-                <span style={{ flex: 1, fontWeight: 700, fontSize: 14, color: C.slate900, textAlign: 'center', letterSpacing: '-0.01em' }}>{resourceLabel}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 14, color: C.slate900, letterSpacing: '-0.01em', pointerEvents: 'none' }}>{resourceLabel}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 'auto' }}>
                   <ModalMenuBtn />
                   <ModalCloseBtn onClick={handleClose} />
                 </div>
