@@ -1506,7 +1506,7 @@ function FormatDropdown({ options, value, onChange }) {
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button ref={triggerRef} onClick={handleOpen}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px 0 8px', border: '1px solid #E2E1DE', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', cursor: 'pointer', outline: 'none' }}>
         <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
         <span>{selected.label}</span>
         <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0 }}>
