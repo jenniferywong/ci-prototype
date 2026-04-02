@@ -3340,11 +3340,23 @@ export default function Home() {
                 { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
               ] : [];
 
-              // When a class is selected, filter semantic results to that class's subject
-              const hardcodedMy   = selectedClass ? semanticLibResults.my.filter(subjectFilter)   : semanticLibResults.my;
-              const hardcodedDist = selectedClass ? semanticLibResults.district.filter(subjectFilter) : semanticLibResults.district;
-              const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
-              const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
+              // Keyword match against label + tags, incorporating page context title
+              const pageCtxWords = pageChipVisible && pageContext?.title
+                ? pageContext.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2)
+                : [];
+              const kwMatchLib = (item, term) => {
+                const hay = (item.label + ' ' + (item.tags || '')).toLowerCase();
+                const words = [...term.toLowerCase().split(/\s+/), ...pageCtxWords].filter(w => w.length > 2);
+                return words.some(w => hay.includes(w));
+              };
+              const kwMy   = MY_LIBRARY_DATA.filter(i => subjectFilter(i) && kwMatchLib(i, searchTerm)).slice(0, 3);
+              const kwDist = DISTRICT_LIBRARY_DATA.filter(i => subjectFilter(i) && kwMatchLib(i, searchTerm)).slice(0, 3);
+
+              // Prefer semantic results (API), fall back to keyword match, then generic
+              const semanticMy   = selectedClass ? semanticLibResults.my.filter(subjectFilter) : semanticLibResults.my;
+              const semanticDist = selectedClass ? semanticLibResults.district.filter(subjectFilter) : semanticLibResults.district;
+              const myLibrary       = semanticMy.length > 0   ? semanticMy   : kwMy.length > 0   ? kwMy   : GENERIC_MY;
+              const districtLibrary = semanticDist.length > 0 ? semanticDist : kwDist.length > 0 ? kwDist : GENERIC_DIST;
 
               // Assignments to grade — shown when query is feedback/grading related
               const assignmentSubject = subjectIsHistory ? 'Social Studies' : subjectIsMath ? 'Math' : subjectIsScience ? 'Science' : subjectIsELA ? 'ELA' : null;
@@ -3643,11 +3655,19 @@ export default function Home() {
 
               const recoGradeCS = CLASSES.find(c => c.id === selectedClass)?.grade || prefs.grade || '8th';
               const subjectDeptCS = subjectIsELA_CS ? 'ELA' : subjectIsMath_CS ? 'Math' : subjectIsHistory_CS ? 'Social Studies' : subjectIsScience_CS ? 'Science' : null;
-              const hardcodedMyCS   = semanticLibResultsCS.my;
-              const hardcodedDistCS = semanticLibResultsCS.district;
-              // Only show real hardcoded library items — no generated fakes
-              const myLibCS = hardcodedMyCS;
-              const distLibCS = hardcodedDistCS;
+              // Keyword match for create panel, with page context
+              const pageCtxWordsCS = pageChipVisible && pageContext?.title
+                ? pageContext.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2)
+                : [];
+              const kwMatchCS = (item, term) => {
+                const hay = (item.label + ' ' + (item.tags || '')).toLowerCase();
+                const words = [...term.toLowerCase().split(/\s+/), ...pageCtxWordsCS].filter(w => w.length > 2);
+                return words.some(w => hay.includes(w));
+              };
+              const kwMyCS   = MY_LIB_CS.filter(i => kwMatchCS(i, searchTermCS)).slice(0, 3);
+              const kwDistCS = DIST_LIB_CS.filter(i => kwMatchCS(i, searchTermCS)).slice(0, 3);
+              const myLibCS   = semanticLibResultsCS.my.length > 0   ? semanticLibResultsCS.my   : kwMyCS;
+              const distLibCS = semanticLibResultsCS.district.length > 0 ? semanticLibResultsCS.district : kwDistCS;
               const recoTopicCS = hasTopicCS ? topicPartCS : q;
               const noToolKw = !/\b(quiz|test|question|presentation|slide|podcast|nearpod|worksheet|lesson|rubric|discussion)\b/i.test(q);
               const recoCS = (hasTopicCS || noToolKw)
