@@ -3230,7 +3230,7 @@ export default function Home() {
 
               // Synonym map for tool label matching (e.g. "slide deck" → Presentation)
               const TOOL_SYNONYMS = {
-                'Presentation': ['slide', 'slides', 'slide deck', 'deck', 'slideshow'],
+                'Presentation': ['slide', 'slides', 'slide deck', 'deck', 'slideshow', 'slide show'],
                 'Quiz': ['test', 'assessment', 'formative', 'exam', 'exit ticket'],
                 'Lesson Plan': ['lesson'],
                 'Unit Plan': ['unit'],
@@ -3563,12 +3563,16 @@ export default function Home() {
               // PROMPT MODE — show a suggested tool if there's a confident keyword match, else fall through
               let suggestedCreateTool = null;
               if (csIsPromptMode) {
-                const TOOL_KW = /\b(quiz|test|question|presentation|slide|podcast|nearpod|worksheet|lesson plan|rubric|graphic organizer|reading guide|discussion)\b/i;
+                const TOOL_KW = /\b(quiz|test|question|presentation|slide show|slideshow|slide deck|slide|podcast|nearpod|worksheet|lesson plan|rubric|graphic organizer|reading guide|discussion)\b/i;
                 const kwMatch = TOOL_KW.exec(q);
                 if (kwMatch) {
                   const allTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools);
                   const kw = kwMatch[1].toLowerCase();
-                  suggestedCreateTool = allTools.find(t => fuzzyMatch(kw.split(' ')[0], t.label)) || null;
+                  const KW_LABEL = { slide: 'Presentation', slides: 'Presentation', slideshow: 'Presentation', 'slide show': 'Presentation', 'slide deck': 'Presentation' };
+                  const targetLabel = KW_LABEL[kw];
+                  suggestedCreateTool = targetLabel
+                    ? (allTools.find(t => t.label === targetLabel) || null)
+                    : (allTools.find(t => fuzzyMatch(kw.split(' ')[0], t.label)) || null);
                 }
                 if (suggestedCreateTool) return (
                   <>
