@@ -2218,6 +2218,8 @@ export default function Home() {
   const [createScroll, setCreateScroll] = useState(0);
   const [welcomeSearch, setWelcomeSearch] = useState('');
   const [createSearch, setCreateSearch] = useState('');
+  const [welcomeMultiline, setWelcomeMultiline] = useState(false);
+  const [createMultiline, setCreateMultiline] = useState(false);
   const [debouncedWelcomeSearch, setDebouncedWelcomeSearch] = useState('');
   const [debouncedCreateSearch, setDebouncedCreateSearch] = useState('');
   const [semanticLibResults, setSemanticLibResults] = useState({ my: [], district: [] });
@@ -2550,6 +2552,7 @@ export default function Home() {
     const p = welcomeSearch.trim();
     if (!p) return;
     setWelcomeSearch('');
+    setWelcomeMultiline(false);
     setChatAnswers([]);
     setChatCurrentQ(0);
     setChatInput('');
@@ -3011,6 +3014,7 @@ export default function Home() {
     const p = createSearch.trim();
     if (!p) return;
     setCreateSearch('');
+    setCreateMultiline(false);
     const detected = detectToolAndTopic(p);
     if (detected) {
       setScreenOneToolType(detected.type);
@@ -3086,7 +3090,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 24px 8px', position: 'relative' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : welcomeMultiline ? 16 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -3116,14 +3120,18 @@ export default function Home() {
                   onChange={e => {
                     setWelcomeSearch(e.target.value);
                     const el = welcomeTextareaRef.current;
-                    if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+                    if (el) {
+                      el.style.height = 'auto';
+                      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+                      setWelcomeMultiline(el.scrollHeight > 30);
+                    }
                   }}
                   placeholder="Search or type what you need"
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
                 />
                 <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
-                  onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
+                  onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; setWelcomeMultiline(el.scrollHeight > 30); } }} />
                 {wsIsPromptMode && welcomeSearch.trim() && (
                   <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center', marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -3273,17 +3281,17 @@ export default function Home() {
 
               // For topic queries with no hardcoded subject match, show generic subject-appropriate items
               const noSubjectMatch = !effectiveSubjectIsELAFull && !effectiveSubjectIsMath && !effectiveSubjectIsHistory && !effectiveSubjectIsScience;
-              const GENERIC_MY = hasTopicComponent && !isPureToolQuery && noSubjectMatch ? [
+              const GENERIC_MY = hasTopicComponent && noSubjectMatch ? [
                 { label: 'Graphic Organizer — Notes',  sub: 'Modified 2 weeks ago', icon: '/icons/Docs.svg' },
                 { label: 'Guided Reading Questions',   sub: 'Modified 1 month ago', icon: '/icons/Docs.svg' },
               ] : [];
-              const GENERIC_DIST = hasTopicComponent && !isPureToolQuery && noSubjectMatch ? [
+              const GENERIC_DIST = hasTopicComponent && noSubjectMatch ? [
                 { label: 'Standards-Aligned Unit Guide', sub: 'District · Curriculum Dept', icon: '/icons/PDF.svg' },
                 { label: 'Vocabulary & Key Terms Bank',  sub: 'District · Curriculum Dept', icon: '/icons/Docs.svg' },
               ] : [];
 
-              const hardcodedMy   = isPureToolQuery ? [] : semanticLibResults.my;
-              const hardcodedDist = isPureToolQuery ? [] : semanticLibResults.district;
+              const hardcodedMy   = semanticLibResults.my;
+              const hardcodedDist = semanticLibResults.district;
               const myLibrary    = hardcodedMy.length > 0 ? hardcodedMy    : GENERIC_MY;
               const districtLibrary = hardcodedDist.length > 0 ? hardcodedDist : GENERIC_DIST;
 
@@ -3393,11 +3401,11 @@ export default function Home() {
                     return (
                       <>
                         {chainedPromptBtn}
-                        {allMatchedTools.length > 0 && <>{sec('Tools')}{allMatchedTools.map(t => <ToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} onClick={t.onClick} />)}</>}
-                        {assignmentsToGrade.length > 0 && <>{sec('Assignments to Grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
-                        {myLibrary.length > 0 && <>{sec('My Library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
-                        {districtLibrary.length > 0 && <>{sec('District Library')}{districtLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
-                        {recommendations.length > 0 && <>{sec('Recommendations')}{recommendations.map(r => <RecoRow key={r.title} item={r} />)}</>}
+                        {allMatchedTools.length > 0 && <>{sec('Brisk tools')}{allMatchedTools.map(t => <ToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} onClick={t.onClick} />)}</>}
+                        {assignmentsToGrade.length > 0 && <>{sec('Assignments to grade')}{assignmentsToGrade.map(a => <LibraryRow key={a.label} item={a} />)}</>}
+                        {myLibrary.length > 0 && <>{sec('My library')}{myLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
+                        {districtLibrary.length > 0 && <>{sec('District library')}{districtLibrary.map(l => <LibraryRow key={l.label} item={l} />)}</>}
+                        {recommendations.length > 0 && <>{sec('Brisk recommendations')}{recommendations.map(r => <RecoRow key={r.title} item={r} />)}</>}
                       </>
                     );
                   })()}
@@ -3429,7 +3437,7 @@ export default function Home() {
 
           {/* Fixed search box — same padding as Welcome */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px ${createScroll > 40 ? 12 : 24}px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : createMultiline ? 16 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -3454,7 +3462,7 @@ export default function Home() {
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
                 <textarea ref={createTextareaRef} value={createSearch}
-                  onChange={e => { setCreateSearch(e.target.value); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }}
+                  onChange={e => { setCreateSearch(e.target.value); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; setCreateMultiline(el.scrollHeight > 30); } }}
                   placeholder="Search or type what you need"
                   rows={1}
                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
@@ -3579,8 +3587,8 @@ export default function Home() {
 
               const recoGradeCS = CLASSES.find(c => c.id === selectedClass)?.grade || prefs.grade || '8th';
               const subjectDeptCS = subjectIsELA_CS ? 'ELA' : subjectIsMath_CS ? 'Math' : subjectIsHistory_CS ? 'Social Studies' : subjectIsScience_CS ? 'Science' : null;
-              const hardcodedMyCS   = isPureToolQueryCS ? [] : semanticLibResultsCS.my;
-              const hardcodedDistCS = isPureToolQueryCS ? [] : semanticLibResultsCS.district;
+              const hardcodedMyCS   = semanticLibResultsCS.my;
+              const hardcodedDistCS = semanticLibResultsCS.district;
               // Only show real hardcoded library items — no generated fakes
               const myLibCS = hardcodedMyCS;
               const distLibCS = hardcodedDistCS;
@@ -3638,9 +3646,9 @@ export default function Home() {
                             {tools.map(t => <CreateToolRow key={t.label} svg={t.svg} label={t.label} sub={t.sub} chips={resolveChips(t)} onClick={resolveOnClick(t)} />)}
                           </div>
                         ))}
-                        {myLibCS.length > 0 && <>{secCS('My Library')}{myLibCS.map(l => <LibRowCS key={l.label} item={l} />)}</>}
-                        {distLibCS.length > 0 && <>{secCS('District Library')}{distLibCS.map(l => <LibRowCS key={l.label} item={l} />)}</>}
-                        {recoCS.length > 0 && <>{secCS('Recommendations')}{recoCS.map(r => <RecoRowCS key={r.title} item={r} />)}</>}
+                        {myLibCS.length > 0 && <>{secCS('My library')}{myLibCS.map(l => <LibRowCS key={l.label} item={l} />)}</>}
+                        {distLibCS.length > 0 && <>{secCS('District library')}{distLibCS.map(l => <LibRowCS key={l.label} item={l} />)}</>}
+                        {recoCS.length > 0 && <>{secCS('Brisk recommendations')}{recoCS.map(r => <RecoRowCS key={r.title} item={r} />)}</>}
                       </>
                     );
                   })()}
