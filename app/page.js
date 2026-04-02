@@ -1660,7 +1660,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F2F0', gap: 24 }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#0E151C', flexShrink: 0 }}>Curriculum</span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-                <span style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
+                <span title={curriculumValue} style={{ fontSize: 13, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{curriculumValue}</span>
               </div>
             </div>
             {/* Audience row */}
@@ -3730,7 +3730,7 @@ export default function Home() {
                         ].sort((a, b) => a.name.length - b.name.length).map(d => (
                           <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #E2E1DE', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
                             <img src={d.svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                            <span style={{ fontSize: 13, color: C.slate900, whiteSpace: 'nowrap' }}>{d.name}</span>
+                            <span title={d.name} style={{ fontSize: 13, color: C.slate900, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{d.name}</span>
                             <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
                               <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
                             </button>
@@ -3764,7 +3764,7 @@ export default function Home() {
                         ].sort((a, b) => a.name.length - b.name.length).map(d => (
                           <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #E2E1DE', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
                             <img src={d.svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                            <span style={{ fontSize: 13, color: C.slate900, whiteSpace: 'nowrap' }}>{d.name}</span>
+                            <span title={d.name} style={{ fontSize: 13, color: C.slate900, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{d.name}</span>
                             <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
                               <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
                             </button>
@@ -3781,7 +3781,7 @@ export default function Home() {
                             <div style={{ width: 16, height: 16, background: '#1B6B6B', borderRadius: 3, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
-                            <span style={{ flex: 1, fontSize: 13, color: C.slate700, lineHeight: '20px' }}>{d}</span>
+                            <span title={d} style={{ flex: 1, fontSize: 13, color: C.slate700, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d}</span>
                           </div>
                         ))}
                         <AddTertiaryBtn style={{ marginTop: 6 }} />
@@ -3792,7 +3792,7 @@ export default function Home() {
                     <button onClick={() => setExpandedSource(expandedSource === section.id ? null : section.id)}
                       style={{ width: '100%', padding: '12px 14px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                       <img src={section.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                      <span style={{ flex: 1, fontSize: 14, fontWeight: 400, color: C.slate900, lineHeight: '21px' }}>{section.label}</span>
+                      <span title={section.label} style={{ flex: 1, fontSize: 14, fontWeight: 400, color: C.slate900, lineHeight: '21px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.label}</span>
                       <span style={{ fontSize: 12, color: C.slate500, lineHeight: '18px', marginRight: 6 }}>{section.count}</span>
                       <img src={expandedSource === section.id ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0 }} />
                     </button>
@@ -4050,7 +4050,7 @@ export default function Home() {
                   {[...curriculumDocs].sort((a, b) => a.name.length - b.name.length).map(d => (
                     <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #E2E1DE', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
                       <img src={d.svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap' }}>{d.name}</span>
+                      <span title={d.name} style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{d.name}</span>
                       <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
                         <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
                       </button>
@@ -4083,7 +4083,7 @@ export default function Home() {
                   {[...districtDocs].sort((a, b) => a.name.length - b.name.length).map(d => (
                     <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #E2E1DE', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
                       <img src={d.svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap' }}>{d.name}</span>
+                      <span title={d.name} style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>{d.name}</span>
                       <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
                         <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
                       </button>
