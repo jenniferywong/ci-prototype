@@ -9,8 +9,8 @@ function parseJSON(text) {
 async function callClaude(client, system, userContent) {
   console.log('[refine] → sending to Claude. User message length:', userContent.length);
   const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 2000,
     system,
     messages: [{ role: 'user', content: userContent }],
   });
