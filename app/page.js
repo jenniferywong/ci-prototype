@@ -472,7 +472,7 @@ function detectCharacter(topic) {
 }
 
 // Generate varied, grade-specific recommendation objects for a topic
-function recoItems(topic, grade, onClickFns) {
+function recoItems(topic, grade, onClickFns, short = false) {
   const toTitleCase = s => s.replace(/\b\w/g, c => c.toUpperCase());
   const t = toTitleCase(topic.trim());
   const g = grade || '8th';
@@ -483,31 +483,31 @@ function recoItems(topic, grade, onClickFns) {
   const allRecs = [
     {
       svg: '/icons/Forms.svg',
-      title: pick([`${g} Grade ${t} Formative Assessment`, `${t} Knowledge Check`, `${t} Quick Check`, `Check for Understanding: ${t}`]),
-      tooltip: `Quick check-in for ${topic}`,
+      title: short ? 'Formative Assessment' : pick([`${g} Grade ${t} Formative Assessment`, `${t} Knowledge Check`, `${t} Quick Check`, `Check for Understanding: ${t}`]),
+      tooltip: `Quick check-in for ${short ? 'this page' : topic}`,
       onClick: onClickFns?.quiz,
     },
     {
       svg: '/icons/Slides.svg',
-      title: pick([`${g} Grade ${t} Presentation`, `Intro to ${t}: Slide Deck`, `${t} Direct Instruction Slides`, `Teaching ${t} Presentation`]),
-      tooltip: `Ready to present on ${topic}`,
+      title: short ? 'Presentation' : pick([`${g} Grade ${t} Presentation`, `Intro to ${t}: Slide Deck`, `${t} Direct Instruction Slides`, `Teaching ${t} Presentation`]),
+      tooltip: `Ready to present on ${short ? 'this topic' : topic}`,
       onClick: onClickFns?.slides,
     },
     {
       svg: '/icons/Docs.svg',
-      title: pick([`${t} Guided Notes`, `${t} Student Notes Sheet`, `Structured Notes: ${t}`, `${t} Note-Taking Guide`]),
+      title: short ? 'Guided Notes' : pick([`${t} Guided Notes`, `${t} Student Notes Sheet`, `Structured Notes: ${t}`, `${t} Note-Taking Guide`]),
       tooltip: `Helps students follow along`,
       onClick: onClickFns?.doc,
     },
     {
       svg: '/icons/Docs.svg',
-      title: pick([`${t} Lesson Plan`, `Introduction to ${t}`, `${t} Exploration Lesson`, `Teaching ${t} Lesson Plan`]),
+      title: short ? 'Lesson Plan' : pick([`${t} Lesson Plan`, `Introduction to ${t}`, `${t} Exploration Lesson`, `Teaching ${t} Lesson Plan`]),
       tooltip: `Saves planning time`,
       onClick: onClickFns?.lesson,
     },
     {
       svg: '/icons/Forms.svg',
-      title: pick([`${t} Exit Ticket`, `${t} End-of-Class Check`, `Quick ${t} Exit Slip`]),
+      title: short ? 'Exit Ticket' : pick([`${t} Exit Ticket`, `${t} End-of-Class Check`, `Quick ${t} Exit Slip`]),
       tooltip: `Catch misconceptions early`,
       onClick: onClickFns?.quiz,
     },
@@ -3178,7 +3178,33 @@ export default function Home() {
                 <ToolRow key={item.label} svg={item.svg} label={item.label} sub={item.sub} onClick={item.onClick} />
               ));
 
-              if (!q) return <>{allToolRows}<div style={{ height: 4 }} /></>;
+              if (!q) {
+                // When page context is active, show short quick-action chips before the tool rows
+                if (pageChipVisible && pageContext) {
+                  const pageQuickChips = [
+                    { label: 'Make a quiz', onClick: () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(''); setScreen(1); } },
+                    { label: 'Make guided notes', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(''); setScreen(1); } },
+                    { label: 'Make a lesson plan', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(''); setScreen(1); } },
+                    { label: 'Make a presentation', onClick: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(''); setScreen(1); } },
+                  ];
+                  return (
+                    <>
+                      <div style={{ padding: '12px 16px 6px', fontSize: 12, fontWeight: 500, color: '#475467' }}>Quick actions for this page</div>
+                      <div style={{ padding: '0 16px 12px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {pageQuickChips.map(chip => (
+                          <button key={chip.label} onClick={chip.onClick}
+                            style={{ padding: '7px 14px', border: '1.5px solid #D0E8F0', borderRadius: 20, background: '#F0F8FB', color: '#06465C', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+                      {allToolRows}
+                      <div style={{ height: 4 }} />
+                    </>
+                  );
+                }
+                return <>{allToolRows}<div style={{ height: 4 }} /></>;
+              }
 
               // Also surface individual create tools (Quiz, Presentation, etc.) when searched directly
               const flatCreateTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools).map(t => ({
@@ -3379,11 +3405,11 @@ export default function Home() {
               const recoTopicComplete = recoTopic.trim().length >= 6 && recoWords.every(w => w.length >= 3);
               const recommendations = (!isPureToolQuery && recoTopicComplete && (hasTopicComponent || !/\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|podcast)\b/i.test(q)))
                 ? recoItems(recoTopic, recoGrade, {
-                    quiz:   () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(recoTopic); setScreen(1); },
-                    slides: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(recoTopic); setScreen(1); },
-                    doc:    () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(recoTopic); setScreen(1); },
-                    lesson: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(recoTopic); setScreen(1); },
-                  })
+                    quiz:   () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(pageChipVisible ? '' : recoTopic); setScreen(1); },
+                    slides: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(pageChipVisible ? '' : recoTopic); setScreen(1); },
+                    doc:    () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(pageChipVisible ? '' : recoTopic); setScreen(1); },
+                    lesson: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(pageChipVisible ? '' : recoTopic); setScreen(1); },
+                  }, pageChipVisible)
                 : [];
 
               const LibraryRow = ({ item }) => (
@@ -3421,16 +3447,20 @@ export default function Home() {
                 const isQuizType = /quiz|test|exit|formative|check/i.test(chainedTool.label);
                 const toolType   = isQuizType ? 'quiz' : 'doc';
                 const displayTopic = chainedTopic.charAt(0).toUpperCase() + chainedTopic.slice(1);
+                // When page context chip is active, don't repeat the topic in the label
+                const chainedLabel = pageChipVisible
+                  ? `Create a ${chainedTool.label}`
+                  : `Create: ${displayTopic} ${chainedTool.label}`;
                 return (
                   <div style={{ padding: '6px 12px 2px' }}>
                     <button
-                      onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(q); setScreen(1); }}
+                      onClick={() => { setScreenOneToolType(toolType); setScreenOneToolLabel(chainedTool.label); setInput(pageChipVisible ? '' : q); setScreen(1); }}
                       style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', border: '1.5px solid #D0E8F0', borderRadius: 10, background: '#F0F8FB', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                       {chainedTool.emoji
                         ? <span style={{ fontSize: 18, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{chainedTool.emoji}</span>
                         : <img src={chainedTool.svg} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, color: '#0E151C', fontWeight: 500, lineHeight: '20px' }}>Create: {displayTopic} {chainedTool.label}</div>
+                        <div style={{ fontSize: 14, color: '#0E151C', fontWeight: 500, lineHeight: '20px' }}>{chainedLabel}</div>
                         <div style={{ fontSize: 12, color: '#475467', lineHeight: '17px', marginTop: 1 }}>Jump straight in — topic pre-loaded</div>
                       </div>
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#06465C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -3643,11 +3673,11 @@ export default function Home() {
               const noToolKw = !/\b(quiz|test|question|presentation|slide|podcast|nearpod|worksheet|lesson|rubric|discussion)\b/i.test(q);
               const recoCS = (hasTopicCS || noToolKw)
                 ? recoItems(recoTopicCS, recoGradeCS, {
-                    quiz:   () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(recoTopicCS); setScreen(1); },
-                    slides: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(recoTopicCS); setScreen(1); },
-                    doc:    () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(recoTopicCS); setScreen(1); },
-                    lesson: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(recoTopicCS); setScreen(1); },
-                  })
+                    quiz:   () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setInput(pageChipVisible ? '' : recoTopicCS); setScreen(1); },
+                    slides: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Presentation'); setInput(pageChipVisible ? '' : recoTopicCS); setScreen(1); },
+                    doc:    () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Guided Notes'); setInput(pageChipVisible ? '' : recoTopicCS); setScreen(1); },
+                    lesson: () => { setScreenOneToolType('doc'); setScreenOneToolLabel('Lesson Plan'); setInput(pageChipVisible ? '' : recoTopicCS); setScreen(1); },
+                  }, pageChipVisible)
                 : [];
 
               const LibRowCS = ({ item }) => (
