@@ -3194,22 +3194,19 @@ export default function Home() {
 
               // PROMPT MODE — only show a suggested tool if there's a confident keyword match
               if (wsIsPromptMode) {
-                const TOOL_KW = /\b(feedback|comment|review|grade|quiz|test|question|inspect|analy|level|simplif|complex|boost|engag|idea|lesson|strateg|create|make|build|presentation|slide|deck|podcast)\b/i;
-                const kwMatch = TOOL_KW.exec(q);
+                const findCreate = label => flatCreateTools.find(t => t.label === label) || null;
                 let suggestedTool = null;
-                if (kwMatch) {
-                  const kw = kwMatch[1].toLowerCase();
-                  const findCreate = label => flatCreateTools.find(t => t.label === label) || null;
-                  if (/feedback|comment|review|grade/.test(kw)) suggestedTool = topTools[1];
-                  else if (/quiz|test|question/.test(kw)) suggestedTool = findCreate('Quiz');
-                  else if (/presentation|slide|deck/.test(kw)) suggestedTool = findCreate('Presentation');
-                  else if (/podcast/.test(kw)) suggestedTool = findCreate('Podcast');
-                  else if (/create|make|build/.test(kw)) suggestedTool = topTools[0];
-                  else if (/inspect|analy/.test(kw)) suggestedTool = topTools[2];
-                  else if (/level|simplif|complex/.test(kw)) suggestedTool = topTools[3];
-                  else if (/boost|engag/.test(kw)) suggestedTool = topTools[4];
-                  else if (/idea|lesson|strateg/.test(kw)) suggestedTool = topTools[5];
-                }
+                // Check specific tools FIRST so "create a quiz" → Quiz, not generic Create
+                if (/\b(feedback|comment|review|grade)\b/i.test(q)) suggestedTool = topTools[1];
+                else if (/\b(quiz|quizzes|test|formative|exit ticket)\b/i.test(q)) suggestedTool = findCreate('Quiz');
+                else if (/\b(podcast)\b/i.test(q)) suggestedTool = findCreate('Podcast');
+                else if (/\b(presentation|slide deck|slideshow)\b/i.test(q)) suggestedTool = findCreate('Presentation');
+                else if (/\bslides?\b/i.test(q)) suggestedTool = findCreate('Presentation');
+                else if (/\b(inspect|analy)\w*/i.test(q)) suggestedTool = topTools[2];
+                else if (/\b(level|simplif|complex)\w*/i.test(q)) suggestedTool = topTools[3];
+                else if (/\b(boost|engag)\w*/i.test(q)) suggestedTool = topTools[4];
+                else if (/\b(idea|lesson|strateg)\w*/i.test(q)) suggestedTool = topTools[5];
+                else if (/\b(create|make|build)\b/i.test(q)) suggestedTool = topTools[0]; // generic fallback
                 if (suggestedTool) return (
                   <>
                     <div style={{ padding: '10px 16px 4px', fontSize: 12, fontWeight: 500, color: '#475467', lineHeight: '18px' }}>Suggested</div>
