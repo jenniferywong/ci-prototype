@@ -201,7 +201,7 @@ function MicButton({ onTranscript, size = 20, btnStyle, className }) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { setSupported(false); return; }
     const r = new SR();
-    r.continuous = false;
+    r.continuous = true;
     r.interimResults = true;
     r.lang = 'en-US';
     r.onresult = (e) => {
