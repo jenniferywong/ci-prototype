@@ -4384,6 +4384,22 @@ export default function Home() {
               text: `Who is the audience for this ${qgShortTopic} presentation?`,
               options: ['Students following along', 'Teacher-led direct instruction', 'Student-created project', 'Family or community sharing'],
             };
+          } else if (rl.includes('podcast')) {
+            QG_Q1 = {
+              type: 'multi-select',
+              text: `What should the ${qgShortTopic} podcast include?`,
+              options: ['Narrated explanations', 'Real-world examples or stories', 'Discussion prompts for students', 'Student-created segments'],
+            };
+            QG_Q2 = {
+              type: 'single-select',
+              text: `What's the main goal for this ${qgShortTopic} podcast?`,
+              options: [
+                'Teach or reinforce a concept',
+                'Spark class discussion',
+                'Connect the topic to the real world',
+                'Give students a voice or showcase their work',
+              ],
+            };
           } else {
             // Generic doc fallback
             QG_Q1 = {
