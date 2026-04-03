@@ -362,6 +362,19 @@ function classifyPrompt(p) {
   return 'Ask Brisk';
 }
 
+// Broad resource-creation intent: turn/adapt/rewrite/make for students etc.
+// Returns true when the query is clearly about making a resource but without a specific tool keyword.
+function detectResourceIntent(p) {
+  const t = p.toLowerCase();
+  return (
+    /\b(turn|convert|transform|adapt|rewrite|rephrase)\s+(this|the|my)\b/.test(t) ||
+    /\bmake\s+(this|it|something)\b/.test(t) ||
+    /\b(for\s+(my\s+)?(students|kids|class|learners))\b/.test(t) ||
+    /\b(easy|fun|engaging|accessible|simpler|interesting)\s+for\b/.test(t) ||
+    /\b(gen\s*z|slang|meme|relatable)\b/.test(t)
+  );
+}
+
 // Tool patterns for intent routing (topic + tool → direct to creation)
 const CHAT_TOOL_PATTERNS = [
   { re: /\b(quiz|test|assessment|formative|exit ticket|exit-ticket)\b/i, type: 'quiz', label: 'Quiz' },
@@ -2655,6 +2668,10 @@ export default function Home() {
       setScreenOneToolLabel(detected.label);
       setInput(p);
       setScreen(1);
+    } else if (detectResourceIntent(p)) {
+      // Open-ended resource creation request — let them pick the resource type
+      setCreateSearch(p);
+      setScreen('create');
     } else {
       const toolName = classifyPrompt(p);
       setChatToolName(toolName);
@@ -3619,10 +3636,11 @@ export default function Home() {
               const sectionLabel = txt => (
                 <div style={{ padding: '10px 24px 4px', fontSize: 12, fontWeight: 500, color: '#475467', lineHeight: '18px' }}>{txt}</div>
               );
+              const intentQuery = detectResourceIntent(createSearch.trim()) ? createSearch.trim() : '';
               const resolveOnClick = t => {
-                if (t.onClick === 'quiz') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); logStep(sessionId, 'welcome_screen', userType, '', { user_type: userType }); setScreen(1); setInput(''); };
-                if (t.label === 'Nearpod') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(''); };
-                if (t.onClick === 'doc' || (t.onClick === null && t.label !== 'Boost Student Activity')) return () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); };
+                if (t.onClick === 'quiz') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); logStep(sessionId, 'welcome_screen', userType, '', { user_type: userType }); setScreen(1); setInput(intentQuery); };
+                if (t.label === 'Nearpod') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(intentQuery); };
+                if (t.onClick === 'doc' || (t.onClick === null && t.label !== 'Boost Student Activity')) return () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(intentQuery); };
                 return t.onClick;
               };
               const allSections = CREATE_TOOL_SECTIONS.map(({ section, tools }) => (
@@ -3654,6 +3672,17 @@ export default function Home() {
                   <>
                     {sectionLabel('Suggested')}
                     <CreateToolRow emoji={suggestedCreateTool.emoji} label={suggestedCreateTool.label} sub={suggestedCreateTool.sub} chips={suggestedCreateTool.chips} onClick={resolveOnClick(suggestedCreateTool)} />
+                    <div style={{ height: 4 }} />
+                  </>
+                );
+                // Open-ended resource intent — show banner + all tools
+                if (detectResourceIntent(q)) return (
+                  <>
+                    <div style={{ margin: '12px 24px 4px', padding: '10px 14px', background: '#EEF4F6', borderRadius: 10, border: '1px solid #C5DBE3' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#06465C', lineHeight: '20px', marginBottom: 2 }}>We can make this into a Brisk resource</div>
+                      <div style={{ fontSize: 13, color: '#344054', lineHeight: '20px' }}>Pick the type of resource you want below.</div>
+                    </div>
+                    {allSections}
                     <div style={{ height: 4 }} />
                   </>
                 );
