@@ -2437,11 +2437,18 @@ export default function Home() {
         numQuestions: prefs.numQuestions || 10,
         pageContextTitle: pageContext?.title || '',
         pageContextPreview: pageContext?.preview || '',
+        pageContextBodyText: pageContext?.bodyText || '',
       }),
     })
       .then(r => r.json())
-      .then(data => { setQgQuizData(data.questions ? data : { questions: [], title: topic }); })
-      .catch(() => { setQgQuizData({ questions: [], title: topic }); })
+      .then(data => {
+        if (data.error) console.error('[quiz-gen] API error:', data.error, data.message || '');
+        setQgQuizData(data.questions?.length > 0 ? data : { questions: [], title: topic });
+      })
+      .catch(err => {
+        console.error('[quiz-gen] fetch failed:', err);
+        setQgQuizData({ questions: [], title: topic });
+      })
       .finally(() => setQgFormsLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizGenPhase]);

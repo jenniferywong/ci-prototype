@@ -1,9 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 function parseJSON(text) {
-  return JSON.parse(
-    text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
-  );
+  const stripped = text
+    .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+  try {
+    return JSON.parse(stripped);
+  } catch {
+    // Fallback: find the outermost { ... } in the response
+    const start = stripped.indexOf('{');
+    const end = stripped.lastIndexOf('}');
+    if (start !== -1 && end > start) return JSON.parse(stripped.slice(start, end + 1));
+    throw new Error(`No JSON object found in response (first 120 chars): ${stripped.slice(0, 120)}`);
+  }
 }
 
 async function callClaude(client, systemPrompt, userMsg = 'Generate now.') {
@@ -191,7 +199,7 @@ Return JSON only, no markdown backticks:
       data = await callClaude(client, systemPrompt);
     } catch (retryErr) {
       console.error('[generate] retry also failed:', retryErr.message);
-      return Response.json({ error: 'retry_failed' }, { status: 500 });
+      return Response.json({ error: 'retry_failed', message: retryErr.message }, { status: 500 });
     }
   }
 

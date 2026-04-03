@@ -1,9 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 function parseJSON(text) {
-  return JSON.parse(
-    text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
-  );
+  const stripped = text
+    .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+  try {
+    return JSON.parse(stripped);
+  } catch {
+    const start = stripped.indexOf('{');
+    const end = stripped.lastIndexOf('}');
+    if (start !== -1 && end > start) return JSON.parse(stripped.slice(start, end + 1));
+    throw new Error(`No JSON object found in response (first 120 chars): ${stripped.slice(0, 120)}`);
+  }
 }
 
 async function callClaude(client, system, userContent) {
