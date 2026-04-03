@@ -1911,7 +1911,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
   const promptBoxRef = useRef(null);
-  const [editingSection, setEditingSection] = useState(null); // null | 'audience' | 'format'
+  const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   const [formatHover, setFormatHover] = useState(false);
   const [curriculumHover, setCurriculumHover] = useState(false);
   const [numQRaw, setNumQRaw] = useState(String(prefs.numQuestions ?? 10));
@@ -1995,7 +1995,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Fixed prompt box — shrinks when editing audience/format to make room */}
       <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 24px 12px' }}>
-        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: editingSection ? 88 : 167, transition: 'min-height 0.22s cubic-bezier(0.4,0,0.2,1)', display: 'flex', flexDirection: 'column' }}>
+        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 167, display: 'flex', flexDirection: 'column' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
               <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2025,7 +2025,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               }}
               placeholder={promptPlaceholder}
               rows={1}
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: editingSection ? 44 : pageChipVisible ? 72 : 110, transition: 'min-height 0.22s cubic-bezier(0.4,0,0.2,1)', paddingTop: 5 }}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: pageChipVisible ? 72 : 110, paddingTop: 5 }}
             />
             <MicButton size={20} className="icon-btn"
               onTranscript={(t) => { onInputChange(t); const el = textareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; } }} />
@@ -2044,33 +2044,102 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         />
       </div>
 
-      {/* Settings body — accordion rows; flex: 1 so it fills space and scrolls, keeping Brisk It pinned */}
+      {/* Settings body — collapsed read-only rows + Settings header with edit button */}
       <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
-        {/* Curriculum row — edit button placeholder (no destination yet) */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #DDE0E3', gap: 24 }}>
+        {/* Settings header */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', flex: 1 }}>Settings</span>
+          <button onClick={() => setSettingsDrawerOpen(true)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
+        </div>
+
+        {/* Curriculum row */}
+        <div style={{ display: 'flex', alignItems: 'center', paddingBottom: 8, borderBottom: '1px solid #DDE0E3', gap: 24 }}>
           <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0, opacity: curriculumHover ? 0 : 1, transition: 'opacity 0.18s ease' }}>Curriculum</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
             <CurriculumMarquee name={curriculumBaseName} onHoverChange={setCurriculumHover} />
-            <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
           </div>
         </div>
 
-        {/* Audience row — accordion */}
-        <div style={{ borderBottom: '1px solid #DDE0E3' }}>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
-            <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, minWidth: 0 }}>
-              {editingSection !== 'audience' && <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{audienceSummary}</span>}
-              <button onClick={() => setEditingSection(editingSection === 'audience' ? null : 'audience')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
-                <img src={editingSection === 'audience' ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={20} height={20} alt="" style={{ display: 'block' }} />
-              </button>
-            </div>
+        {/* Standards row */}
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8, paddingBottom: 8, borderBottom: '1px solid #DDE0E3', gap: 24 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Standards</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 0 }}>
+            <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefs.standards || 'None'}</span>
           </div>
-          <div style={{ overflow: 'hidden', maxHeight: editingSection === 'audience' ? 200 : 0, transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div style={{ paddingBottom: 14 }}>
+        </div>
+
+        {/* Audience row */}
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8, paddingBottom: 8, borderBottom: '1px solid #DDE0E3', gap: 24 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Audience</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 0 }}>
+            <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{audienceSummary}</span>
+          </div>
+        </div>
+
+        {/* Format row */}
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8, paddingBottom: 8, gap: 24 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+            <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
+            {formatParts.slice(0, formatShownCount).map((part, idx) => {
+              const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
+              return (
+                <Fragment key={idx}>
+                  {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
+                  {isQuizCount ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
+                      <img src="/icons/Bulleted List.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
+                  )}
+                </Fragment>
+              );
+            })}
+            {formatParts.length > formatShownCount && (
+              <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Settings drawer — full-screen overlay */}
+      {settingsDrawerOpen && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 20,
+          background: '#FAF9F6', borderRadius: 12,
+          display: 'flex', flexDirection: 'column',
+          animation: 'slideUpDrawer 0.25s cubic-bezier(0.22,1,0.36,1) both',
+        }}>
+          {/* Drawer header */}
+          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, borderBottom: '1px solid #E7E5E4', background: '#FAF9F6', borderRadius: '12px 12px 0 0' }}>
+            <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#0E151C', lineHeight: '24px' }}>Settings</span>
+            <button onClick={() => setSettingsDrawerOpen(false)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6L9 12L15 6" stroke="#475467" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          </div>
+
+          {/* Drawer body */}
+          <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '20px 24px 32px' }}>
+
+            {/* Curriculum & Scope section */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', marginBottom: 12 }}>Curriculum &amp; Scope</div>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, background: '#fff', paddingLeft: 12, paddingRight: 40, overflow: 'hidden' }}>
+                <span style={{ flex: 1, fontSize: 14, color: '#0E151C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{curriculumBaseName} <span style={{ color: '#74818E' }}>(entire course)</span></span>
+                <button className="icon-btn" style={{ position: 'absolute', right: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 4, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>{pencilIcon}</button>
+              </div>
+            </div>
+
+            <div style={{ borderBottom: '1px solid #DDE0E3', marginBottom: 20 }} />
+
+            {/* Audience section */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', marginBottom: 12 }}>Audience</div>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Grade Level</div>
                   <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
                 </div>
                 <div>
@@ -2079,43 +2148,20 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Format row — accordion */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0', gap: 24 }}>
-            <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Format</span>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
-              {editingSection !== 'format' && <img src={formatIconSrc} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />}
-              {editingSection !== 'format' && formatParts.slice(0, formatShownCount).map((part, idx) => {
-                const isQuizCount = toolType !== 'doc' && !isSlidesDefault && idx === formatParts.length - 1;
-                return (
-                  <Fragment key={idx}>
-                    {idx > 0 && <span style={{ color: '#344054', fontSize: 14, flexShrink: 0 }}> • </span>}
-                    {isQuizCount ? (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-                        <span style={{ fontSize: 14, color: '#344054' }}>{part}</span>
-                        <img src="/icons/Bulleted List.svg" width={20} height={20} alt="" style={{ display: 'block' }} />
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{part}</span>
-                    )}
-                  </Fragment>
-                );
-              })}
-              {editingSection !== 'format' && formatParts.length > formatShownCount && (
-                <span style={{ fontSize: 14, color: '#767B7F', flexShrink: 0 }}>+{formatParts.length - formatShownCount}</span>
-              )}
-              {!isPodcast && (
-                <button onClick={() => setEditingSection(editingSection === 'format' ? null : 'format')} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, marginLeft: 2 }}>
-                  <img src={editingSection === 'format' ? '/icons/Chevron Up.svg' : '/icons/Chevron Down.svg'} width={20} height={20} alt="" style={{ display: 'block' }} />
-                </button>
-              )}
+            <div style={{ borderBottom: '1px solid #DDE0E3', marginBottom: 20 }} />
+
+            {/* Standards section */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', marginBottom: 12 }}>Standards</div>
+              <PillSelect value={prefs.standards || 'None'} options={['None','CCSS','NGSS','C3 Framework','State Standards']} onChange={v => onPrefsChange({ standards: v })} fullWidth />
             </div>
-          </div>
-          <div style={{ overflow: 'hidden', maxHeight: editingSection === 'format' ? 320 : 0, transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div style={{ paddingBottom: 14 }}>
+
+            <div style={{ borderBottom: '1px solid #DDE0E3', marginBottom: 20 }} />
+
+            {/* Format section */}
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', marginBottom: 12 }}>Format</div>
               {toolType === 'doc' && isSlidesDefault ? (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', columnGap: 8, rowGap: 16 }}>
                   <div>
@@ -2167,7 +2213,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Action buttons — pinned to bottom */}
       <div style={{ flexShrink: 0, padding: '8px 24px 20px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
@@ -2188,7 +2234,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 // ══════════════════════════════════════════════════════════════
 // MAIN
 // ══════════════════════════════════════════════════════════════
-const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multiple choice', numQuestions: 10, platform: 'Forms', includeSources: false, numSlides: 10, includeImages: true };
+const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multiple choice', numQuestions: 10, platform: 'Forms', includeSources: false, numSlides: 10, includeImages: true, standards: 'None' };
 
 export default function Home() {
   const [sessionId] = useState(() => genUUID());
