@@ -1361,17 +1361,17 @@ function GoogleDocPreview({ quiz, title, isIterating }) {
 function GoogleSlidesPreview({ quiz, title }) {
   const slides = [];
   if (quiz) {
-    // Title slide
     slides.push({ type: 'title', heading: title || 'Untitled', sub: quiz.warmupLabel || '' });
-    // Warmup slide
     if (quiz.warmup?.length > 0) {
       slides.push({ type: 'warmup', heading: quiz.warmupLabel || 'Warm-Up', items: quiz.warmup });
     }
-    // One slide per question (group 2 per slide)
-    const qs = quiz.questions || [];
-    for (let i = 0; i < qs.length; i += 2) {
-      slides.push({ type: 'questions', items: qs.slice(i, i + 2), startIdx: i });
-    }
+    // Each question is its own content slide
+    (quiz.questions || []).forEach(q => {
+      const bullets = q.explanation
+        ? q.explanation.split(/\n|(?<=\.)\s+(?=[A-Z•–-])/).map(s => s.replace(/^[•–-]\s*/, '').trim()).filter(Boolean)
+        : [];
+      slides.push({ type: 'content', heading: q.question, bullets });
+    });
   }
   const [active, setActive] = useState(0);
   const current = slides[active];
@@ -1394,24 +1394,18 @@ function GoogleSlidesPreview({ quiz, title }) {
         ))}
       </div>
     );
-    if (slide.type === 'questions') return (
-      <div style={{ padding: '28px 48px', height: '100%' }}>
-        {slide.items.map((q, i) => (
-          <div key={i} style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a2e', lineHeight: 1.5, marginBottom: 8 }}>
-              Q{slide.startIdx + i + 1}. {q.question}
+    if (slide.type === 'content') return (
+      <div style={{ padding: '36px 52px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 20, borderBottom: '2px solid #4285f4', paddingBottom: 12 }}>{slide.heading}</div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {slide.bullets.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#202124', lineHeight: 1.6 }}>
+              <span style={{ color: '#4285f4', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>•</span>
+              <span>{b}</span>
             </div>
-            {q.options?.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
-                {q.options.map((opt, j) => (
-                  <div key={j} style={{ fontSize: 13, color: '#444', lineHeight: 1.5, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
-                    <span style={{ fontWeight: 600, color: '#4285f4', flexShrink: 0 }}>{String.fromCharCode(65 + j)}.</span> {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+          {slide.bullets.length === 0 && <div style={{ fontSize: 14, color: '#999' }}>{slide.heading}</div>}
+        </div>
       </div>
     );
     return null;
@@ -1441,11 +1435,9 @@ function GoogleSlidesPreview({ quiz, title }) {
           {slides.map((s, i) => (
             <div key={i} onClick={() => setActive(i)}
               style={{ background: active === i ? '#4285f4' : '#fff', borderRadius: 3, padding: 3, cursor: 'pointer', outline: active === i ? '2px solid #4285f4' : 'none', outlineOffset: 1 }}>
-              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 8px' }}>
-                <div style={{ fontSize: 5, color: '#333', lineHeight: 1.4, overflow: 'hidden', maxHeight: '100%', width: '100%', textAlign: 'center' }}>
-                  {s.type === 'title' ? s.heading :
-                   s.type === 'warmup' ? s.heading :
-                   `Q${s.startIdx + 1}${s.items.length > 1 ? `–${s.startIdx + s.items.length}` : ''}`}
+              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', padding: '4px 6px' }}>
+                <div style={{ fontSize: 4.5, color: '#333', lineHeight: 1.4, overflow: 'hidden', maxHeight: '100%', fontWeight: s.type === 'title' ? 700 : 400 }}>
+                  {s.heading || (s.type === 'warmup' ? s.heading : '')}
                 </div>
               </div>
               <div style={{ fontSize: 9, color: active === i ? '#fff' : '#aaa', textAlign: 'center', marginTop: 3 }}>{i + 1}</div>
@@ -1456,7 +1448,6 @@ function GoogleSlidesPreview({ quiz, title }) {
         {/* Active slide */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
           <div style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
-            {/* Slide accent bar */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #4285f4, #34a853)' }} />
             {current ? <SlideContent slide={current} /> : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#aaa', fontSize: 14 }}>No slides yet</div>
