@@ -113,7 +113,8 @@ export async function POST(request) {
   console.log('[generate] ANTHROPIC_API_KEY present:', !!key, '| starts with:', key?.slice(0, 12));
 
   const {
-    topic, subject, grade, fluencyAnswer, struggleAnswer,
+    topic, subject, grade, language, standards,
+    fluencyAnswer, struggleAnswer,
     hardestThing, scaffoldStrategy, scaffoldStrategyDesc,
     teacherScaffolds, questionType, numQuestions,
     toolName, className, pageContextTitle, pageContextPreview, pageContextBodyText,
@@ -146,13 +147,16 @@ export async function POST(request) {
       : null,
   ].filter(Boolean).join('\n');
 
+  const langLine = (language && language !== 'English') ? `\n- Language: Generate the entire quiz in ${language}.` : '';
+  const stdLine = (standards && standards !== 'None') ? `\n- Standards alignment: Align questions to ${standards} where applicable.` : '';
+
   const systemPrompt = isQuizTool
     ? `You are Brisk, an AI assistant for K-12 teachers. Generate a ${nQ}-question ${qType} quiz about ${topic} for ${grade || '8th grade'} students studying ${subject}${classContext}.
 
 STUDENT CONTEXT:
 - Students are struggling with: ${hardestThing}
 - Specific challenge: ${struggleAnswer}
-- Reading/fluency support needed: ${fluencyAnswer}
+- Reading/fluency support needed: ${fluencyAnswer}${langLine}${stdLine}
 
 ${scaffoldSection}
 
@@ -173,7 +177,7 @@ Return JSON only, no markdown backticks:
 STUDENT CONTEXT:
 - Students are struggling with: ${hardestThing || 'N/A'}
 - Specific challenge: ${struggleAnswer || 'N/A'}
-- Reading/fluency support needed: ${fluencyAnswer || 'N/A'}
+- Reading/fluency support needed: ${fluencyAnswer || 'N/A'}${langLine}${stdLine}
 
 ${scaffoldSection}
 

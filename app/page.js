@@ -2929,7 +2929,7 @@ export default function Home() {
     const scaffoldTexts = scaffolds.map(s => s.text).filter(Boolean);
     fetch('/api/generate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffoldStrategy: strategy?.name || '', scaffoldStrategyDesc: strategy?.desc || '', teacherScaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '', pageContextBodyText: pageContext?.bodyText || '' }),
+      body: JSON.stringify({ topic, subject: detectedSubject || curriculumCard?.subject, grade: prefs.grade, language: prefs.language || 'English', standards: prefs.standards || 'None', fluencyAnswer, struggleAnswer: needs2Answer, hardestThing, scaffoldStrategy: strategy?.name || '', scaffoldStrategyDesc: strategy?.desc || '', teacherScaffolds: scaffoldTexts, questionType: prefs.questionType, numQuestions: prefs.numQuestions, className: CLASSES.find(c => c.id === selectedClass)?.label || '', pageContextTitle: pageContext?.title || '', pageContextPreview: pageContext?.preview || '', pageContextBodyText: pageContext?.bodyText || '' }),
     })
       .then(r => r.json())
       .then(data => {
