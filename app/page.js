@@ -1904,6 +1904,14 @@ function detectSettingsFromInput(text) {
   if (/true[/ -]?false/i.test(t)) changes.questionType = 'True/False';
   else if (/short[- ]?answer|open[- ]?ended/i.test(t)) changes.questionType = 'Short Answer';
   else if (/multiple[- ]?choice/i.test(t)) changes.questionType = 'Multiple choice';
+  // Standards auto-detection from subject keywords
+  if (/\b(science|biology|chemistry|physics|ecology|earth\s*science|astronomy|genetics|evolution|atom|molecule|cell|organism|force|energy|climate|weather|photosynthesis|periodic\s*table)\b/i.test(t)) {
+    changes.standards = 'NGSS';
+  } else if (/\b(history|social\s*studies|civics|geography|government|economics|civilization|democracy|constitution|revolution|society|citizenship)\b/i.test(t)) {
+    changes.standards = 'C3 Framework';
+  } else if (/\b(math|algebra|geometry|calculus|arithmetic|fraction|equation|statistics|probability|trigonometry|polynomial|integer|decimal|percent|ratio|proportion|reading|writing|grammar|literature|poetry|fiction|nonfiction|essay|vocabulary|comprehension|narrative|figurative\s*language)\b/i.test(t)) {
+    changes.standards = 'CCSS';
+  }
   return changes;
 }
 
@@ -2063,8 +2071,11 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         {/* Standards row */}
         <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8, paddingBottom: 8, borderBottom: '1px solid #DDE0E3', gap: 24 }}>
           <span style={{ fontSize: 14, fontWeight: 500, color: '#0E151C', lineHeight: '22px', flexShrink: 0 }}>Standards</span>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 0 }}>
-            <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefs.standards || 'None'}</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+            <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefs.standards && prefs.standards !== 'None' ? prefs.standards : 'None'}</span>
+            {prefs.standards && prefs.standards !== 'None' && (
+              <span style={{ fontSize: 11, fontWeight: 500, color: '#06465C', background: '#EEF4F6', border: '1px solid #C5DBE3', borderRadius: 4, padding: '1px 5px', flexShrink: 0, lineHeight: '16px' }}>auto</span>
+            )}
           </div>
         </div>
 
