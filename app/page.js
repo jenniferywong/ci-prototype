@@ -1365,18 +1365,17 @@ function GoogleSlidesPreview({ quiz, title }) {
     if (quiz.warmup?.length > 0) {
       slides.push({ type: 'warmup', heading: quiz.warmupLabel || 'Warm-Up', items: quiz.warmup });
     }
-    // Each question is its own content slide
     (quiz.questions || []).forEach(q => {
-      const bullets = q.explanation
-        ? q.explanation.split(/\n|(?<=\.)\s+(?=[A-Z•–-])/).map(s => s.replace(/^[•–-]\s*/, '').trim()).filter(Boolean)
+      const raw = q.explanation || '';
+      const bullets = raw
+        ? raw.split('\n').map(s => s.replace(/^[•–\-*]\s*/, '').trim()).filter(Boolean)
         : [];
       slides.push({ type: 'content', heading: q.question, bullets });
     });
   }
   const [active, setActive] = useState(0);
-  const current = slides[active];
 
-  function SlideContent({ slide }) {
+  function Slide({ slide, num }) {
     if (!slide) return null;
     if (slide.type === 'title') return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '40px 60px', textAlign: 'center' }}>
@@ -1394,7 +1393,7 @@ function GoogleSlidesPreview({ quiz, title }) {
         ))}
       </div>
     );
-    if (slide.type === 'content') return (
+    return (
       <div style={{ padding: '36px 52px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 20, borderBottom: '2px solid #4285f4', paddingBottom: 12 }}>{slide.heading}</div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -1404,15 +1403,13 @@ function GoogleSlidesPreview({ quiz, title }) {
               <span>{b}</span>
             </div>
           ))}
-          {slide.bullets.length === 0 && <div style={{ fontSize: 14, color: '#999' }}>{slide.heading}</div>}
         </div>
       </div>
     );
-    return null;
   }
 
   return (
-    <div style={{ minHeight: '100%', background: '#1e1e1e', fontFamily: 'Google Sans, Arial, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', background: '#1e1e1e', fontFamily: 'Google Sans, Arial, sans-serif', display: 'flex', flexDirection: 'column' }}>
       {/* App bar */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <img src="/icons/Slides.svg" width={30} height={30} alt="" style={{ display: 'block', flexShrink: 0 }} />
@@ -1434,10 +1431,10 @@ function GoogleSlidesPreview({ quiz, title }) {
         <div style={{ width: 160, background: '#2d2d2d', overflowY: 'auto', padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
           {slides.map((s, i) => (
             <div key={i} onClick={() => setActive(i)}
-              style={{ background: active === i ? '#4285f4' : '#fff', borderRadius: 3, padding: 3, cursor: 'pointer', outline: active === i ? '2px solid #4285f4' : 'none', outlineOffset: 1 }}>
-              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', padding: '4px 6px' }}>
+              style={{ background: active === i ? '#4285f4' : 'transparent', borderRadius: 3, padding: 3, cursor: 'pointer' }}>
+              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', padding: '4px 6px', outline: active === i ? '2px solid #fff' : 'none' }}>
                 <div style={{ fontSize: 4.5, color: '#333', lineHeight: 1.4, overflow: 'hidden', maxHeight: '100%', fontWeight: s.type === 'title' ? 700 : 400 }}>
-                  {s.heading || (s.type === 'warmup' ? s.heading : '')}
+                  {s.heading}
                 </div>
               </div>
               <div style={{ fontSize: 9, color: active === i ? '#fff' : '#aaa', textAlign: 'center', marginTop: 3 }}>{i + 1}</div>
@@ -1445,14 +1442,20 @@ function GoogleSlidesPreview({ quiz, title }) {
           ))}
           {!quiz && <div style={{ color: '#888', fontSize: 10, textAlign: 'center', marginTop: 20 }}>Slides will appear here</div>}
         </div>
-        {/* Active slide */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
-          <div style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #4285f4, #34a853)' }} />
-            {current ? <SlideContent slide={current} /> : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#aaa', fontSize: 14 }}>No slides yet</div>
-            )}
-          </div>
+        {/* All slides scrollable */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center' }}>
+          {slides.length === 0 && (
+            <div style={{ color: '#aaa', fontSize: 14, marginTop: 60 }}>No slides yet</div>
+          )}
+          {slides.map((s, i) => (
+            <div key={i} id={`slide-${i}`}
+              onClick={() => setActive(i)}
+              style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#fff', boxShadow: active === i ? '0 0 0 3px #4285f4, 0 4px 24px rgba(0,0,0,0.5)' : '0 4px 24px rgba(0,0,0,0.4)', borderRadius: 3, overflow: 'hidden', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #4285f4, #34a853)' }} />
+              <Slide slide={s} num={i} />
+            </div>
+          ))}
+          <div style={{ height: 40 }} />
         </div>
       </div>
     </div>
