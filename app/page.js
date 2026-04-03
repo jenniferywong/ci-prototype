@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Fragment } from 'react';
-import IntentChips from './components/IntentChips.js';
+import IntentChips, { savePromptToHistory } from './components/IntentChips.js';
 
 function genUUID() {
   return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
@@ -1883,6 +1883,30 @@ function CurriculumMarquee({ name, onHoverChange }) {
   );
 }
 
+function detectSettingsFromInput(text) {
+  const t = text.toLowerCase();
+  const changes = {};
+  // Grade
+  if (/\bkindergarten\b|\bkinder\b/.test(t)) {
+    changes.grade = 'K';
+  } else {
+    const gm = t.match(/\b(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\s*(?:grade|grader)/)
+      || t.match(/\bgrade\s+(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\b/)
+      || t.match(/\bfor\s+(?:a\s+)?(\d+)(?:st|nd|rd|th)\s*grade/)
+      || t.match(/\b(\d+)(?:st|nd|rd|th)\s+grader/);
+    if (gm) {
+      const raw = gm[1];
+      const map = {'1':'1st','2':'2nd','3':'3rd','4':'4th','5':'5th','6':'6th','7':'7th','8':'8th','9':'9th','10':'10th','11':'11th','12':'12th'};
+      changes.grade = map[raw] || raw;
+    }
+  }
+  // Question type
+  if (/true[/ -]?false/i.test(t)) changes.questionType = 'True/False';
+  else if (/short[- ]?answer|open[- ]?ended/i.test(t)) changes.questionType = 'Short Answer';
+  else if (/multiple[- ]?choice/i.test(t)) changes.questionType = 'Multiple choice';
+  return changes;
+}
+
 function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile }) {
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
@@ -1994,6 +2018,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               value={input}
               onChange={e => {
                 onInputChange(e.target.value);
+                const detected = detectSettingsFromInput(e.target.value);
+                if (Object.keys(detected).length > 0) onPrefsChange(detected);
                 const el = textareaRef.current;
                 if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; }
               }}
@@ -2148,7 +2174,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         {(() => {
           const canBrisk = !!input.trim() || pageChipVisible;
           return (
-            <button onClick={canBrisk ? onBriskIt : undefined} disabled={!canBrisk}
+            <button onClick={canBrisk ? () => { savePromptToHistory(input); onBriskIt(); } : undefined} disabled={!canBrisk}
               style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: canBrisk ? '#06465C' : '#D1CFC9', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: canBrisk ? 'pointer' : 'default', transition: 'background 0.15s' }}>
               Brisk It
             </button>
