@@ -2139,9 +2139,9 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             {/* Curriculum & Scope section */}
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', marginBottom: 12 }}>Curriculum &amp; Scope</div>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, background: '#fff', paddingLeft: 12, paddingRight: 40, overflow: 'hidden' }}>
-                <span style={{ flex: 1, fontSize: 14, color: '#0E151C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{curriculumBaseName} <span style={{ color: '#74818E' }}>(entire course)</span></span>
-                <button className="icon-btn" style={{ position: 'absolute', right: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 4, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>{pencilIcon}</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ flex: 1, fontSize: 14, color: '#0E151C', lineHeight: '22px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{curriculumBaseName} <span style={{ color: '#74818E' }}>(entire course)</span></span>
+                <button className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
               </div>
             </div>
 
