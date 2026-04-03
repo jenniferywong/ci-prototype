@@ -2117,13 +2117,11 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 
       {/* Settings drawer — full-screen overlay */}
       {settingsDrawerOpen && (
-        <div
-          onAnimationEnd={e => { e.currentTarget.style.animation = 'none'; }}
-          style={{
+        <div style={{
             position: 'absolute', inset: 0, zIndex: 20,
             background: '#FAF9F6', borderRadius: 12,
             display: 'flex', flexDirection: 'column',
-            animation: 'slideUpDrawer 0.25s cubic-bezier(0.22,1,0.36,1) both',
+            animation: 'fadeIn 0.15s ease both',
           }}>
           {/* Drawer header */}
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, borderBottom: '1px solid #E7E5E4', background: '#FAF9F6', borderRadius: '12px 12px 0 0' }}>
