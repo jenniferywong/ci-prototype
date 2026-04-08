@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #FAF9F6;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::-webkit-scrollbar { width: 0; height: 0; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; }
+.scroll-area { overflow-y: auto !important; scrollbar-width: none; }
+* { scrollbar-width: none; }
+
+.tool-row { transition: background 0.1s; }
+.tool-row:hover { background: #EBE9E6 !important; }
+.icon-btn { transition: background 0.1s; }
+.icon-btn:hover { background: #EBE9E6 !important; }
+.page-chip { transition: background 0.1s; }
+.page-chip:hover { background: #E0E7ED !important; }
+.menu-item { transition: background 0.1s; }
+.menu-item:hover { background: #E0E7ED !important; }
+.add-tertiary-btn { transition: background 0.1s; border-radius: 6px; }
+.add-tertiary-btn:hover { background: #EEEDE9 !important; }
+input::placeholder { color: #74818E; font-weight: 400; }
+textarea::placeholder { color: #74818E; font-weight: 400; }
+.url-bar-input::placeholder { color: rgba(255,255,255,0.4); }
+
+:focus-visible { outline: 2px solid #06465C; outline-offset: 2px; }
+
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes chipSlideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 60px; } }
+@keyframes chipSlideUp   { from { opacity: 1; max-height: 60px; } to { opacity: 0; max-height: 0; } }
+.chip-enter { animation: chipSlideDown 0.25s ease-out both; overflow: hidden; }
+.chip-exit  { animation: chipSlideUp   0.2s ease-in both;  overflow: hidden; }
+.search-container { transition: border-radius 0.25s ease; overflow: hidden; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.msg-slide { animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.fade-in { animation: fadeIn 0.2s ease-out both; }
+@keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+@keyframes shimmer { 0%,100%{opacity:0.55} 50%{opacity:1} }
+@keyframes dpulse { 0%,60%,100%{opacity:0.2;transform:translateX(-50%) rotate(45deg) scale(0.78)} 30%{opacity:1;transform:translateX(-50%) rotate(45deg) scale(1)} }
+@keyframes skpulse { 0%,100%{opacity:.35} 50%{opacity:.8} }
+/* Counter input */
+.counter-input { cursor: text; border-radius: 4px; transition: background 0.12s; }
+.counter-input:hover { background: #F0F0EE; }
+.counter-input:focus { outline: none; background: #F0F0EE; }
+.counter-input::-webkit-inner-spin-button, .counter-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Intent chips */
+.intent-chip:hover { background: #F7F6F4 !important; }
+.intent-prompt-row:hover { background: #F7F6F4 !important; }
+.intent-popover {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+.intent-popover--open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Library/reco row hover sub text — shown inline like ToolRow */
+.lib-sub { display: none; font-size: 12px; color: #344054; line-height: 17px; margin-top: 1px; }
+.lib-row:hover .lib-sub { display: block; }
+
+/* ── Mobile (≤475px) — full-width layout, no bubble ── */
+@media (max-width: 475px) {
+  /* Dropdown grids collapse to single column */
+  .two-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Intent chips row: allow more wrapping room */
+  .intent-chip { font-size: 13px !important; padding: 6px 10px !important; }
+  /* Tabs: ensure they don't clip on narrow screens */
+  .qg-tab-strip { padding: 0 16px 10px !important; }
+  /* Tooltip hovers don't work on touch — hide them */
+  .tooltip-row[data-tooltip]:hover::before { display: none; }
+}
+
+.tooltip-row { position: relative; }
+.tooltip-row[data-tooltip]:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 12px; right: 12px;
+  background: #0E151C;
+  color: #fff;
+  font-size: 12px;
+  line-height: 17px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  z-index: 200;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  white-space: normal;
+  pointer-events: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
