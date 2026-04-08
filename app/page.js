@@ -292,7 +292,7 @@ const CREATE_ICONS = {
 };
 
 // Format chip constants — shown on tool row hover
-const FC_DOC     = { title: 'Docs',       icon: <img src="/icons/Docs.svg"    width={24} height={24} alt="Docs"       style={{ display: 'block' }} /> };
+const FC_DOC     = { title: 'Docs / Word', icon: <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><img src="/icons/Docs.svg" width={22} height={22} alt="Docs" style={{ display: 'block' }} /><img src="/icons/Word.svg" width={22} height={22} alt="Word" style={{ display: 'block' }} /></div> };
 const FC_SLIDES  = { title: 'Slides',     icon: <img src="/icons/Slides.svg"  width={24} height={24} alt="Slides"     style={{ display: 'block' }} /> };
 const FC_FORMS   = { title: 'Forms',      icon: <img src="/icons/Forms.svg"   width={24} height={24} alt="Forms"      style={{ display: 'block' }} /> };
 const FC_KAHOOT  = { title: 'Kahoot',     icon: <img src="/icons/Kahoot.svg"  width={24} height={24} alt="Kahoot"     style={{ display: 'block' }} /> };
@@ -498,61 +498,61 @@ function recoItems(topic, grade, onClickFns, short = false) {
     {
       svg: '/icons/Forms.svg',
       title: short ? 'Formative Assessment' : pick([`${g} Grade ${t} Formative Assessment`, `${t} Knowledge Check`, `${t} Quick Check`, `Check for Understanding: ${t}`]),
-      tooltip: `Quick check-in for ${short ? 'this page' : topic}`,
+      tooltip: 'Checks understanding quickly',
       onClick: onClickFns?.quiz,
     },
     {
       svg: '/icons/Slides.svg',
       title: short ? 'Presentation' : pick([`${g} Grade ${t} Presentation`, `Intro to ${t}: Slide Deck`, `${t} Direct Instruction Slides`, `Teaching ${t} Presentation`]),
-      tooltip: `Ready to present on ${short ? 'this topic' : topic}`,
+      tooltip: 'Instruction slides',
       onClick: onClickFns?.slides,
     },
     {
       svg: '/icons/Docs.svg',
       title: short ? 'Guided Notes' : pick([`${t} Guided Notes`, `${t} Student Notes Sheet`, `Structured Notes: ${t}`, `${t} Note-Taking Guide`]),
-      tooltip: `Helps students follow along`,
+      tooltip: 'Note-taking scaffold',
       onClick: onClickFns?.doc,
     },
     {
       svg: '/icons/Docs.svg',
       title: short ? 'Lesson Plan' : pick([`${t} Lesson Plan`, `Introduction to ${t}`, `${t} Exploration Lesson`, `Teaching ${t} Lesson Plan`]),
-      tooltip: `Saves planning time`,
+      tooltip: 'Saves planning time',
       onClick: onClickFns?.lesson,
     },
     {
       svg: '/icons/Forms.svg',
       title: short ? 'Exit Ticket' : pick([`${t} Exit Ticket`, `${t} End-of-Class Check`, `Quick ${t} Exit Slip`]),
-      tooltip: `Catch misconceptions early`,
+      tooltip: 'Catch misconceptions early',
       onClick: onClickFns?.quiz,
     },
     {
       svg: '/icons/Whiteboard.svg',
       title: pick([`${t} Whiteboard`, `${t} Operations Whiteboard`, `Interactive ${t} Whiteboard`, `${t} Problem-Solving Whiteboard`]),
-      tooltip: `Students show their thinking`,
+      tooltip: 'Students show their thinking',
       onClick: onClickFns?.doc,
     },
     {
       svg: '/icons/Tutor.svg',
       title: pick([`${t} Open-Ended Tutor`, `Ask About ${t}`, `${t} AI Tutor Chat`, `Explore ${t} with a Tutor`]),
-      tooltip: `Students self-pace with AI support`,
+      tooltip: 'AI-powered student tutor',
       onClick: null,
     },
     {
       svg: '/icons/gavel.svg',
       title: pick([`${t} Debate`, `${t} Socratic Debate`, `The ${t} Debate`, `${t} Discussion Challenge`]),
-      tooltip: `Builds critical thinking`,
+      tooltip: 'Builds critical thinking',
       onClick: null,
     },
     {
       svg: '/icons/Podcast.svg',
       title: pick([`${t} in Everyday Contexts`, `${t} Explained: Student Podcast`, `Why ${t} Matters`, `${t} in the Real World`]),
-      tooltip: `Connects content to real life`,
+      tooltip: 'Connects content to real life',
       onClick: onClickFns?.slides,
     },
     {
       svg: '/icons/Character Chat.svg',
       title: `Chat with ${character}`,
-      tooltip: `Students ask questions directly`,
+      tooltip: 'Student Q&A',
       onClick: null,
     },
   ];
@@ -602,56 +602,56 @@ function generateLibraryItems(topic, grade, subjectLabel) {
 // Full create tool list, organized by section
 const CREATE_TOOL_SECTIONS = [
   { section: 'Popular Tools', tools: [
-    { label: 'Presentation',  emoji: '🖥️',  sub: 'Slides for direct instruction or student projects',    chips: CHIPS_PRES,     onClick: null },
-    { label: 'Quiz',          emoji: '✅',  sub: 'Formative assessments',                               chips: CHIPS_QUIZ_ALL, onClick: 'quiz' },
-    { label: 'Podcast',       emoji: '🎙️',  sub: 'Student-facing audio content or discussion starters', chips: CHIPS_DOC,      onClick: null },
-    { label: 'Nearpod',       emoji: '📱',  sub: 'Interactive lessons with student pacing',             chips: CHIPS_NEARPOD,  onClick: null },
+    { label: 'Presentation',  emoji: '🖥️',  sub: 'Instruction slides',             chips: CHIPS_PRES,     onClick: null },
+    { label: 'Quiz',          emoji: '✅',  sub: 'Formative assessments',           chips: CHIPS_QUIZ_ALL, onClick: 'quiz' },
+    { label: 'Podcast',       emoji: '🎙️',  sub: 'Audio content for students',      chips: CHIPS_DOC,      onClick: null },
+    { label: 'Nearpod',       emoji: '📱',  sub: 'Interactive student pacing',      chips: CHIPS_NEARPOD,  onClick: null },
   ]},
   { section: 'School-Specific Tools', tools: [
-    { label: 'CPS Teacher Facilitation',    emoji: '🏫', sub: 'District-aligned facilitation guides',              chips: CHIPS_DOC,    onClick: null },
-    { label: 'Regents - ELA',               emoji: '📖', sub: 'New York Regents exam prep materials',              chips: CHIPS_ASSESS, onClick: null },
-    { label: 'Portrait of a Graduate',      emoji: '🎓', sub: 'Competency-aligned learning artifacts',             chips: CHIPS_DOC,    onClick: null },
-    { label: 'English II EOC Practice',     emoji: '✏️', sub: 'End-of-course prep aligned to standards',          chips: CHIPS_ASSESS, onClick: null },
-    { label: 'MAP Practice Test Generator', emoji: '📊', sub: 'NWEA-aligned growth practice questions',           chips: CHIPS_ASSESS, onClick: null },
-    { label: 'CBLI Observation Notes',      emoji: '🔍', sub: 'Classroom-based literacy intervention records',     chips: CHIPS_DOC,    onClick: null },
+    { label: 'CPS Teacher Facilitation',    emoji: '🏫', sub: 'District facilitation guides',    chips: CHIPS_DOC,    onClick: null },
+    { label: 'Regents - ELA',               emoji: '📖', sub: 'NY Regents exam prep',            chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Portrait of a Graduate',      emoji: '🎓', sub: 'Competency-aligned artifacts',    chips: CHIPS_DOC,    onClick: null },
+    { label: 'English II EOC Practice',     emoji: '✏️', sub: 'Standards-aligned EOC prep',      chips: CHIPS_ASSESS, onClick: null },
+    { label: 'MAP Practice Test Generator', emoji: '📊', sub: 'NWEA-aligned practice',           chips: CHIPS_ASSESS, onClick: null },
+    { label: 'CBLI Observation Notes',      emoji: '🔍', sub: 'Literacy intervention records',   chips: CHIPS_DOC,    onClick: null },
   ]},
   { section: 'Curriculum Essentials', tools: [
-    { label: 'Boost Student Activity', emoji: '⚡',  sub: 'Add scaffolds, prompts, or engagement to any task', chips: CHIPS_DOC,    onClick: null },
-    { label: 'Rubric',                 emoji: '📋',  sub: 'Criteria-based assessment for student work',        chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'Syllabus',               emoji: '🗓️',  sub: 'Course overview, expectations, and schedule',      chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'Progress Report',        emoji: '📈',  sub: 'Student performance summaries for families',       chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'Resource',               emoji: '📚',  sub: 'Supplemental reading or reference materials',      chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'Exemplar',               emoji: '⭐',  sub: 'High-quality student work samples with annotation',chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'Lesson Plan',            emoji: '📅',  sub: 'Standards-aligned daily or unit lessons',         chips: CHIPS_DOC,    onClick: 'doc' },
-    { label: 'DOK Questions',          emoji: '🧠',  sub: 'Depth of Knowledge tiered question sets',         chips: CHIPS_ASSESS, onClick: null },
-    { label: 'Decodable Text',         emoji: '🔤',  sub: 'Phonics-controlled reading passages',             chips: CHIPS_DOC,    onClick: null },
-    { label: 'Translation',            emoji: '🌐',  sub: 'Multilingual versions of classroom materials',    chips: CHIPS_DOC,    onClick: null },
-    { label: 'Math Spiral Review',     emoji: '🔢',  sub: 'Cumulative practice across prior standards',      chips: CHIPS_DOC,    onClick: null },
-    { label: 'Math Word Problems',     emoji: '🧮',  sub: 'Real-world application and contextual problems',  chips: CHIPS_DOC,    onClick: null },
-    { label: 'Science Lab',            emoji: '🔬',  sub: 'Guided inquiry lab procedures and write-ups',     chips: CHIPS_DOC,    onClick: null },
-    { label: 'Inquiry Task',           emoji: '🔭',  sub: 'Open-ended student-driven investigation',         chips: CHIPS_DOC,    onClick: null },
-    { label: 'Guided Notes',           emoji: '📓',  sub: 'Structured note-taking with fill-in scaffolds',   chips: CHIPS_DOC,    onClick: null },
-    { label: 'Unit Plan',              emoji: '🗺️',  sub: 'Multi-week scope and sequence with standards',    chips: CHIPS_DOC,    onClick: null },
-    { label: 'Sub Plan',               emoji: '📄',  sub: 'Detailed plans and materials for a substitute',  chips: CHIPS_DOC,    onClick: null },
-    { label: 'SBAC Practice Test',     emoji: '🏆',  sub: 'Smarter Balanced assessment prep questions',      chips: CHIPS_ASSESS, onClick: null },
-    { label: 'STAAR Practice Test',    emoji: '🌟',  sub: 'Texas state assessment prep questions',           chips: CHIPS_ASSESS, onClick: null },
-    { label: 'UDL Lesson Plan',        emoji: '🌈',  sub: 'Universal Design for Learning framework lesson',  chips: CHIPS_DOC,    onClick: null },
-    { label: 'Standards Unpacker',     emoji: '📌',  sub: 'Break standards into learning targets and tasks', chips: CHIPS_DOC,    onClick: null },
-    { label: 'SAT Practice Test',      emoji: '🎯',  sub: 'College Board SAT prep questions and strategies', chips: CHIPS_ASSESS, onClick: null },
-    { label: 'ACT Practice Test',      emoji: '🏅',  sub: 'ACT prep questions and test-taking strategies',  chips: CHIPS_ASSESS, onClick: null },
-    { label: 'Canvas QTI',             emoji: '💻',  sub: 'Quiz import format compatible with Canvas LMS',  chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Boost Student Activity', emoji: '⚡',  sub: 'Add scaffolds or prompts',        chips: CHIPS_DOC,    onClick: null },
+    { label: 'Rubric',                 emoji: '📋',  sub: 'Criteria-based assessment',       chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Syllabus',               emoji: '🗓️',  sub: 'Course overview & schedule',      chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Progress Report',        emoji: '📈',  sub: 'Performance summaries',           chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Resource',               emoji: '📚',  sub: 'Supplemental reading',            chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Exemplar',               emoji: '⭐',  sub: 'Annotated student samples',       chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'Lesson Plan',            emoji: '📅',  sub: 'Daily or unit lessons',           chips: CHIPS_DOC,    onClick: 'doc' },
+    { label: 'DOK Questions',          emoji: '🧠',  sub: 'Tiered DOK question sets',        chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Decodable Text',         emoji: '🔤',  sub: 'Phonics-controlled passages',     chips: CHIPS_DOC,    onClick: null },
+    { label: 'Translation',            emoji: '🌐',  sub: 'Multilingual materials',          chips: CHIPS_DOC,    onClick: null },
+    { label: 'Math Spiral Review',     emoji: '🔢',  sub: 'Cumulative standards practice',   chips: CHIPS_DOC,    onClick: null },
+    { label: 'Math Word Problems',     emoji: '🧮',  sub: 'Real-world math problems',        chips: CHIPS_DOC,    onClick: null },
+    { label: 'Science Lab',            emoji: '🔬',  sub: 'Lab procedures & write-ups',      chips: CHIPS_DOC,    onClick: null },
+    { label: 'Inquiry Task',           emoji: '🔭',  sub: 'Student-driven investigation',    chips: CHIPS_DOC,    onClick: null },
+    { label: 'Guided Notes',           emoji: '📓',  sub: 'Fill-in note scaffold',           chips: CHIPS_DOC,    onClick: null },
+    { label: 'Unit Plan',              emoji: '🗺️',  sub: 'Multi-week scope & sequence',     chips: CHIPS_DOC,    onClick: null },
+    { label: 'Sub Plan',               emoji: '📄',  sub: 'Plans for a substitute',          chips: CHIPS_DOC,    onClick: null },
+    { label: 'SBAC Practice Test',     emoji: '🏆',  sub: 'Smarter Balanced prep',           chips: CHIPS_ASSESS, onClick: null },
+    { label: 'STAAR Practice Test',    emoji: '🌟',  sub: 'Texas state assessment prep',     chips: CHIPS_ASSESS, onClick: null },
+    { label: 'UDL Lesson Plan',        emoji: '🌈',  sub: 'UDL framework lesson',            chips: CHIPS_DOC,    onClick: null },
+    { label: 'Standards Unpacker',     emoji: '📌',  sub: 'Learning targets from standards', chips: CHIPS_DOC,    onClick: null },
+    { label: 'SAT Practice Test',      emoji: '🎯',  sub: 'SAT prep questions',              chips: CHIPS_ASSESS, onClick: null },
+    { label: 'ACT Practice Test',      emoji: '🏅',  sub: 'ACT prep questions',              chips: CHIPS_ASSESS, onClick: null },
+    { label: 'Canvas QTI',             emoji: '💻',  sub: 'Canvas LMS quiz import',          chips: CHIPS_ASSESS, onClick: null },
   ]},
   { section: 'Administrative Tasks', tools: [
-    { label: 'Email',            emoji: '✉️',  sub: 'Professional messages to families or colleagues', chips: CHIPS_DOC, onClick: null },
-    { label: 'Newsletter',       emoji: '📰',  sub: 'Class or school updates for stakeholders',       chips: CHIPS_DOC, onClick: null },
-    { label: 'Letter of Rec',    emoji: '📜',  sub: 'Personalized student recommendation letters',    chips: CHIPS_DOC, onClick: null },
-    { label: 'Observation Notes',emoji: '👁️',  sub: 'Structured classroom observation records',       chips: CHIPS_DOC, onClick: null },
+    { label: 'Email',            emoji: '✉️',  sub: 'Messages to families',         chips: CHIPS_DOC, onClick: null },
+    { label: 'Newsletter',       emoji: '📰',  sub: 'Class or school updates',      chips: CHIPS_DOC, onClick: null },
+    { label: 'Letter of Rec',    emoji: '📜',  sub: 'Recommendation letters',       chips: CHIPS_DOC, onClick: null },
+    { label: 'Observation Notes',emoji: '👁️',  sub: 'Classroom observation notes',  chips: CHIPS_DOC, onClick: null },
   ]},
   { section: 'Interventions', tools: [
-    { label: 'IEP Goal Plan',  emoji: '🎯',  sub: 'Individualized Education Program goal documentation', chips: CHIPS_DOC, onClick: null },
-    { label: 'MTSS Strategy',  emoji: '🧩',  sub: 'Multi-Tiered System of Supports strategy cards',     chips: CHIPS_DOC, onClick: null },
-    { label: 'MTSS Plan',      emoji: '🗂️',  sub: 'Tiered intervention plan for student support',       chips: CHIPS_DOC, onClick: null },
-    { label: '504 Plan',       emoji: '♿',  sub: 'Accommodation documentation for eligible students',  chips: CHIPS_DOC, onClick: null },
+    { label: 'IEP Goal Plan',  emoji: '🎯',  sub: 'IEP goal documentation',    chips: CHIPS_DOC, onClick: null },
+    { label: 'MTSS Strategy',  emoji: '🧩',  sub: 'MTSS strategy cards',        chips: CHIPS_DOC, onClick: null },
+    { label: 'MTSS Plan',      emoji: '🗂️',  sub: 'Tiered intervention plan',   chips: CHIPS_DOC, onClick: null },
+    { label: '504 Plan',       emoji: '♿',  sub: '504 accommodation docs',     chips: CHIPS_DOC, onClick: null },
   ]},
 ];
 
@@ -677,7 +677,7 @@ function CreateToolRow({ emoji, svg, iconEl, label, sub, chips, onClick }) {
         {hovered && visibleChips.length > 0 && (
           <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center' }}>
             {visibleChips.map((chip, i) => (
-              <div key={i} title={chip.title} style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div key={i} title={chip.title} style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {chip.icon}
               </div>
             ))}
@@ -854,6 +854,38 @@ function InlineClassPicker({ value, onChange }) {
   );
 }
 
+// 3-step stepper for resource/intent creation flow
+function ResourceIntentStepper({ step }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', padding: '0 24px 14px' }}>
+      {[1, 2, 3].map((s, i) => {
+        const isPast = step > s;
+        const isCurrent = step === s;
+        return (
+          <Fragment key={s}>
+            {i > 0 && (
+              <div style={{ flex: 1, height: 2, background: '#E5E4E2', borderRadius: 1 }} />
+            )}
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: isCurrent ? '#0E151C' : 'transparent',
+              border: isCurrent ? 'none' : isPast ? '1.5px solid #0E151C' : undefined,
+              outline: isCurrent || isPast ? undefined : '1.5px dashed #A9A7A2',
+              outlineOffset: isCurrent || isPast ? undefined : '-1px',
+              fontSize: 14, fontWeight: 500, fontFamily: 'Inter, inherit',
+              color: isCurrent ? '#fff' : isPast ? '#0E151C' : '#A9A7A2',
+              flexShrink: 0,
+            }}>
+              {s}
+            </div>
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
 // Stage navigator breadcrumb
 const STEPS = ['Topic', 'Needs', 'Scaffolds', 'Create'];
 function Breadcrumb({ active, visited = [], onStepClick }) {
@@ -929,8 +961,8 @@ function TextInput({ placeholder, value, onChange, onSubmit, disabled, animatedP
 // Shared pill-style bottom input bar — used on Sources, Overview, Chat screens
 function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled }) {
   return (
-    <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 10px' }}>
-      <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: disabled ? '#F4F3F0' : '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: '0 16px', height: 52, transition: 'background 0.15s' }}>
+    <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+      <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: disabled ? '#F4F3F0' : '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: '0 10px 0 4px', height: 52, transition: 'background 0.15s' }}>
         <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, opacity: disabled ? 0.4 : 1 }}>
           <img src="/icons/Add.svg" width={22} height={22} alt="Add" style={{ display: 'block' }} />
         </button>
@@ -942,13 +974,10 @@ function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled }) {
           disabled={disabled}
           style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: C.slate900, background: 'transparent', fontFamily: 'inherit', padding: 0, margin: 0, lineHeight: 'normal', display: 'block', opacity: disabled ? 0.4 : 1 }}
         />
-        {value.trim() && !disabled ? (
+        {value.trim() && !disabled && (
           <button onClick={onSubmit} style={{ width: 36, height: 36, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
-        ) : (
-          <MicButton size={22} className="icon-btn" btnStyle={{ opacity: disabled ? 0.4 : 1 }}
-            onTranscript={(t, isFinal) => { if (!disabled) onChange(t); }} />
         )}
       </div>
     </div>
@@ -1371,6 +1400,16 @@ function GoogleDocPreview({ quiz, title, isIterating }) {
 }
 
 // ── Google Slides-style preview ────────────────────────────────
+const SLIDE_PALETTES = [
+  { bg: '#1a73e8', text: '#fff', accent: '#fbbc04' },
+  { bg: '#34a853', text: '#fff', accent: '#fff' },
+  { bg: '#ea4335', text: '#fff', accent: '#fbbc04' },
+  { bg: '#4285f4', text: '#fff', accent: '#34a853' },
+  { bg: '#0f9d58', text: '#fff', accent: '#fbbc04' },
+  { bg: '#ab47bc', text: '#fff', accent: '#fff' },
+  { bg: '#e65100', text: '#fff', accent: '#fff' },
+];
+
 function GoogleSlidesPreview({ quiz, title }) {
   const slides = [];
   if (quiz) {
@@ -1378,41 +1417,120 @@ function GoogleSlidesPreview({ quiz, title }) {
     if (quiz.warmup?.length > 0) {
       slides.push({ type: 'warmup', heading: quiz.warmupLabel || 'Warm-Up', items: quiz.warmup });
     }
-    (quiz.questions || []).forEach(q => {
+    (quiz.questions || []).forEach((q, idx) => {
       const raw = q.explanation || '';
       const bullets = raw
         ? raw.split('\n').map(s => s.replace(/^[•–\-*]\s*/, '').trim()).filter(Boolean)
         : [];
-      slides.push({ type: 'content', heading: q.question, bullets });
+      // Vary layouts: 0=bullets, 1=big-number, 2=two-col-ish, cycling
+      const layout = idx % 3;
+      slides.push({ type: 'content', layout, heading: q.question, bullets, idx });
     });
   }
   const [active, setActive] = useState(0);
 
-  function Slide({ slide, num }) {
-    if (!slide) return null;
+  function SlideThumb({ slide, palette }) {
     if (slide.type === 'title') return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '40px 60px', textAlign: 'center' }}>
-        <div style={{ fontSize: 32, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 16 }}>{slide.heading}</div>
-        {slide.sub && <div style={{ fontSize: 16, color: '#5f6368' }}>{slide.sub}</div>}
+      <div style={{ width: '100%', height: '100%', background: palette.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '6px 8px', textAlign: 'center' }}>
+        <div style={{ width: '60%', height: 2, background: palette.accent, marginBottom: 4 }} />
+        <div style={{ fontSize: 5, fontWeight: 700, color: palette.text, lineHeight: 1.3, overflow: 'hidden' }}>{slide.heading}</div>
       </div>
     );
     if (slide.type === 'warmup') return (
-      <div style={{ padding: '32px 48px', height: '100%' }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e', marginBottom: 18, borderBottom: '2px solid #4285f4', paddingBottom: 8 }}>{slide.heading}</div>
-        {slide.items.map((w, i) => (
-          <div key={i} style={{ fontSize: 14, color: '#202124', marginBottom: 10, lineHeight: 1.6 }}>
-            <span style={{ fontWeight: 700, color: '#1a73e8' }}>{w.term}</span> — {w.definition}
+      <div style={{ width: '100%', height: '100%', background: '#fff', padding: '4px 6px' }}>
+        <div style={{ fontSize: 4, fontWeight: 700, color: '#1a1a2e', marginBottom: 3, borderBottom: `1.5px solid ${SLIDE_PALETTES[0].bg}`, paddingBottom: 2 }}>{slide.heading}</div>
+        {(slide.items || []).slice(0, 3).map((w, i) => (
+          <div key={i} style={{ fontSize: 3.5, color: '#444', marginBottom: 1.5 }}>
+            <span style={{ fontWeight: 700 }}>{w.term}</span>
           </div>
         ))}
       </div>
     );
     return (
-      <div style={{ padding: '36px 52px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 20, borderBottom: '2px solid #4285f4', paddingBottom: 12 }}>{slide.heading}</div>
+      <div style={{ width: '100%', height: '100%', background: slide.layout === 1 ? palette.bg : '#fff', padding: '5px 6px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: 4, fontWeight: 700, color: slide.layout === 1 ? palette.text : '#1a1a2e', marginBottom: 3, borderBottom: `1.5px solid ${slide.layout === 1 ? palette.accent : palette.bg}`, paddingBottom: 2 }}>{slide.heading}</div>
+        {slide.bullets.slice(0, 3).map((b, i) => (
+          <div key={i} style={{ display: 'flex', gap: 2, marginBottom: 1.5, alignItems: 'flex-start' }}>
+            <span style={{ color: slide.layout === 1 ? palette.accent : palette.bg, fontWeight: 700, fontSize: 4 }}>•</span>
+            <span style={{ fontSize: 3.5, color: slide.layout === 1 ? 'rgba(255,255,255,0.85)' : '#444', lineHeight: 1.4 }}>{b}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  function Slide({ slide, num, palette }) {
+    if (!slide) return null;
+    if (slide.type === 'title') return (
+      <div style={{ width: '100%', height: '100%', background: palette.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 80px', textAlign: 'center' }}>
+        <div style={{ width: 80, height: 3, background: palette.accent, marginBottom: 24, borderRadius: 2 }} />
+        <div style={{ fontSize: 34, fontWeight: 700, color: palette.text, lineHeight: 1.25, marginBottom: 16 }}>{slide.heading}</div>
+        {slide.sub && <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.75)', marginTop: 8 }}>{slide.sub}</div>}
+        <div style={{ width: 80, height: 3, background: palette.accent, marginTop: 24, borderRadius: 2 }} />
+      </div>
+    );
+    if (slide.type === 'warmup') return (
+      <div style={{ padding: '40px 56px', height: '100%', background: '#fff' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: palette.bg, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Warm-Up</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', marginBottom: 20, borderBottom: `3px solid ${palette.bg}`, paddingBottom: 10 }}>{slide.heading}</div>
+        {(slide.items || []).map((w, i) => (
+          <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 12, alignItems: 'flex-start' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: palette.bg, flexShrink: 0, marginTop: 7 }} />
+            <div style={{ fontSize: 14, color: '#202124', lineHeight: 1.6 }}>
+              <span style={{ fontWeight: 700, color: palette.bg }}>{w.term}</span>
+              {w.definition ? ` — ${w.definition}` : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+    // content slide — 3 layouts
+    if (slide.layout === 1) {
+      // Big-number / accent background layout
+      return (
+        <div style={{ width: '100%', height: '100%', background: palette.bg, display: 'flex', flexDirection: 'column', padding: '32px 52px' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: palette.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Key Concept</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: palette.text, lineHeight: 1.3, marginBottom: 22, flex: '0 0 auto' }}>{slide.heading}</div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {slide.bullets.map((b, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: palette.text }}>{i + 1}</span>
+                </div>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>{b}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    if (slide.layout === 2) {
+      // Left accent bar layout
+      return (
+        <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex' }}>
+          <div style={{ width: 8, background: palette.bg, flexShrink: 0 }} />
+          <div style={{ flex: 1, padding: '32px 44px 32px 40px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 20 }}>{slide.heading}</div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {slide.bullets.map((b, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#202124', lineHeight: 1.6 }}>
+                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: palette.bg, flexShrink: 0, marginTop: 8 }} />
+                  <span>{b}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // Default: header underline layout
+    return (
+      <div style={{ padding: '36px 52px', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3, marginBottom: 18, paddingBottom: 12, borderBottom: `3px solid ${palette.bg}` }}>{slide.heading}</div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {slide.bullets.map((b, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#202124', lineHeight: 1.6 }}>
-              <span style={{ color: '#4285f4', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>•</span>
+              <span style={{ color: palette.bg, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>›</span>
               <span>{b}</span>
             </div>
           ))}
@@ -1430,7 +1548,7 @@ function GoogleSlidesPreview({ quiz, title }) {
           <div style={{ fontSize: 16, color: '#202124', fontWeight: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title || 'Untitled presentation'}</div>
           <div style={{ fontSize: 11, color: '#5f6368', marginTop: 1 }}>File &nbsp; Edit &nbsp; View &nbsp; Insert &nbsp; Format &nbsp; Slide &nbsp; Tools &nbsp; Help</div>
         </div>
-        <div style={{ background: '#fbbc04', color: '#000', fontSize: 13, fontWeight: 500, padding: '7px 20px', borderRadius: 4 }}>Share</div>
+        <div style={{ background: '#1a73e8', color: '#fff', fontSize: 13, fontWeight: 500, padding: '7px 20px', borderRadius: 4 }}>Share</div>
       </div>
       {/* Toolbar */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e0e0e0', padding: '2px 16px', display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
@@ -1442,17 +1560,18 @@ function GoogleSlidesPreview({ quiz, title }) {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Slide strip */}
         <div style={{ width: 160, background: '#2d2d2d', overflowY: 'auto', padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-          {slides.map((s, i) => (
-            <div key={i} onClick={() => setActive(i)}
-              style={{ background: active === i ? '#4285f4' : 'transparent', borderRadius: 3, padding: 3, cursor: 'pointer' }}>
-              <div style={{ background: '#fff', aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', padding: '4px 6px', outline: active === i ? '2px solid #fff' : 'none' }}>
-                <div style={{ fontSize: 4.5, color: '#333', lineHeight: 1.4, overflow: 'hidden', maxHeight: '100%', fontWeight: s.type === 'title' ? 700 : 400 }}>
-                  {s.heading}
+          {slides.map((s, i) => {
+            const palette = s.type === 'title' ? SLIDE_PALETTES[0] : SLIDE_PALETTES[(s.idx ?? i) % SLIDE_PALETTES.length];
+            return (
+              <div key={i} onClick={() => setActive(i)}
+                style={{ background: active === i ? '#4285f4' : 'transparent', borderRadius: 3, padding: 3, cursor: 'pointer' }}>
+                <div style={{ aspectRatio: '16/9', borderRadius: 2, overflow: 'hidden', outline: active === i ? '2px solid #fff' : 'none' }}>
+                  <SlideThumb slide={s} palette={palette} />
                 </div>
+                <div style={{ fontSize: 9, color: active === i ? '#fff' : '#aaa', textAlign: 'center', marginTop: 3 }}>{i + 1}</div>
               </div>
-              <div style={{ fontSize: 9, color: active === i ? '#fff' : '#aaa', textAlign: 'center', marginTop: 3 }}>{i + 1}</div>
-            </div>
-          ))}
+            );
+          })}
           {!quiz && <div style={{ color: '#888', fontSize: 10, textAlign: 'center', marginTop: 20 }}>Slides will appear here</div>}
         </div>
         {/* All slides scrollable */}
@@ -1460,14 +1579,16 @@ function GoogleSlidesPreview({ quiz, title }) {
           {slides.length === 0 && (
             <div style={{ color: '#aaa', fontSize: 14, marginTop: 60 }}>No slides yet</div>
           )}
-          {slides.map((s, i) => (
-            <div key={i} id={`slide-${i}`}
-              onClick={() => setActive(i)}
-              style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', background: '#fff', boxShadow: active === i ? '0 0 0 3px #4285f4, 0 4px 24px rgba(0,0,0,0.5)' : '0 4px 24px rgba(0,0,0,0.4)', borderRadius: 3, overflow: 'hidden', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #4285f4, #34a853)' }} />
-              <Slide slide={s} num={i} />
-            </div>
-          ))}
+          {slides.map((s, i) => {
+            const palette = s.type === 'title' ? SLIDE_PALETTES[0] : SLIDE_PALETTES[(s.idx ?? i) % SLIDE_PALETTES.length];
+            return (
+              <div key={i} id={`slide-${i}`}
+                onClick={() => setActive(i)}
+                style={{ width: '100%', maxWidth: 800, aspectRatio: '16/9', boxShadow: active === i ? '0 0 0 3px #4285f4, 0 4px 24px rgba(0,0,0,0.5)' : '0 4px 24px rgba(0,0,0,0.4)', borderRadius: 3, overflow: 'hidden', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+                <Slide slide={s} num={i} palette={palette} />
+              </div>
+            );
+          })}
           <div style={{ height: 40 }} />
         </div>
       </div>
@@ -1728,7 +1849,7 @@ function FormatDropdown({ options, value, onChange, fullWidth }) {
   return (
     <div style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block', width: fullWidth ? '100%' : undefined }}>
       <button ref={triggerRef} onClick={handleOpen}
-        style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px 0 12px', border: '1px solid #CACED1', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
+        style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px 0 12px', border: '1px solid #CACED1', borderRadius: 8, background: '#fff', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <img src={selected.icon} width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selected.label}</span>
@@ -1793,7 +1914,7 @@ function PillSelect({ value, options, onChange, fullWidth }) {
   return (
     <div style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block', width: fullWidth ? '100%' : undefined }}>
       <button ref={triggerRef} onClick={handleOpen}
-        style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px', border: '1px solid #CACED1', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined, gap: 8 }}>
+        style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px', border: '1px solid #CACED1', borderRadius: 8, background: '#fff', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', cursor: 'pointer', outline: 'none', width: fullWidth ? '100%' : undefined, gap: 8 }}>
         <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedLabel}</span>
         <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0 }}>
           <path d="M1 1L5 5L9 1" stroke="#78716c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1922,12 +2043,23 @@ function detectSettingsFromInput(text) {
   return changes;
 }
 
-function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile }) {
+function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile, currentStep = 1 }) {
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
   const promptBoxRef = useRef(null);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
+  const [settingsDrawerClosing, setSettingsDrawerClosing] = useState(false);
+  const [settingsDrawerAnimDone, setSettingsDrawerAnimDone] = useState(false);
   const [formatHover, setFormatHover] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [moreSubMenu, setMoreSubMenu] = useState(null); // null | 'grade' | 'language'
+  const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
+  useEffect(() => {
+    if (!moreMenuOpen && !historyMenuOpen) return;
+    const handler = () => { setMoreMenuOpen(false); setMoreSubMenu(null); setHistoryMenuOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [moreMenuOpen, historyMenuOpen]);
   const [curriculumHover, setCurriculumHover] = useState(false);
   const [numQRaw, setNumQRaw] = useState(String(prefs.numQuestions ?? 10));
   const [numSRaw, setNumSRaw] = useState(String(prefs.numSlides ?? 10));
@@ -1985,32 +2117,20 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
   return (
     <>
       {/* Header */}
-      <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', borderBottom: '1px solid #e7e5e4', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8 }}>
+      <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
           <ModalBackBtn onClick={onBack} />
-          <div style={{ flex: 1 }} />
-          <HeaderActions onClose={onClose} />
+          <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#0E151C', letterSpacing: '-0.01em', pointerEvents: 'none' }}>{toolName}</span>
+          <div style={{ marginLeft: 'auto' }}>
+            <ModalCloseBtn onClick={onClose} />
+          </div>
         </div>
+        <ResourceIntentStepper step={currentStep} />
       </div>
 
-      {/* Fixed heading — stack vertically when title is long enough to wrap */}
-      {(() => {
-        const headingText = `What\u2019s your ${toolName.toLowerCase()} about?`;
-        const stacked = headingText.length > 32;
-        const iconSize = stacked ? 40 : 32;
-        const docIcon = effectiveDocFormat === 'Word' ? 'Word' : effectiveDocFormat === 'Powerpoint' ? 'Powerpoint' : effectiveDocFormat === 'Slides' ? 'Slides' : 'Docs';
-        const icon = <img src={isPodcast ? '/icons/Podcast.svg' : toolType === 'doc' ? `/icons/${docIcon}.svg` : `/icons/${prefs.platform || 'Forms'}.svg`} width={iconSize} height={iconSize} alt={toolName} style={{ display: 'block', flexShrink: 0 }} />;
-        return (
-          <div style={{ flexShrink: 0, padding: '20px 24px 12px', display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: stacked ? 8 : 10, background: '#FAF9F6', textAlign: stacked ? 'center' : 'left' }}>
-            {icon}
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#0E151C', lineHeight: '26px', letterSpacing: '-0.02em', ...(stacked ? { padding: '0 24px' } : {}) }}>{headingText}</div>
-          </div>
-        );
-      })()}
-
-      {/* Fixed prompt box — shrinks when editing audience/format to make room */}
-      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '0 24px 12px' }}>
-        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden', minHeight: 167, display: 'flex', flexDirection: 'column' }}>
+      {/* Prompt box — fills remaining space */}
+      <div style={{ flex: 1, background: '#FAF9F6', padding: '0 24px 12px', display: 'flex', flexDirection: 'column' }}>
+        <div ref={promptBoxRef} style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)', flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
           {pageChipVisible && pageContext && (
             <div style={{ padding: '8px 10px 2px' }}>
               <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -2022,12 +2142,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
               </div>
             </div>
           )}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: 4, padding: '10px 8px 10px' }}>
-            <button ref={addBtnRef} className="icon-btn"
-              onClick={() => { const r = addBtnRef.current?.getBoundingClientRect(); if (r && onAddClick) onAddClick({ top: r.bottom + 6, left: r.left }); }}
-              style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
-              <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
-            </button>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '10px 12px 8px' }}>
             <textarea
               ref={textareaRef}
               value={input}
@@ -2038,33 +2153,103 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                 const el = textareaRef.current;
                 if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; }
               }}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  const canBrisk = !!input.trim() || pageChipVisible;
+                  if (canBrisk) { savePromptToHistory(input); onBriskIt(); }
+                }
+              }}
               placeholder={promptPlaceholder}
               rows={1}
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: pageChipVisible ? 72 : 110, paddingTop: 5 }}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: pageChipVisible ? 60 : 120, padding: 0 }}
             />
-            <MicButton size={20} className="icon-btn"
-              onTranscript={(t) => { onInputChange(t); const el = textareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; } }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <button ref={addBtnRef} className="icon-btn"
+                  onClick={() => { const r = addBtnRef.current?.getBoundingClientRect(); if (r && onAddClick) onAddClick({ top: r.bottom + 6, left: r.left }); }}
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
+                  <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
+                </button>
+                <div style={{ position: 'relative' }}>
+                  <button className="icon-btn" onClick={() => { setHistoryMenuOpen(v => !v); setMoreMenuOpen(false); }}
+                    style={{ width: 32, height: 32, border: 'none', background: historyMenuOpen ? '#F0EFED' : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
+                    <img src="/icons/Time.svg" width={20} height={20} alt="History" style={{ display: 'block' }} />
+                  </button>
+                  {historyMenuOpen && (() => {
+                    const HISTORY_KEY = 'brisk_prompt_history';
+                    let allHistory = [];
+                    try { allHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch {}
+                    const words = input.trim().toLowerCase().split(/\s+/).filter(w => w.length > 2);
+                    const filtered = words.length > 0
+                      ? allHistory.filter(h => words.some(w => h.toLowerCase().includes(w)))
+                      : allHistory;
+                    const items = filtered.slice(0, 6);
+                    return (
+                      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 220, maxWidth: 280, zIndex: 50, overflow: 'hidden' }}>
+                        <div style={{ padding: '8px 14px 4px', fontSize: 14, fontWeight: 500, color: '#74818E' }}>Prompt History</div>
+                        {items.length === 0 ? (
+                          <div style={{ padding: '10px 14px 12px', fontSize: 13, color: '#74818E' }}>No history yet</div>
+                        ) : items.map((h, i) => (
+                          <button key={i} onClick={() => { onInputChange(h); setHistoryMenuOpen(false); }}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', textAlign: 'left', lineHeight: '18px' }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                            <img src="/icons/Time.svg" width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0, opacity: 0.4 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h}</span>
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <button className="icon-btn" onClick={() => { setMoreMenuOpen(v => !v); setMoreSubMenu(null); }}
+                    style={{ width: 32, height: 32, border: 'none', background: moreMenuOpen ? '#F0EFED' : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
+                    <img src="/icons/More.svg" width={20} height={20} alt="More" style={{ display: 'block' }} />
+                  </button>
+              {moreMenuOpen && (
+                <div style={{ position: 'absolute', bottom: 'calc(100% + 4px)', left: 0, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 220, zIndex: 50, overflow: 'hidden', padding: '8px 0 12px' }}>
+                  <div style={{ padding: '0 14px 4px', fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit' }}>Alignment</div>
+                  {[
+                    { label: 'Standards', icon: '/icons/Checklist.svg' },
+                    { label: 'Curriculum', icon: '/icons/Lightening Stroke.svg' },
+                  ].map(item => (
+                    <button key={item.label} onClick={() => setMoreMenuOpen(false)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', textAlign: 'left' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                      <img src={item.icon} width={18} height={18} alt="" style={{ display: 'block', flexShrink: 0 }} />
+                      {item.label}
+                    </button>
+                  ))}
+                  <div style={{ height: 1, background: '#F0EFED', margin: '4px 12px 8px' }} />
+                  <div style={{ padding: '0 14px', marginBottom: 8 }}>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Grade Level</div>
+                    <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: g === 'K' ? 'Kindergarten' : `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
+                  </div>
+                  <div style={{ padding: '0 14px', marginBottom: toolType !== 'doc' ? 8 : 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Language</div>
+                    <PillSelect value={prefs.language} options={['English','Spanish','French','Mandarin','Arabic']} onChange={v => onPrefsChange({ language: v })} fullWidth />
+                  </div>
+                  {toolType !== 'doc' && (
+                    <div style={{ padding: '0 14px' }}>
+                      <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Questions</div>
+                      <PillSelect value={String(prefs.numQuestions ?? 10)} options={[5,10,15,20,25,30,35,40,45,50].map(n => ({ value: String(n), label: `${n} questions` }))} onChange={v => { const n = parseInt(v); onPrefsChange({ numQuestions: n }); setNumQRaw(String(n)); }} fullWidth />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ flexShrink: 0 }}>
-        <IntentChips
-          toolName={toolName}
-          input={input}
-          onInputChange={onInputChange}
-          pageContext={pageContext}
-          pageChipVisible={pageChipVisible}
-          promptBoxRef={promptBoxRef}
-        />
-      </div>
-
       {/* Settings body — collapsed read-only rows + Settings header with edit button */}
-      <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6', padding: '8px 24px 0' }}>
+      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 0' }}>
         {/* Settings header */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', flex: 1 }}>Settings</span>
-          <button onClick={() => setSettingsDrawerOpen(true)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
+          <button onClick={() => { setSettingsDrawerAnimDone(false); setSettingsDrawerOpen(true); }} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>{pencilIcon}</button>
         </div>
 
         {/* Curriculum row */}
@@ -2081,7 +2266,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
             <span style={{ fontSize: 14, color: '#344054', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefs.standards && prefs.standards !== 'None' ? prefs.standards : 'None'}</span>
             {prefs.standards && prefs.standards !== 'None' && (
-              <span style={{ fontSize: 11, fontWeight: 500, color: '#06465C', background: '#EEF4F6', border: '1px solid #C5DBE3', borderRadius: 4, padding: '1px 5px', flexShrink: 0, lineHeight: '16px' }}>auto</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: '#0E151C', background: '#F0EFED', border: '1px solid #D0CEC9', borderRadius: 4, padding: '1px 5px', flexShrink: 0, lineHeight: '16px' }}>auto</span>
             )}
           </div>
         </div>
@@ -2122,18 +2307,21 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
         </div>
       </div>
 
-      {/* Settings drawer — full-screen overlay */}
+      {/* Settings drawer — slides up from bottom */}
       {settingsDrawerOpen && (
-        <div style={{
+        <div
+          onAnimationEnd={() => { if (!settingsDrawerClosing) setSettingsDrawerAnimDone(true); }}
+          style={{
             position: 'absolute', inset: 0, zIndex: 20,
             background: '#FAF9F6', borderRadius: 12,
             display: 'flex', flexDirection: 'column',
-            animation: 'fadeIn 0.15s ease both',
+            animation: settingsDrawerAnimDone ? 'none' : `${settingsDrawerClosing ? 'drawerSlideDown' : 'drawerSlideUp'} 0.38s cubic-bezier(0.22,1,0.36,1) both`,
+            overflow: 'hidden',
           }}>
           {/* Drawer header */}
-          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, borderBottom: '1px solid #E7E5E4', background: '#FAF9F6', borderRadius: '12px 12px 0 0' }}>
+          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '4px 24px 0', height: 52, background: '#FAF9F6', borderRadius: '12px 12px 0 0' }}>
             <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#0E151C', lineHeight: '24px' }}>Settings</span>
-            <button onClick={() => setSettingsDrawerOpen(false)} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+            <button onClick={() => { setSettingsDrawerAnimDone(false); setSettingsDrawerClosing(true); setTimeout(() => { setSettingsDrawerOpen(false); setSettingsDrawerClosing(false); }, 360); }} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6L9 12L15 6" stroke="#475467" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
           </div>
@@ -2187,18 +2375,8 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                     <FormatDropdown options={FORMAT_OPTIONS.presentation} value={effectiveDocFormat} onChange={v => onPrefsChange({ docFormat: v })} fullWidth />
                   </div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Slides</div>
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #CACED1', borderRadius: 8, height: 40, overflow: 'hidden', background: 'transparent' }}>
-                      <button onClick={() => { const v = Math.max(1, (prefs.numSlides || 10) - 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-                      <input type="text" inputMode="numeric" className="counter-input" value={numSRaw} onChange={e => { setNumSRaw(e.target.value); const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 50) onPrefsChange({ numSlides: v }); }} onBlur={() => { const v = parseInt(numSRaw); setNumSRaw(String(isNaN(v) ? prefs.numSlides ?? 10 : Math.min(50, Math.max(1, v)))); }} style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: 500, color: '#0E151C', border: 'none', background: 'none', fontFamily: 'inherit', width: 0, padding: '0 4px' }} />
-                      <button onClick={() => { const v = Math.min(50, (prefs.numSlides || 10) + 1); onPrefsChange({ numSlides: v }); setNumSRaw(String(v)); }} style={{ width: 40, height: '100%', border: 'none', background: 'none', cursor: 'pointer', fontSize: 16, color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
-                    </div>
-                  </div>
-                  <div>
                     <div style={{ fontSize: 14, fontWeight: 500, lineHeight: '22px', color: '#0E151C', marginBottom: 8 }}>Images</div>
-                    <button onClick={() => onPrefsChange({ includeImages: !prefs.includeImages })} style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: prefs.includeImages ? '#06465C' : '#D1D5DB', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}>
-                      <span style={{ position: 'absolute', top: 2, left: prefs.includeImages ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
-                    </button>
+                    <PillSelect value={prefs.includeImages === false ? 'Without images' : 'With images'} options={['With images', 'Without images']} onChange={v => onPrefsChange({ includeImages: v === 'With images' })} fullWidth />
                   </div>
                 </div>
               ) : toolType === 'doc' ? (
@@ -2234,13 +2412,13 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       )}
 
       {/* Action buttons — pinned to bottom */}
-      <div style={{ flexShrink: 0, padding: '8px 24px 20px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+      <div style={{ flexShrink: 0, padding: '32px 24px 20px', background: '#FAF9F6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
         {(() => {
           const canBrisk = !!input.trim() || pageChipVisible;
           return (
             <button onClick={canBrisk ? () => { savePromptToHistory(input); onBriskIt(); } : undefined} disabled={!canBrisk}
-              style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: canBrisk ? '#06465C' : '#D1CFC9', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: canBrisk ? 'pointer' : 'default', transition: 'background 0.15s' }}>
-              Brisk It
+              style={{ padding: '8px 12px', border: 'none', borderRadius: 20, background: canBrisk ? '#0E151C' : '#D1CFC9', color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: canBrisk ? 'pointer' : 'default', transition: 'background 0.15s' }}>
+              Next
             </button>
           );
         })()}
@@ -2257,6 +2435,7 @@ const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multip
 export default function Home() {
   const [sessionId] = useState(() => genUUID());
   const [screen, setScreen] = useState('welcome');
+  const [currentStep, setCurrentStep] = useState(1);
   const [userType, setUserType] = useState('Teacher');
   const [input, setInput] = useState('');
 
@@ -2298,6 +2477,12 @@ export default function Home() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+  useEffect(() => {
+    if (!addMenuOpen) return;
+    const handler = () => setAddMenuOpen(false);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [addMenuOpen]);
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
     setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.platform));
@@ -2383,7 +2568,8 @@ export default function Home() {
   const [quizGenKey, setQuizGenKey] = useState(0);
   // sourcesReady is derived below near isDockedRight
   const [sourcesViewed, setSourcesViewed] = useState(false);
-  const [quizGenExpandedSource, setQuizGenExpandedSource] = useState(null);
+  const [quizGenExpandedSource, setQuizGenExpandedSource] = useState('needs');
+  const [confirmAdjustOpen, setConfirmAdjustOpen] = useState(false);
   const [qgQuizData, setQgQuizData] = useState(null);
   const [qgFormsLoading, setQgFormsLoading] = useState(false);
   const qgScrollRef = useRef(null);
@@ -2633,6 +2819,7 @@ export default function Home() {
 
   function handleClose() {
     setIsOpen(false);
+    setCurrentStep(1);
     setScreen('welcome'); setWelcomeScroll(0); setCreateScroll(0); setTopic(''); setCurriculumCard(null); setCardLoading(false);
     setHardestThing(''); setFluencyAnswer(''); setNeeds2Data(null);
     setNeeds2Loading(false); setNeeds2Answer(''); setNeeds2Selections([]); setStrategy(null);
@@ -2765,6 +2952,7 @@ export default function Home() {
     setQgQ1OtherActive(false);
     setQgQ2OtherText('');
     setQgQ2OtherActive(false);
+    setCurrentStep(2);
     setScreen('quiz-gen');
     setInput('');
   }
@@ -3949,11 +4137,12 @@ export default function Home() {
           onDismissChip={dismissChip}
           onAddClick={({ top, left }) => { setAddMenuPos({ top, left }); setAddMenuOpen(v => !v); }}
           onBriskIt={handleQuizBriskIt}
-          onBack={() => setScreen('create')}
+          onBack={() => { setCurrentStep(1); setScreen('create'); }}
           onClose={handleClose}
           curriculumCard={curriculumCard}
           selectedClass={selectedClass}
           onEditCurriculum={() => setScreen(2)}
+          currentStep={currentStep}
         />
       )}
 
@@ -4431,7 +4620,7 @@ export default function Home() {
           `Wrapping up…`,
         ];
         const FINALIZING_MSGS = [
-          `Finalizing your ${resourceLabel}…`,
+          `Wrapping up your ${resourceLabel.toLowerCase()}…`,
           `Personalizing for ${qgGrade} grade…`,
           `Aligning to standards…`,
           `Almost there…`,
@@ -4689,19 +4878,6 @@ export default function Home() {
                 <AddTertiaryBtn style={{ marginTop: 12 }} />
               </div>
             ) },
-          { id: 'data', label: 'Student Data', count: studentDataRows.length, icon: '/icons/Graph.svg',
-            content: (
-              <div style={{ borderTop: '1px solid #E2E1DE', margin: '0 -14px', padding: '12px 14px 12px' }}>
-                {studentDataRows.map(d => (
-                  <div key={d} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-                    <div style={{ width: 16, height: 16, background: '#1B6B6B', borderRadius: 3, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                    <span style={{ flex: 1, fontSize: 13, color: C.slate700, lineHeight: '20px' }}>{d}</span>
-                  </div>
-                ))}
-              </div>
-            ) },
         ];
         const sourcesCount = qgSources.reduce((s, c) => s + c.count, 0);
         const sourcesBadge = (() => {
@@ -4719,33 +4895,34 @@ export default function Home() {
         return (
           <>
             {/* Header bar + segmented control */}
-            <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0, borderBottom: `1px solid ${C.slate200}` }}>
+            <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
-                <ModalBackBtn onClick={() => setScreen(1)} />
-                <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 14, color: C.slate900, letterSpacing: '-0.01em', pointerEvents: 'none' }}>{resourceLabel}</span>
+                <ModalBackBtn onClick={() => { setCurrentStep(1); setScreen(1); }} />
+                <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 16, color: C.slate900, letterSpacing: '-0.01em', pointerEvents: 'none' }}>{resourceLabel}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 'auto' }}>
                   <ModalMenuBtn />
                   <ModalCloseBtn onClick={handleClose} />
                 </div>
               </div>
-              {/* Segmented control — inside header */}
-              <div style={{ padding: '0 24px 12px' }}>
-                <div style={{ display: 'flex', background: '#EEEDE9', borderRadius: 10, padding: 4, height: 40 }}>
-                  {['Overview', 'Sources'].map(tab => {
-                    const isActive = quizGenTab === tab;
+              {!(quizGenPhase === 'done' && sourcesReady) && <ResourceIntentStepper step={currentStep} />}
+              {/* Tabs — only shown during iteration/done phase */}
+              {quizGenPhase === 'done' && sourcesReady && (
+                <div style={{ display: 'flex', borderBottom: `1px solid ${C.slate200}` }}>
+                  {['Iterate', 'Sources'].map(tab => {
+                    const isActive = tab === 'Iterate' ? (quizGenTab === 'Iterate' || quizGenTab === 'Overview') : quizGenTab === tab;
                     return (
-                      <button key={tab} onClick={() => { setQuizGenTab(tab); if (tab === 'Sources') setSourcesViewed(true); }}
-                        style={{ flex: 1, fontFamily: 'inherit', fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? C.slate900 : C.slate500, background: isActive ? '#fff' : 'transparent', border: 'none', outline: 'none', borderRadius: 8, boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.10)' : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'background 0.15s' }}>
+                      <button key={tab} onClick={() => { setQuizGenTab(tab); if (tab === 'Sources') { setSourcesViewed(true); setQuizGenExpandedSource(prev => prev || 'needs'); } }}
+                        style={{ flex: 1, fontFamily: 'inherit', fontSize: 14, fontWeight: isActive ? 600 : 400, color: isActive ? '#06465C' : C.slate400, background: 'transparent', border: 'none', outline: 'none', cursor: 'pointer', padding: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, borderBottom: isActive ? '2.5px solid #06465C' : '2px solid transparent', marginBottom: -1, transition: 'color 0.12s' }}>
                         {tab}
                         {tab === 'Sources' && sourcesBadge}
                       </button>
                     );
                   })}
                 </div>
-              </div>
+              )}
             </div>
-            {/* OVERVIEW TAB */}
-            {quizGenTab === 'Overview' && (
+            {/* ITERATE TAB */}
+            {(quizGenTab === 'Overview' || quizGenTab === 'Iterate') && (
               <>
                 <div ref={qgScrollRef} className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6' }}>
                   <div style={{ padding: '20px 24px 8px' }}>
@@ -4755,6 +4932,15 @@ export default function Home() {
                       <div className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
                         <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
                           {topic}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Brisk intro message — shown during Q1/Q2 ── */}
+                    {(quizGenPhase === 'q1' || quizGenPhase === 'q2') && (
+                      <div className="fade-in" style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px' }}>
+                          While we pull up your curriculum, a couple quick questions to tailor your {resourceLabel.toLowerCase()} on <strong>{qgShortTopic}</strong>.
                         </div>
                       </div>
                     )}
@@ -4924,8 +5110,8 @@ export default function Home() {
                             const sel = quizGenQ1Sels.includes(opt);
                             return (
                               <button key={opt} onClick={() => setQuizGenQ1Sels(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])}
-                                style={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 8, justifyContent: 'flex-start', padding: '10px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                                <div style={{ width: 18, height: 18, borderRadius: 2, border: sel ? 'none' : '1.5px solid #CACED1', background: sel ? '#06465C' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '8px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                                <div style={{ width: 18, height: 18, borderRadius: 2, border: sel ? 'none' : '1.5px solid #CACED1', background: sel ? '#06465C' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                   {sel && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                                 </div>
                                 <span style={{ flex: 1 }}>{opt}</span>
@@ -4934,7 +5120,7 @@ export default function Home() {
                           })}
                           {/* Other option */}
                           <button onClick={() => { setQgQ1OtherActive(true); }}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '10px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '8px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
                             <div style={{ width: 18, height: 18, borderRadius: 2, border: (qgQ1OtherActive && qgQ1OtherText) ? 'none' : '1.5px solid #CACED1', background: (qgQ1OtherActive && qgQ1OtherText) ? '#1B6B6B' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               {(qgQ1OtherActive && qgQ1OtherText) && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                             </div>
@@ -4987,7 +5173,8 @@ export default function Home() {
                                   setQuizGenQ2(opt);
                                   setQgQ2OtherActive(false);
                                   setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: opt }]);
-                                  setQuizGenPhase('answered');
+                                  setCurrentStep(3);
+                                  setScreen('confirm');
                                 }}
                                   onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = '#F7F6F4'; }}
                                   onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = 'transparent'; }}
@@ -5030,12 +5217,13 @@ export default function Home() {
                               </svg>
                             </button>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-                              <button onClick={() => { setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: '—' }]); setQuizGenPhase('answered'); }}
+                              <button onClick={() => { setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: '—' }]); setCurrentStep(3); setScreen('confirm'); }}
                                 style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate400, cursor: 'pointer' }}>Skip</button>
                               <button onClick={() => {
                                 const a = q2IsOther ? (qgQ2OtherText.trim() || '—') : q2Sel;
                                 setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a }]);
-                                setQuizGenPhase('answered');
+                                setCurrentStep(3);
+                                setScreen('confirm');
                               }} style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate300}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: C.slate900, cursor: 'pointer' }}>Finish</button>
                             </div>
                           </div>
@@ -5059,31 +5247,241 @@ export default function Home() {
             {quizGenTab === 'Sources' && (
               <>
                 <div className="scroll-area" style={{ flex: 1, overflowY: 'auto', padding: '12px 24px 8px', background: '#FAF9F6' }}>
-                  {qgSources.map(section => (
-                    <div key={section.id} style={{ background: '#fff', border: '1px solid #E2E1DE', borderRadius: 10, marginBottom: 8, padding: '14px 14px 0', overflow: 'hidden' }}>
-                      <button onClick={() => setQuizGenExpandedSource(quizGenExpandedSource === section.id ? null : section.id)}
-                        style={{ width: '100%', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: '0 0 14px' }}>
-                        <img src={section.icon} width={28} height={28} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: '22px' }}>{section.label}</div>
-                          <div style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{section.count} sources</div>
-                        </div>
-                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" style={{ flexShrink: 0, transform: quizGenExpandedSource === section.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>
-                          <path d="M1 1.5L6 6.5L11 1.5" stroke={C.slate400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                      {quizGenExpandedSource === section.id && section.content}
-                    </div>
-                  ))}
-                  <div style={{ padding: '4px 0 12px' }}>
-                    <button style={{ width: '100%', padding: '10px 0', border: `1px solid ${C.slate200}`, borderRadius: 8, background: 'none', fontFamily: 'inherit', fontSize: 14, color: C.slate700, cursor: 'pointer' }}>+ Add Source</button>
-                  </div>
+                  {qgSources.map(section => {
+                    const isOpen = quizGenExpandedSource === section.id;
+                    return (
+                      <div key={section.id} style={{ overflow: 'hidden' }}>
+                        <button onClick={() => setQuizGenExpandedSource(isOpen ? null : section.id)}
+                          style={{ width: '100%', background: 'none', border: 'none', display: 'flex', alignItems: 'center', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: '14px 0', gap: 8 }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px' }}>{section.label}</div>
+                            <div style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{section.count} sources</div>
+                          </div>
+                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke={C.slate400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                        {isOpen && section.content}
+                      </div>
+                    );
+                  })}
+                  <div style={{ height: 12 }} />
                 </div>
               </>
             )}
           </>
         );
       })()}
+
+      {/* ── STEP 3 — Confirm ── */}
+      {screen === 'confirm' && (() => {
+        const resourceLabel = screenOneToolLabel || 'Quiz';
+        const struggle = quizGenAnswers[0]?.a || '';
+        const goal = quizGenAnswers[1]?.a || '';
+
+        // Derive context
+        const cfCls = CLASSES.find(c => c.id === selectedClass);
+        const cfSubject = cfCls?.subject || detectedSubject || 'ELA';
+        const cfGrade = cfCls?.grade || prefs.grade || '8th';
+        const cfPageTitle = pageContext?.title || '';
+        const cfRawTopic = topic || cfPageTitle || 'this topic';
+        const cfShortTopic = cfRawTopic.replace(/\s*[-|]\s*[^-|]{3,}$/, '').trim().slice(0, 50) || cfRawTopic;
+        const cfCurriculumName = cfSubject === 'Math' ? 'Illustrative Mathematics' : cfSubject === 'Science' ? 'Amplify Science' : cfSubject === 'Social Studies' ? 'TCI History Alive!' : 'EL Education';
+        const cfCurriculumBaseName = `${cfCurriculumName} Grade ${cfGrade}`;
+
+        // Map selected challenge to a natural "help your students X" phrase
+        function challengePhrase(struggleText) {
+          const s = (struggleText || '').toLowerCase();
+          if (/tracking|what happens/.test(s)) return `help your students track what happens in ${cfShortTopic} and understand why`;
+          if (/author.*choice|author.*purpose/.test(s)) return `help your students understand the author's choices in ${cfShortTopic}`;
+          if (/inference|infer|beyond.*literal/.test(s)) return `help your students make inferences beyond the literal meaning`;
+          if (/theme|connect.*theme/.test(s)) return `help your students connect themes across ${cfShortTopic}`;
+          if (/identify|shift|perspective|narrator.*view/.test(s)) return `help your students identify when the narrator's perspective shifts`;
+          if (/background|shape.*what|what.*notice/.test(s)) return `help your students understand how background shapes what they notice`;
+          if (/reader.*experience|connect.*reader/.test(s)) return `help your students connect point of view to the reader's experience`;
+          if (/vocab|key.*word|terminology/.test(s)) return `help your students master key vocabulary in ${cfShortTopic}`;
+          if (/setting up|problem.*correctly/.test(s)) return `help your students set up ${cfShortTopic} problems correctly`;
+          if (/cause.*effect|effect|relationship/.test(s)) return `help your students understand cause and effect relationships`;
+          return `support your students with ${cfShortTopic}`;
+        }
+
+        const cfChallengePhrase = challengePhrase(struggle);
+        const cfStrategy = pickStrategy(cfSubject, struggle, goal);
+
+        // Blocker phrase based on strategy
+        const stratLower = cfStrategy.name.toLowerCase();
+        const cfBlocker = stratLower.includes('vocab') || stratLower.includes('7 step') ? 'a vocabulary wall'
+          : stratLower.includes('semantic') || stratLower.includes('mapping') ? 'trouble seeing how ideas connect'
+          : stratLower.includes('organiz') ? 'difficulty organizing their thoughts'
+          : stratLower.includes('worked example') ? 'confusion about where errors happen'
+          : stratLower.includes('cra') || stratLower.includes('concrete') ? 'an abstract concept wall'
+          : stratLower.includes('frayer') ? 'difficulty defining key terms'
+          : 'a common stumbling block';
+
+        // First challenge for district guidance sentence
+        const cfFirstStruggle = struggle.split(',')[0].trim();
+
+        // Curriculum source chips
+        const cfCurriculumDocs = [
+          cfPageTitle
+            ? { svg: '/icons/Docs.svg', name: cfPageTitle }
+            : { svg: '/icons/Docs.svg', name: `${cfShortTopic} — Teacher Guide` },
+          { svg: '/icons/PDF.svg', name: `${cfGrade} Grade ${cfSubject} Strategies` },
+        ];
+
+        function SourceChip({ svg, name }) {
+          return (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #CACED1', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
+              <img src={svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
+              <span title={name} style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160 }}>{name}</span>
+              <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
+                <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
+              </button>
+            </div>
+          );
+        }
+
+        function handleConfirmGenerate() {
+          setScreen('quiz-gen');
+          setQuizGenPhase('answered');
+        }
+
+        function handleConfirmBack() {
+          setCurrentStep(2);
+          setQuizGenAnswers(prev => prev.slice(0, 1));
+          setQuizGenQ2('');
+          setScreen('quiz-gen');
+        }
+
+        return (
+          <>
+            {/* Header */}
+            <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
+                <ModalBackBtn onClick={handleConfirmBack} />
+                <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 16, color: C.slate900, letterSpacing: '-0.01em', pointerEvents: 'none' }}>{resourceLabel}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 'auto' }}>
+                  <ModalMenuBtn />
+                  <ModalCloseBtn onClick={handleClose} />
+                </div>
+              </div>
+              <ResourceIntentStepper step={currentStep} />
+            </div>
+
+            {/* Body — receipt-style personalized summary */}
+            <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+            <div className="scroll-area" style={{ height: '100%', overflowY: 'auto', background: '#FAF9F6' }}>
+              <div style={{ padding: '20px 24px 104px' }}>
+
+                {/* Section 1: Curriculum */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.slate900, marginBottom: 8 }}>Curriculum</div>
+                  <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px', marginBottom: 12 }}>
+                    We pulled this from <strong>Unit 2 in {cfCurriculumBaseName}</strong> to {cfChallengePhrase}.
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {cfCurriculumDocs.map(d => <SourceChip key={d.name} svg={d.svg} name={d.name} />)}
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid #E5E4E2', marginBottom: 20 }} />
+
+                {/* Section 2: District Guidance */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.slate900, marginBottom: 8 }}>District Guidance</div>
+                  <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px', marginBottom: 12 }}>
+                    Students struggling with <strong>{cfFirstStruggle.toLowerCase()}</strong> often hit {cfBlocker} first. Your district&apos;s <strong>{cfStrategy.name}</strong> strategy {cfStrategy.desc}.
+                  </div>
+                  <SourceChip svg="/icons/Docs.svg" name={cfStrategy.name} />
+                </div>
+
+                <div style={{ borderTop: '1px solid #E5E4E2', marginBottom: 16 }} />
+
+                {/* Section 3: Additional settings */}
+                <div style={{ marginBottom: 4 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.slate900, marginBottom: 10 }}>Additional settings</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: C.slate700 }}>Grade</span>
+                      <span style={{ fontSize: 13, color: C.slate900 }}>{cfGrade === 'K' ? 'Kindergarten' : `${cfGrade} Grade`}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: C.slate700 }}>Language</span>
+                      <span style={{ fontSize: 13, color: C.slate900 }}>{prefs.language}</span>
+                    </div>
+                    {cfSubject !== 'doc' && (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: C.slate700 }}>Format</span>
+                        <span style={{ fontSize: 13, color: C.slate900 }}>{prefs.platform || 'Forms'} · {prefs.questionType === 'Multiple choice' ? 'Multi-choice' : prefs.questionType} · {prefs.numQuestions ?? 10} questions</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            {/* Gradient fade over scroll content */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 96, background: 'linear-gradient(to bottom, rgba(250,249,246,0) 0%, rgba(250,249,246,0.55) 45%, rgba(250,249,246,0.92) 100%)', pointerEvents: 'none' }} />
+            </div>
+
+            {/* Bottom card — Ready to create? OR Adjust prompt card */}
+            {confirmAdjustOpen ? (
+              <div style={{ flexShrink: 0, padding: '6px 12px 16px', background: '#FAF9F6' }}>
+                <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: C.slate900 }}>Adjust {resourceLabel}</span>
+                    <button onClick={() => { setInput(''); setConfirmAdjustOpen(false); }} className="icon-btn"
+                      style={{ width: 28, height: 28, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0, flexShrink: 0 }}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="#475467" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                    </button>
+                  </div>
+                  <textarea
+                    autoFocus
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey && input.trim()) {
+                        e.preventDefault();
+                        savePromptToHistory(input);
+                        setConfirmAdjustOpen(false);
+                        handleConfirmGenerate();
+                      }
+                    }}
+                    placeholder="Tell us what you need"
+                    rows={3}
+                    style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: C.slate900, background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', padding: 0, boxSizing: 'border-box' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                    <button onClick={() => { if (input.trim()) { savePromptToHistory(input); setConfirmAdjustOpen(false); handleConfirmGenerate(); } }}
+                      disabled={!input.trim()}
+                      style={{ width: 36, height: 36, borderRadius: '50%', background: input.trim() ? '#06465C' : '#D1CFC9', border: 'none', cursor: input.trim() ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, transition: 'background 0.15s' }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ flexShrink: 0, padding: '0 12px 20px', background: '#FAF9F6' }}>
+                <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 2 }}>Looks good?</div>
+                  <div style={{ fontSize: 13, color: '#74818E', lineHeight: '20px', marginBottom: 20 }}>Brisk will use the curriculum and guidance above.</div>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                    <button onClick={() => { setInput(''); setConfirmAdjustOpen(true); }}
+                      style={{ height: 36, padding: '0 16px', border: '1px solid #E5E4E2', borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: 'pointer' }}>
+                      Adjust
+                    </button>
+                    <button onClick={handleConfirmGenerate}
+                      style={{ height: 36, padding: '0 16px', border: 'none', borderRadius: 20, background: '#0E151C', color: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
+                      Brisk It
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
+
 
       {/* ── CHAT DETAIL SCREEN ── */}
       {screen === 'chat' && (() => {
@@ -5503,8 +5901,6 @@ export default function Home() {
             </>
           )}
           {[
-            { icon: <img src="/icons/Checklist.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'Add Standards' },
-            { icon: <img src="/icons/Lightening Stroke.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'Add Curriculum' },
             { icon: <img src="/icons/Attach.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'Add Files or Photos', dividerAfter: true },
             { icon: <img src="/icons/Time.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'View Prompt History' },
           ].map(item => (
