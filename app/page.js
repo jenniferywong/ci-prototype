@@ -959,13 +959,15 @@ function TextInput({ placeholder, value, onChange, onSubmit, disabled, animatedP
 }
 
 // Shared pill-style bottom input bar — used on Sources, Overview, Chat screens
-function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled }) {
+function BottomInputBar({ placeholder, value, onChange, onSubmit, disabled, noAdd }) {
   return (
     <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
-      <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: disabled ? '#F4F3F0' : '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: '0 10px 0 4px', height: 52, transition: 'background 0.15s' }}>
-        <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, opacity: disabled ? 0.4 : 1 }}>
-          <img src="/icons/Add.svg" width={22} height={22} alt="Add" style={{ display: 'block' }} />
-        </button>
+      <div style={{ border: `1px solid ${C.slate200}`, borderRadius: 999, background: disabled ? '#F4F3F0' : '#fff', display: 'flex', alignItems: 'center', gap: 4, padding: noAdd ? '0 10px 0 14px' : '0 10px 0 4px', height: 52, transition: 'background 0.15s' }}>
+        {!noAdd && (
+          <button className="icon-btn" style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, opacity: disabled ? 0.4 : 1 }}>
+            <img src="/icons/Add.svg" width={22} height={22} alt="Add" style={{ display: 'block' }} />
+          </button>
+        )}
         <input
           value={value}
           onChange={e => !disabled && onChange(e.target.value)}
@@ -2043,23 +2045,26 @@ function detectSettingsFromInput(text) {
   return changes;
 }
 
-function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onAddClick, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile, currentStep = 1 }) {
+function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlaceholder, input, onInputChange, prefs, onPrefsChange, pageContext, pageChipVisible, onDismissChip, onBriskIt, onBack, onClose, curriculumCard, selectedClass, onEditCurriculum, isMobile, currentStep = 1, autoOpenSettings, onSettingsOpened, hideBody, onDrawerClose }) {
   const textareaRef = useRef(null);
   const addBtnRef = useRef(null);
+  const toolFileInputRef = useRef(null);
   const promptBoxRef = useRef(null);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   const [settingsDrawerClosing, setSettingsDrawerClosing] = useState(false);
   const [settingsDrawerAnimDone, setSettingsDrawerAnimDone] = useState(false);
+  // Auto-open settings drawer when triggered from parent (e.g. confirm screen)
+  useEffect(() => {
+    if (autoOpenSettings) { setSettingsDrawerAnimDone(false); setSettingsDrawerOpen(true); if (onSettingsOpened) onSettingsOpened(); }
+  }, [autoOpenSettings]);
   const [formatHover, setFormatHover] = useState(false);
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [moreSubMenu, setMoreSubMenu] = useState(null); // null | 'grade' | 'language'
   const [historyMenuOpen, setHistoryMenuOpen] = useState(false);
   useEffect(() => {
-    if (!moreMenuOpen && !historyMenuOpen) return;
-    const handler = () => { setMoreMenuOpen(false); setMoreSubMenu(null); setHistoryMenuOpen(false); };
+    if (!historyMenuOpen) return;
+    const handler = () => { setHistoryMenuOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [moreMenuOpen, historyMenuOpen]);
+  }, [historyMenuOpen]);
   const [curriculumHover, setCurriculumHover] = useState(false);
   const [numQRaw, setNumQRaw] = useState(String(prefs.numQuestions ?? 10));
   const [numSRaw, setNumSRaw] = useState(String(prefs.numSlides ?? 10));
@@ -2117,7 +2122,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
   return (
     <>
       {/* Header */}
-      <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', flexShrink: 0 }}>
+      <div style={{ background: '#FAF9F6', borderRadius: '12px 12px 0 0', flexShrink: 0, visibility: hideBody ? 'hidden' : 'visible' }}>
         <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
           <ModalBackBtn onClick={onBack} />
           <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#0E151C', letterSpacing: '-0.01em', pointerEvents: 'none' }}>{toolName}</span>
@@ -2166,15 +2171,16 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <input ref={toolFileInputRef} type="file" style={{ display: 'none' }} onChange={() => {}} />
                 <button ref={addBtnRef} className="icon-btn"
-                  onClick={() => { const r = addBtnRef.current?.getBoundingClientRect(); if (r && onAddClick) onAddClick({ top: r.bottom + 6, left: r.left }); }}
+                  onClick={() => toolFileInputRef.current?.click()}
                   style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
                 <div style={{ position: 'relative' }}>
-                  <button className="icon-btn" onClick={() => { setHistoryMenuOpen(v => !v); setMoreMenuOpen(false); }}
+                  <button className="icon-btn" onClick={() => setHistoryMenuOpen(v => !v)}
                     style={{ width: 32, height: 32, border: 'none', background: historyMenuOpen ? '#F0EFED' : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
-                    <img src="/icons/Time.svg" width={20} height={20} alt="History" style={{ display: 'block' }} />
+                    <img src="/icons/History.svg" width={20} height={20} alt="History" style={{ display: 'block' }} />
                   </button>
                   {historyMenuOpen && (() => {
                     const HISTORY_KEY = 'brisk_prompt_history';
@@ -2184,17 +2190,42 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                     const filtered = words.length > 0
                       ? allHistory.filter(h => words.some(w => h.toLowerCase().includes(w)))
                       : allHistory;
-                    const items = filtered.slice(0, 6);
+                    const realItems = filtered.slice(0, 6);
+                    // Class-aware placeholders when no real history
+                    const cls = CLASSES.find(c => c.id === selectedClass);
+                    const subj = (cls?.subject || 'ELA').toLowerCase();
+                    const grade = cls?.grade || '8th';
+                    const placeholders = subj.includes('science') ? [
+                      `Quiz on ecosystems for ${grade} grade`,
+                      `Photosynthesis check-in quiz`,
+                      `Cell structure guided notes`,
+                      `Food webs formative assessment`,
+                    ] : subj.includes('math') ? [
+                      `Fractions quiz for ${grade} grade`,
+                      `Algebra unit check-in`,
+                      `Geometry vocabulary worksheet`,
+                      `Multi-step equations quiz`,
+                    ] : subj.includes('social') || subj.includes('history') ? [
+                      `Civil War quiz for ${grade} grade`,
+                      `Primary source analysis worksheet`,
+                      `Causes of WWI formative`,
+                      `Geography unit check-in`,
+                    ] : [
+                      `Point of view quiz for ${grade} grade`,
+                      `Character analysis worksheet`,
+                      `Figurative language check-in`,
+                      `Reading comprehension quiz`,
+                    ];
+                    const items = realItems.length > 0 ? realItems : placeholders;
+                    const isPlaceholder = realItems.length === 0;
                     return (
-                      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 220, maxWidth: 280, zIndex: 50, overflow: 'hidden' }}>
-                        <div style={{ padding: '8px 14px 4px', fontSize: 14, fontWeight: 500, color: '#74818E' }}>Prompt History</div>
-                        {items.length === 0 ? (
-                          <div style={{ padding: '10px 14px 12px', fontSize: 13, color: '#74818E' }}>No history yet</div>
-                        ) : items.map((h, i) => (
+                      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 240, maxWidth: 300, zIndex: 50, overflow: 'hidden' }}>
+                        <div style={{ padding: '8px 14px 4px', fontSize: 12, fontWeight: 500, color: '#74818E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>{isPlaceholder ? 'Recent' : 'Prompt History'}</div>
+                        {items.map((h, i) => (
                           <button key={i} onClick={() => { onInputChange(h); setHistoryMenuOpen(false); }}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: '#0E151C', textAlign: 'left', lineHeight: '18px' }}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: isPlaceholder ? '#74818E' : '#0E151C', textAlign: 'left', lineHeight: '18px' }}
                             onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                            <img src="/icons/Time.svg" width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0, opacity: 0.4 }} />
+                            <img src="/icons/History.svg" width={14} height={14} alt="" style={{ display: 'block', flexShrink: 0, opacity: 0.4 }} />
                             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h}</span>
                           </button>
                         ))}
@@ -2202,42 +2233,6 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
                     );
                   })()}
                 </div>
-                <div style={{ position: 'relative' }}>
-                  <button className="icon-btn" onClick={() => { setMoreMenuOpen(v => !v); setMoreSubMenu(null); }}
-                    style={{ width: 32, height: 32, border: 'none', background: moreMenuOpen ? '#F0EFED' : 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0 }}>
-                    <img src="/icons/More.svg" width={20} height={20} alt="More" style={{ display: 'block' }} />
-                  </button>
-              {moreMenuOpen && (
-                <div style={{ position: 'absolute', bottom: 'calc(100% + 4px)', left: 0, background: '#fff', border: '1px solid #E5E4E2', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 220, zIndex: 50, overflow: 'hidden', padding: '8px 0 12px' }}>
-                  <div style={{ padding: '0 14px 4px', fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit' }}>Alignment</div>
-                  {[
-                    { label: 'Standards', icon: '/icons/Checklist.svg' },
-                    { label: 'Curriculum', icon: '/icons/Lightening Stroke.svg' },
-                  ].map(item => (
-                    <button key={item.label} onClick={() => setMoreMenuOpen(false)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, color: '#0E151C', textAlign: 'left' }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                      <img src={item.icon} width={18} height={18} alt="" style={{ display: 'block', flexShrink: 0 }} />
-                      {item.label}
-                    </button>
-                  ))}
-                  <div style={{ height: 1, background: '#F0EFED', margin: '4px 12px 8px' }} />
-                  <div style={{ padding: '0 14px', marginBottom: 8 }}>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Grade Level</div>
-                    <PillSelect value={prefs.grade} options={['K','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'].map(g => ({ value: g, label: g === 'K' ? 'Kindergarten' : `${g} Grade` }))} onChange={v => onPrefsChange({ grade: v })} fullWidth />
-                  </div>
-                  <div style={{ padding: '0 14px', marginBottom: toolType !== 'doc' ? 8 : 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Language</div>
-                    <PillSelect value={prefs.language} options={['English','Spanish','French','Mandarin','Arabic']} onChange={v => onPrefsChange({ language: v })} fullWidth />
-                  </div>
-                  {toolType !== 'doc' && (
-                    <div style={{ padding: '0 14px' }}>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: '#74818E', fontFamily: 'Inter, inherit', marginBottom: 4 }}>Questions</div>
-                      <PillSelect value={String(prefs.numQuestions ?? 10)} options={[5,10,15,20,25,30,35,40,45,50].map(n => ({ value: String(n), label: `${n} questions` }))} onChange={v => { const n = parseInt(v); onPrefsChange({ numQuestions: n }); setNumQRaw(String(n)); }} fullWidth />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
               </div>
             </div>
           </div>
@@ -2245,7 +2240,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
       </div>
 
       {/* Settings body — collapsed read-only rows + Settings header with edit button */}
-      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 0' }}>
+      <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 24px 0', visibility: hideBody ? 'hidden' : 'visible' }}>
         {/* Settings header */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#0E151C', lineHeight: '22px', flex: 1 }}>Settings</span>
@@ -2321,7 +2316,7 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
           {/* Drawer header */}
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '4px 24px 0', height: 52, background: '#FAF9F6', borderRadius: '12px 12px 0 0' }}>
             <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#0E151C', lineHeight: '24px' }}>Settings</span>
-            <button onClick={() => { setSettingsDrawerAnimDone(false); setSettingsDrawerClosing(true); setTimeout(() => { setSettingsDrawerOpen(false); setSettingsDrawerClosing(false); }, 360); }} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+            <button onClick={() => { setSettingsDrawerAnimDone(false); setSettingsDrawerClosing(true); setTimeout(() => { setSettingsDrawerOpen(false); setSettingsDrawerClosing(false); if (onDrawerClose) onDrawerClose(); }, 360); }} className="icon-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6L9 12L15 6" stroke="#475467" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
           </div>
@@ -2461,13 +2456,13 @@ export default function Home() {
   const [panelPos, setPanelPos] = useState(null); // null = default bottom-right
   const [activeTab, setActiveTab] = useState('Overview');
   const [expandedSource, setExpandedSource] = useState(null);
-  const [addMenuOpen, setAddMenuOpen] = useState(false);
-  const [addMenuPos, setAddMenuPos] = useState({ top: 0, left: 0 });
   const addBtnRef = useRef(null);
   const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [classPickerPos, setClassPickerPos] = useState({ top: 0, left: 0 });
   const classBtnRef = useRef(null);
   const welcomeTextareaRef = useRef(null);
+  const welcomeFileInputRef = useRef(null);
+  const createFileInputRef = useRef(null);
   const createTextareaRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -2477,12 +2472,6 @@ export default function Home() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-  useEffect(() => {
-    if (!addMenuOpen) return;
-    const handler = () => setAddMenuOpen(false);
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [addMenuOpen]);
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
     setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.platform));
@@ -2584,6 +2573,14 @@ export default function Home() {
   const [qgQ1OtherActive, setQgQ1OtherActive] = useState(false);
   const [qgQ2OtherText, setQgQ2OtherText] = useState('');
   const [qgQ2OtherActive, setQgQ2OtherActive] = useState(false);
+  const [qgQ2CardId, setQgQ2CardId] = useState('goal');
+  const [quizGenQ2Sels, setQuizGenQ2Sels] = useState([]);
+  const [qgScaffoldCardOpen, setQgScaffoldCardOpen] = useState(false);
+  const [qgReadingLevelCardOpen, setQgReadingLevelCardOpen] = useState(false);
+  const [qgReadingLevelFollowUp, setQgReadingLevelFollowUp] = useState(false);
+  const [qgReadingLevelScopeCardOpen, setQgReadingLevelScopeCardOpen] = useState(false);
+  const [globalSettingsOpen, setGlobalSettingsOpen] = useState(false);
+  const [returnToConfirm, setReturnToConfirm] = useState(false);
 
   const SCREEN_NAMES = {
     0: 'page-context', 1: 'topic', 2: 'curriculum-card', 3: 'needs-1', 4: 'needs-2',
@@ -2647,6 +2644,13 @@ export default function Home() {
     const id = setInterval(() => setQuizGenLoadingIdx(i => i + 1), 2500);
     return () => clearInterval(id);
   }, [screen, quizGenKey]);
+
+  // Quiz-gen: navigate to confirm after pre-confirm loading animation
+  useEffect(() => {
+    if (screen !== 'quiz-gen' || quizGenPhase !== 'pre-confirm') return;
+    const t = setTimeout(() => { setCurrentStep(3); setScreen('confirm'); }, 2800);
+    return () => clearTimeout(t);
+  }, [screen, quizGenPhase]);
 
   // Quiz-gen: transition to 'done' phase 3s after all questions answered
   // But wait if the user is actively typing (input non-empty) — let them finish
@@ -2952,6 +2956,13 @@ export default function Home() {
     setQgQ1OtherActive(false);
     setQgQ2OtherText('');
     setQgQ2OtherActive(false);
+    setQgQ2CardId('goal');
+    setQuizGenQ2Sels([]);
+    setQgScaffoldCardOpen(false);
+    setQgReadingLevelCardOpen(false);
+    setQgReadingLevelFollowUp(false);
+    setQgReadingLevelScopeCardOpen(false);
+    setQgUsedChips([]);
     setCurrentStep(2);
     setScreen('quiz-gen');
     setInput('');
@@ -3329,9 +3340,9 @@ export default function Home() {
   // ── Styles ────────────────────────────────────────────────────
   const outerStyle = { minHeight: '100vh' };
 
-  // sourcesReady: true once phase is done AND generate call has finished (with or without data)
-  const sourcesReady = quizGenPhase === 'done' && !qgFormsLoading;
-  const isDockedRight = !isMobile && screen === 'quiz-gen' && quizGenPhase === 'done' && sourcesReady;
+  // sourcesReady: true once quiz has loaded at least once (stays true during refinement loading)
+  const sourcesReady = quizGenPhase === 'done' && (!qgFormsLoading || qgQuizData != null);
+  const isDockedRight = !isMobile && screen === 'quiz-gen' && quizGenPhase === 'done';
   const panelStyle = isMobile ? {
     background: '#FAF9F6',
     display: 'flex', flexDirection: 'column',
@@ -3383,7 +3394,7 @@ export default function Home() {
 
           {/* Fixed prompt box */}
           <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 24px 8px', position: 'relative' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : welcomeMultiline ? 16 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : welcomeMultiline ? 16 : 16, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 143, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -3397,37 +3408,38 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: (pageChipVisible && !chipDismissing) ? '6px 8px 10px' : '6px 8px' }}>
-                <button ref={addBtnRef} className="icon-btn"
-                  onClick={() => {
-                    const r = addBtnRef.current?.getBoundingClientRect();
-                    if (r) setAddMenuPos({ top: r.bottom + 6, left: r.left });
-                    setAddMenuOpen(v => !v);
-                  }}
-                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}>
+              {/* Textarea fills the space */}
+              <textarea
+                ref={welcomeTextareaRef}
+                value={welcomeSearch}
+                onChange={e => {
+                  setWelcomeSearch(e.target.value);
+                  const el = welcomeTextareaRef.current;
+                  if (el) {
+                    el.style.height = 'auto';
+                    el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+                    setWelcomeMultiline(el.scrollHeight > 30);
+                  }
+                }}
+                placeholder="Search or type what you need"
+                rows={1}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && wsIsPromptMode && welcomeSearch.trim()) { e.preventDefault(); handlePromptSend(); } }}
+                style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 90, padding: '10px 14px 4px' }}
+              />
+              {/* Bottom action row */}
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 8px', gap: 0 }}>
+                <input ref={welcomeFileInputRef} type="file" style={{ display: 'none' }} onChange={() => {}} />
+                <button className="icon-btn" onClick={() => welcomeFileInputRef.current?.click()}
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
-                <textarea
-                  ref={welcomeTextareaRef}
-                  value={welcomeSearch}
-                  onChange={e => {
-                    setWelcomeSearch(e.target.value);
-                    const el = welcomeTextareaRef.current;
-                    if (el) {
-                      el.style.height = 'auto';
-                      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-                      setWelcomeMultiline(el.scrollHeight > 30);
-                    }
-                  }}
-                  placeholder="Search or type what you need"
-                  rows={1}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && wsIsPromptMode && welcomeSearch.trim()) { e.preventDefault(); handlePromptSend(); } }}
-                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
-                />
-                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
-                  onTranscript={(t) => { setWelcomeSearch(t); const el = welcomeTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; setWelcomeMultiline(el.scrollHeight > 30); } }} />
+                <button className="icon-btn"
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, marginLeft: 8 }}>
+                  <img src="/icons/History.svg" width={18} height={18} alt="History" style={{ display: 'block' }} />
+                </button>
+                <div style={{ flex: 1 }} />
                 {wsIsPromptMode && welcomeSearch.trim() && (
-                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center', marginLeft: 4 }}>
+                  <button onClick={handlePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, marginLeft: 4 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
@@ -3458,11 +3470,11 @@ export default function Home() {
               const flatCreateTools = CREATE_TOOL_SECTIONS.flatMap(s => s.tools).map(t => ({
                 emoji: t.emoji, label: t.label, sub: t.sub,
                 onClick: t.onClick === 'quiz'
-                  ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setScreen(1); setInput(''); }
+                  ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); setScreen(1); setInput(welcomeSearch.trim()); }
                   : t.label === 'Nearpod'
-                    ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(''); }
+                    ? () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(welcomeSearch.trim()); }
                     : (t.onClick === 'doc' || t.onClick === null) && t.label !== 'Boost Student Activity'
-                      ? () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(''); }
+                      ? () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(welcomeSearch.trim()); }
                       : () => { setScreen('create'); setCreateScroll(0); },
               }));
 
@@ -3774,8 +3786,8 @@ export default function Home() {
           </div>
 
           {/* Fixed search box — same padding as Welcome */}
-          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: `${createScroll > 40 ? 12 : 4}px ${createScroll > 40 ? 12 : 24}px 8px`, position: 'relative', transition: 'padding 0.35s cubic-bezier(0.4,0,0.2,1)' }}>
-            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : createMultiline ? 16 : 100, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ flexShrink: 0, background: '#FAF9F6', padding: '4px 24px 8px', position: 'relative' }}>
+            <div className="search-container" style={{ border: '1px solid #E5E4E2', borderRadius: (pageChipVisible && !chipDismissing) ? 12 : 16, background: '#FFFFFF', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', minHeight: 143, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
               {(pageChipVisible || chipDismissing) && (
                 <div className={chipDismissing ? 'chip-exit' : 'chip-enter'} style={{ padding: '8px 10px 2px', overflow: 'hidden' }}>
                   <div className="page-chip" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E5E4E2', borderRadius: 6, padding: '5px 8px 5px 6px', minWidth: 0 }}>
@@ -3789,27 +3801,28 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: (pageChipVisible && !chipDismissing) ? '6px 8px 10px' : '6px 8px' }}>
-                <button ref={addBtnRef} className="icon-btn"
-                  onClick={() => {
-                    const r = addBtnRef.current?.getBoundingClientRect();
-                    if (r) setAddMenuPos({ top: r.bottom + 6, left: r.left });
-                    setAddMenuOpen(v => !v);
-                  }}
-                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}>
+              {/* Textarea fills the space */}
+              <textarea ref={createTextareaRef} value={createSearch}
+                onChange={e => { setCreateSearch(e.target.value); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; setCreateMultiline(el.scrollHeight > 30); } }}
+                placeholder="Search or type what you need"
+                rows={1}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && csIsPromptMode && createSearch.trim()) { e.preventDefault(); handleCreatePromptSend(); } }}
+                style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 90, padding: '10px 14px 4px' }}
+              />
+              {/* Bottom action row */}
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 8px', gap: 0 }}>
+                <input ref={createFileInputRef} type="file" style={{ display: 'none' }} onChange={() => {}} />
+                <button className="icon-btn" onClick={() => createFileInputRef.current?.click()}
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0 }}>
                   <img src="/icons/Add.svg" width={20} height={20} alt="Add" style={{ display: 'block' }} />
                 </button>
-                <textarea ref={createTextareaRef} value={createSearch}
-                  onChange={e => { setCreateSearch(e.target.value); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; setCreateMultiline(el.scrollHeight > 30); } }}
-                  placeholder="Search or type what you need"
-                  rows={1}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && csIsPromptMode && createSearch.trim()) { e.preventDefault(); handleCreatePromptSend(); } }}
-                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, fontWeight: 400, color: '#0E151C', background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', overflowY: 'hidden', minHeight: 22 }}
-                />
-                <MicButton size={20} className="icon-btn" btnStyle={{ alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center' }}
-                  onTranscript={(t) => { setCreateSearch(t); const el = createTextareaRef.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; } }} />
+                <button className="icon-btn"
+                  style={{ width: 32, height: 32, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, padding: 0, marginLeft: 8 }}>
+                  <img src="/icons/History.svg" width={18} height={18} alt="History" style={{ display: 'block' }} />
+                </button>
+                <div style={{ flex: 1 }} />
                 {csIsPromptMode && createSearch.trim() && (
-                  <button onClick={handleCreatePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, alignSelf: (pageChipVisible && !chipDismissing) ? 'flex-start' : 'center', marginLeft: 4 }}>
+                  <button onClick={handleCreatePromptSend} style={{ width: 32, height: 32, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
@@ -3824,11 +3837,11 @@ export default function Home() {
               const sectionLabel = txt => (
                 <div style={{ padding: '10px 24px 4px', fontSize: 12, fontWeight: 500, color: '#475467', lineHeight: '18px' }}>{txt}</div>
               );
-              const intentQuery = detectResourceIntent(createSearch.trim()) ? createSearch.trim() : '';
+              const carryQuery = createSearch.trim();
               const resolveOnClick = t => {
-                if (t.onClick === 'quiz') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); logStep(sessionId, 'welcome_screen', userType, '', { user_type: userType }); setScreen(1); setInput(intentQuery); };
-                if (t.label === 'Nearpod') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(intentQuery); };
-                if (t.onClick === 'doc' || (t.onClick === null && t.label !== 'Boost Student Activity')) return () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(intentQuery); };
+                if (t.onClick === 'quiz') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Quiz'); logStep(sessionId, 'welcome_screen', userType, '', { user_type: userType }); setScreen(1); setInput(carryQuery); };
+                if (t.label === 'Nearpod') return () => { setScreenOneToolType('quiz'); setScreenOneToolLabel('Nearpod'); setPrefs(p => ({ ...p, platform: 'Nearpod' })); setScreen(1); setInput(carryQuery); };
+                if (t.onClick === 'doc' || (t.onClick === null && t.label !== 'Boost Student Activity')) return () => { setScreenOneToolType('doc'); setScreenOneToolLabel(t.label); setScreen(1); setInput(carryQuery); };
                 return t.onClick;
               };
               const allSections = CREATE_TOOL_SECTIONS.map(({ section, tools }) => (
@@ -4135,7 +4148,6 @@ export default function Home() {
           pageChipVisible={pageChipVisible}
           isMobile={isMobile}
           onDismissChip={dismissChip}
-          onAddClick={({ top, left }) => { setAddMenuPos({ top, left }); setAddMenuOpen(v => !v); }}
           onBriskIt={handleQuizBriskIt}
           onBack={() => { setCurrentStep(1); setScreen('create'); }}
           onClose={handleClose}
@@ -4143,6 +4155,10 @@ export default function Home() {
           selectedClass={selectedClass}
           onEditCurriculum={() => setScreen(2)}
           currentStep={currentStep}
+          autoOpenSettings={globalSettingsOpen}
+          onSettingsOpened={() => setGlobalSettingsOpen(false)}
+          hideBody={returnToConfirm}
+          onDrawerClose={() => { if (returnToConfirm) { setReturnToConfirm(false); setCurrentStep(3); setScreen('confirm'); } }}
         />
       )}
 
@@ -4626,6 +4642,15 @@ export default function Home() {
           `Almost there…`,
           `One moment…`,
         ];
+        const PRE_CONFIRM_MSGS = [
+          qgPageTitle ? `Loading your curriculum…` : `Analyzing ${qgShortTopic}…`,
+          qgQ2CardId === 'goal' ? 'Personalizing based on your goals…'
+            : qgQ2CardId === 'difficulty' ? 'Personalizing based on difficulty…'
+            : qgQ2CardId === 'misconception' ? "Personalizing based on your students' common mistakes…"
+            : qgQ2CardId === 'focus' ? 'Personalizing based on specific student needs…'
+            : "Personalizing based on your students' struggles…",
+          `Getting your ${resourceLabel.toLowerCase()} ready…`,
+        ];
 
         // Resource-specific Q1/Q2 for doc tools; subject-aware fallback for quiz tools
         let QG_Q1, QG_Q2;
@@ -4731,53 +4756,125 @@ export default function Home() {
             };
           }
         } else {
-          // Quiz tool: subject-aware Q1 options, made specific to page content when available
+          // Quiz tool: 5-card pool, select 2 based on input context
           const hasPage = !!qgPageTitle;
-          const q1Options = qgSubjectL.includes('math') ? [
-            `Setting up ${qgShortTopic} problems correctly`,
-            'Understanding the concept behind the steps',
-            'Connecting it to real-world contexts',
-            'Checking their work for errors',
-          ] : qgSubjectL.includes('science') ? [
-            `Understanding key vocabulary in ${qgShortTopic}`,
-            'Applying concepts to new situations',
-            'Analyzing data and drawing conclusions',
-            'Connecting ideas to the bigger unit',
-          ] : (qgSubjectL.includes('social') || qgSubjectL.includes('history')) ? [
-            hasPage ? `Grasping the significance of ${qgShortTopic}` : 'Analyzing primary sources',
-            'Understanding cause and effect relationships',
-            'Identifying multiple perspectives',
-            'Connecting events or ideas to today',
-          ] : [
-            hasPage ? `Tracking what happens in ${qgShortTopic} and why` : 'Finding and using evidence from the text',
-            hasPage ? `Understanding the author's choices in ${qgShortTopic}` : "Understanding the author's purpose or perspective",
-            'Making inferences beyond the literal meaning',
-            'Connecting themes across the text',
-          ];
+          const inputLower = (input || '').toLowerCase();
 
-          QG_Q1 = {
-            type: 'multi-select',
-            text: `What are students finding hardest about ${qgShortTopic}?`,
-            options: q1Options,
+          const cardPool = {
+            struggles: {
+              id: 'struggles',
+              type: 'single-select',
+              text: `Is there anything your students have been struggling with in ${qgShortTopic}?`,
+              options: qgSubjectL.includes('math') ? [
+                `Setting up ${qgShortTopic} problems correctly`,
+                `Understanding the concept behind ${qgShortTopic}`,
+                `Connecting ${qgShortTopic} to real-world contexts`,
+                `Catching their own errors in ${qgShortTopic}`,
+              ] : qgSubjectL.includes('science') ? [
+                `Understanding key vocabulary in ${qgShortTopic}`,
+                `Applying ${qgShortTopic} concepts to new situations`,
+                `Analyzing data and drawing conclusions from ${qgShortTopic}`,
+                `Connecting ${qgShortTopic} to the bigger unit`,
+              ] : (qgSubjectL.includes('social') || qgSubjectL.includes('history')) ? [
+                `Grasping why ${qgShortTopic} matters historically`,
+                `Tracing cause and effect within ${qgShortTopic}`,
+                `Identifying multiple perspectives on ${qgShortTopic}`,
+                `Connecting ${qgShortTopic} to events today`,
+              ] : [
+                `Following the sequence of events in ${qgShortTopic}`,
+                `Understanding character motivations in ${qgShortTopic}`,
+                `Reading between the lines — making inferences`,
+                `Connecting ${qgShortTopic}'s themes to bigger ideas`,
+              ],
+            },
+            goal: {
+              id: 'goal',
+              type: 'single-select',
+              text: `What's your main goal for this ${qgShortTopic} quiz?`,
+              options: [
+                `Check if students can follow ${qgShortTopic}`,
+                `Catch gaps before moving on from ${qgShortTopic}`,
+                `Prep students for an upcoming ${qgShortTopic} assessment`,
+                `Help students go deeper with ${qgShortTopic}`,
+              ],
+            },
+            focus: {
+              id: 'focus',
+              type: 'single-select',
+              text: `What do you want to focus on in ${qgShortTopic}?`,
+              options: qgSubjectL.includes('math') ? [
+                `Conceptual understanding of ${qgShortTopic}`,
+                `Step-by-step procedure for ${qgShortTopic}`,
+                `Problem-solving strategies`,
+                `Real-world application of ${qgShortTopic}`,
+              ] : qgSubjectL.includes('science') ? [
+                `Key vocabulary in ${qgShortTopic}`,
+                `Cause-and-effect relationships in ${qgShortTopic}`,
+                `Scientific reasoning and evidence`,
+                `Real-world connection to ${qgShortTopic}`,
+              ] : [
+                `Character development in ${qgShortTopic}`,
+                `Plot and story structure`,
+                `Themes and symbolism in ${qgShortTopic}`,
+                `Key vocabulary from ${qgShortTopic}`,
+              ],
+            },
+            difficulty: {
+              id: 'difficulty',
+              type: 'single-select',
+              text: `What level of thinking do you want to target for ${qgShortTopic}?`,
+              options: [
+                'Quick recall and comprehension',
+                'Application and analysis',
+                'Mix of both',
+                'Push deeper thinking (DOK 3+)',
+              ],
+            },
+            misconception: {
+              id: 'misconception',
+              type: 'single-select',
+              text: `Any common mistakes you want this ${qgShortTopic} quiz to surface?`,
+              options: qgSubjectL.includes('math') ? [
+                `Confusing the steps in ${qgShortTopic}`,
+                `Setting up ${qgShortTopic} problems incorrectly`,
+                `Misapplying ${qgShortTopic} to new contexts`,
+                'None specifically',
+              ] : qgSubjectL.includes('science') ? [
+                `Confusing correlation with causation in ${qgShortTopic}`,
+                `Misreading evidence or data from ${qgShortTopic}`,
+                `Overgeneralizing from one example in ${qgShortTopic}`,
+                'None specifically',
+              ] : (qgSubjectL.includes('social') || qgSubjectL.includes('history')) ? [
+                `Mixing up key figures or events in ${qgShortTopic}`,
+                `Oversimplifying the causes behind ${qgShortTopic}`,
+                `Applying modern bias when analyzing ${qgShortTopic}`,
+                'None specifically',
+              ] : [
+                `Confusing characters or mixing up their roles in ${qgShortTopic}`,
+                `Missing shifts in perspective or tone in ${qgShortTopic}`,
+                `Overgeneralizing themes without using evidence`,
+                'None specifically',
+              ],
+            },
           };
 
-          QG_Q2 = {
-            type: 'single-select',
-            text: `What do you want this ${resourceLabel.toLowerCase()} to do?`,
-            options: [
-              `Check if students understood ${qgShortTopic}`,
-              'Help students practice and apply what they learned',
-              'Prep them for an upcoming assessment',
-              'Catch who needs more support before moving on',
-            ],
-          };
+          QG_Q1 = cardPool.struggles;
+          if (/think|level|depth|dok|rigor/.test(inputLower)) {
+            QG_Q2 = cardPool.difficulty;
+          } else if (/mistake|misconception|confus|wrong|error/.test(inputLower)) {
+            QG_Q2 = cardPool.misconception;
+          } else if (/focus|character|plot|theme|vocab|skill/.test(inputLower)) {
+            QG_Q2 = cardPool.focus;
+          } else {
+            QG_Q2 = cardPool.goal;
+          }
         }
 
         const currentCard = quizGenPhase === 'q1' ? QG_Q1 : quizGenPhase === 'q2' ? QG_Q2 : null;
         // Only show "you told me" summary after the output has loaded — not during generation
-        const showSummary = quizGenPhase === 'done' && !qgFormsLoading && sourcesReady;
+        const showSummary = quizGenPhase === 'done';
         // Don't show the generic loading shimmer during chip refinements — the iteration shimmer handles that
-        const showLoading = !qgUserReply && (quizGenPhase !== 'done' || !sourcesReady);
+        const showLoading = !qgUserReply && quizGenPhase !== 'q1' && quizGenPhase !== 'q2' && (quizGenPhase !== 'done' || !sourcesReady);
 
         const CIRC = (2 * Math.PI * 9.5).toFixed(1);
         const sourcesTabActive = quizGenTab === 'Sources';
@@ -4819,7 +4916,7 @@ export default function Home() {
         const qgSources = [
           ...(showStudentNeeds ? [{ id: 'needs', label: 'Student Needs & Goals', count: 3, icon: '/icons/Diploma.svg',
             content: (
-              <div style={{ borderTop: '1px solid #E2E1DE', margin: '0 -14px', padding: '12px 14px 12px' }}>
+              <div style={{ margin: '0 -14px', padding: '0 14px 12px' }}>
                 <textarea
                   value={needsDisplayText}
                   onChange={e => setQgNeedsText(e.target.value)}
@@ -4830,7 +4927,7 @@ export default function Home() {
             ) }] : []),
           { id: 'curriculum', label: 'Curriculum', count: curriculumDocs.length, icon: '/icons/CI Lightening.svg',
             content: (
-              <div style={{ borderTop: '1px solid #E2E1DE', margin: '0 -14px', padding: '12px 14px 12px' }}>
+              <div style={{ margin: '0 -14px', padding: '0 14px 12px' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'flex-start' }}>
                   {[...curriculumDocs].sort((a, b) => a.name.length - b.name.length).map(d => (
                     <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #CACED1', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
@@ -4847,7 +4944,7 @@ export default function Home() {
             ) },
           { id: 'standards', label: 'Standards', count: 4, icon: '/icons/Standards.svg',
             content: (
-              <div style={{ borderTop: '1px solid #E2E1DE', margin: '0 -14px', padding: '12px 14px 12px' }}>
+              <div style={{ margin: '0 -14px', padding: '0 14px 12px' }}>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                   {['RL 2.3', 'RL 2.4', 'RL 2.6', 'RL 2.8'].sort((a, b) => a.length - b.length).map(s => (
                     <span key={s} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, height: 28, padding: '0 8px', background: '#fff', border: `1px solid ${C.slate200}`, borderRadius: 6, fontSize: 12, color: '#0E151C' }}>
@@ -4863,7 +4960,7 @@ export default function Home() {
             ) },
           { id: 'district', label: 'District Guidance', count: districtDocs.length, icon: '/icons/School.svg',
             content: (
-              <div style={{ borderTop: '1px solid #E2E1DE', margin: '0 -14px', padding: '12px 14px 12px' }}>
+              <div style={{ margin: '0 -14px', padding: '0 14px 12px' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'flex-start' }}>
                   {[...districtDocs].sort((a, b) => a.name.length - b.name.length).map(d => (
                     <div key={d.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #CACED1', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
@@ -4896,8 +4993,10 @@ export default function Home() {
           <>
             {/* Header bar + segmented control */}
             <div style={{ background: '#FAF9F6', borderRadius: isMobile ? 0 : '12px 12px 0 0', flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 52, gap: 8, position: 'relative' }}>
-                <ModalBackBtn onClick={() => { setCurrentStep(1); setScreen(1); }} />
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 44, gap: 8, position: 'relative' }}>
+                {quizGenPhase === 'done' && sourcesReady
+                  ? <div style={{ width: 18 }} />
+                  : <ModalBackBtn onClick={() => { setCurrentStep(1); setScreen(1); }} />}
                 <span style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', fontWeight: 700, fontSize: 16, color: C.slate900, letterSpacing: '-0.01em', pointerEvents: 'none' }}>{resourceLabel}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 'auto' }}>
                   <ModalMenuBtn />
@@ -4927,28 +5026,21 @@ export default function Home() {
                 <div ref={qgScrollRef} className="scroll-area" style={{ flex: 1, overflowY: 'auto', background: '#FAF9F6' }}>
                   <div style={{ padding: '20px 24px 8px' }}>
 
-                    {/* ── HISTORY (oldest first, natural order) ── */}
-                    {topic && (
-                      <div className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
-                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
-                          {topic}
-                        </div>
-                      </div>
-                    )}
-
                     {/* ── Brisk intro message — shown during Q1/Q2 ── */}
                     {(quizGenPhase === 'q1' || quizGenPhase === 'q2') && (
                       <div className="fade-in" style={{ marginBottom: 14 }}>
                         <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px' }}>
-                          While we pull up your curriculum, a couple quick questions to tailor your {resourceLabel.toLowerCase()} on <strong>{qgShortTopic}</strong>.
+                          Please answer a few questions to further tailor your {resourceLabel.toLowerCase()} about <strong>{qgShortTopic}</strong>.
                         </div>
                       </div>
                     )}
-                    {quizGenAnswers.map((pair, i) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
-                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
-                          <div style={{ marginBottom: 6 }}>Q: {pair.q}</div>
-                          <div>A: {pair.a}</div>
+
+                    {/* Q&A bubbles — only shown after the user finishes both follow-up questions */}
+                    {quizGenPhase !== 'q1' && quizGenPhase !== 'q2' && quizGenAnswers.map((pair, i) => (
+                      <div key={i} className="fade-in" style={{ marginBottom: 10, marginLeft: 32 }}>
+                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', fontSize: 14, lineHeight: '22px', color: C.slate900 }}>
+                          <div><span style={{ color: C.slate500 }}>Q:</span> {pair.q}</div>
+                          <div style={{ marginTop: 4 }}><span style={{ color: C.slate500 }}>A:</span> {pair.a}</div>
                         </div>
                       </div>
                     ))}
@@ -4960,9 +5052,11 @@ export default function Home() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingTop: 8 }}>
                         <BriskLogo size={20} style={{ animation: 'shimmer 1.6s ease-in-out infinite', opacity: 0.7 }} />
                         <span key={quizGenLoadingIdx} className="fade-in" style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic', lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animation: 'shimmer 1.6s ease-in-out infinite, fadeIn 0.15s ease-out both' }}>
-                          {(quizGenPhase === 'answered' || quizGenPhase === 'done')
-                            ? FINALIZING_MSGS[quizGenLoadingIdx % FINALIZING_MSGS.length]
-                            : QUIZ_GEN_LOADING_MSGS[quizGenLoadingIdx % QUIZ_GEN_LOADING_MSGS.length]}
+                          {quizGenPhase === 'pre-confirm'
+                            ? PRE_CONFIRM_MSGS[quizGenLoadingIdx % PRE_CONFIRM_MSGS.length]
+                            : (quizGenPhase === 'answered' || quizGenPhase === 'done')
+                              ? FINALIZING_MSGS[quizGenLoadingIdx % FINALIZING_MSGS.length]
+                              : QUIZ_GEN_LOADING_MSGS[quizGenLoadingIdx % QUIZ_GEN_LOADING_MSGS.length]}
                         </span>
                       </div>
                     )}
@@ -4972,81 +5066,40 @@ export default function Home() {
                       <>
                         {/* Summary text */}
                         <div ref={qgSummaryRef} className="fade-in" style={{ fontSize: 14, color: C.slate700, lineHeight: '22px', marginBottom: 16, paddingTop: 8 }}>
-                          {(() => {
-                            const districtStrat = strategy;
-                            const teacherScaffoldList = activeScaffolds.map(s => s.text.trim()).filter(Boolean);
-                            const hasDistrict = !!districtStrat;
-                            const hasTeacher = teacherScaffoldList.length > 0;
-                            const needPhrase = struggle ? struggle.toLowerCase() : null;
-                            const goalPhrase = goal ? goal.toLowerCase() : null;
-
-                            // Build a list of bullet items when there are multiple things to highlight
-                            const bulletItems = [];
-                            if (hasDistrict) bulletItems.push({ label: districtStrat.name, detail: districtStrat.desc });
-                            if (hasTeacher) teacherScaffoldList.forEach(s => bulletItems.push({ label: s, detail: null }));
-                            const useBullets = bulletItems.length > 1;
-
-                            return (
-                              <>
-                                {/* Intro sentence */}
-                                <div style={{ marginBottom: (hasDistrict || hasTeacher) ? 10 : 0 }}>
-                                  {needPhrase
-                                    ? <>Your {resourceLabel.toLowerCase()} is tailored for students struggling with <strong>{needPhrase}</strong>{goalPhrase ? <> with the goal to <strong>{goalPhrase}</strong></> : null}.</>
-                                    : !hasDistrict && !hasTeacher
-                                      ? <>Your {resourceLabel.toLowerCase()} on <strong>{topic}</strong> is ready.</>
-                                      : <>Here&apos;s what&apos;s applied to this {resourceLabel.toLowerCase()}:</>
-                                  }
-                                </div>
-
-                                {/* Bullet list when multiple items */}
-                                {useBullets && (
-                                  <ul style={{ margin: '0 0 0 4px', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                    {bulletItems.map((item, i) => (
-                                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                                        <span style={{ marginTop: 6, width: 5, height: 5, borderRadius: '50%', background: C.slate400, flexShrink: 0 }} />
-                                        <span><strong>{item.label}</strong>{item.detail ? ` — ${item.detail}` : ''}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                )}
-
-                                {/* Single item — keep as prose */}
-                                {!useBullets && hasDistrict && (
-                                  <div>
-                                    <strong>{districtStrat.name}</strong> is your district&apos;s instructional strategy for {qgSubject || 'this subject'} — {districtStrat.desc}. Applied here to give students a consistent structure as they work through {qgShortTopic || 'this content'}.
-                                  </div>
-                                )}
-                                {!useBullets && !hasDistrict && hasTeacher && (
-                                  <div>
-                                    <strong>{teacherScaffoldList[0]}</strong> is included to further support student access.
-                                  </div>
-                                )}
-
-                                {/* Fallback — no district or teacher scaffolds */}
-                                {!hasDistrict && !hasTeacher && needPhrase && (
-                                  <div style={{ marginTop: 4 }}>
-                                    I used the <strong>{qgStrategy.name}</strong> approach — {qgStrategy.desc} — to help address this.
-                                  </div>
-                                )}
-                              </>
-                            );
-                          })()}
+                          <div style={{ fontWeight: 600, color: C.slate900, marginBottom: 10 }}>{resourceLabel}: {qgShortTopic}</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                            {[...curriculumDocs.slice(0, 2), { svg: '/icons/Docs.svg', name: `District ${qgStrategy.name} strategy` }].map(d => (
+                              <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ width: 4, height: 4, borderRadius: '50%', background: C.slate400, flexShrink: 0 }} />
+                                <span style={{ fontSize: 13, color: C.slate700 }}>{d.name}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
 
-                        {/* Improvement chips — cycle through pool, removing used ones */}
-                        {(() => {
+                        {/* Improvement chips */}
+                        {!qgScaffoldCardOpen && (() => {
                           const chipPool = isDocTool
-                            ? ['Make it shorter', 'Add more detail', 'Simplify the language', 'Add examples', 'Restructure it']
-                            : ['Make it shorter', 'Make it harder', 'Make it easier', 'Add more questions', 'Change to open-ended'];
+                            ? ['Make it shorter', 'Add more detail', 'Simplify the language', 'Add examples', 'Restructure it', 'Add scaffolds']
+                            : ['Make it shorter', 'Make it harder', 'Add scaffolds'];
                           const available = chipPool.filter(c => !qgUsedChips.includes(c));
-                          const visibleChips = available.slice(0, 3);
-                          if (visibleChips.length === 0) return null;
+                          if (available.length === 0) return null;
                           return (
                             <div style={{ marginBottom: 16 }}>
                               <div style={{ fontSize: 13, fontWeight: 600, color: C.slate700, marginBottom: 12 }}>Anything you want to improve?</div>
                               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                                {visibleChips.map(pill => (
-                                  <button key={pill} onClick={() => { if (!qgFormsLoading) { setQgUsedChips(u => [...u, pill]); setQgIterationHistory(h => [...h, pill]); setQgUserReply(pill); setInput(pill); } }}
+                                {available.map(pill => (
+                                  <button key={pill} onClick={() => {
+                                    if (qgFormsLoading) return;
+                                    setQgUsedChips(u => [...u, pill]);
+                                    if (pill === 'Add scaffolds') {
+                                      setQgIterationHistory(h => [...h, pill]);
+                                      setQgScaffoldCardOpen(true);
+                                    } else {
+                                      setQgIterationHistory(h => [...h, pill]);
+                                      setQgUserReply(pill);
+                                    }
+                                  }}
                                     style={{ padding: '6px 12px', border: `1px solid ${C.slate300}`, borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: qgFormsLoading ? 'default' : 'pointer', lineHeight: '20px', opacity: qgFormsLoading ? 0.5 : 1 }}>
                                     {pill}
                                   </button>
@@ -5060,12 +5113,32 @@ export default function Home() {
 
                     {/* User iteration history bubbles — always visible once populated */}
                     {qgIterationHistory.map((msg, i) => (
-                      <div key={i} className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
-                          {msg}
+                      typeof msg === 'object' && msg.type === 'qa' ? (
+                        <div key={i} className="fade-in" style={{ marginBottom: 16, marginLeft: 32 }}>
+                          <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', fontSize: 14, lineHeight: '22px', color: C.slate900 }}>
+                            <div><span style={{ color: C.slate500 }}>Q:</span> {msg.q}</div>
+                            <div style={{ marginTop: 4 }}><span style={{ color: C.slate500 }}>A:</span> {msg.a}</div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div key={i} className="msg-slide" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                          <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
+                            {msg}
+                          </div>
+                        </div>
+                      )
+                    ))}
+
+                    {/* Reading level follow-up — after "No thanks", ask why */}
+                    {qgReadingLevelFollowUp && !qgReadingLevelScopeCardOpen && (
+                      <div className="fade-in" style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px' }}>
+                          What's making the current level feel too high for your students?
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Scaffold selection card */}
 
                     {/* Iteration shimmer — always visible during iteration loading */}
                     {qgUserReply && qgFormsLoading && (() => {
@@ -5073,12 +5146,17 @@ export default function Home() {
                       const iterMsgs =
                         /short|fewer|less/.test(r) ? ['Trimming the content…', 'Shortening for your class…', 'Almost done…'] :
                         /hard|rigorous|challeng|difficult|advanced/.test(r) ? ['Raising the difficulty…', 'Adding more rigor…', 'Almost done…'] :
-                        /easier|simpl|reading level|lower|accessi|scaffold/.test(r) ? ['Simplifying the language…', 'Adjusting the reading level…', 'Almost done…'] :
+                        /sentence stem/.test(r) ? ['Adding sentence stems…', 'Weaving in writing supports…', 'Almost done…'] :
+                        /word bank/.test(r) ? ['Building a word bank…', 'Adding key vocabulary support…', 'Almost done…'] :
+                        /graphic organizer/.test(r) ? ['Adding a graphic organizer…', 'Structuring the layout…', 'Almost done…'] :
+                        /scaffolded question/.test(r) ? ['Breaking questions into steps…', 'Adding guided sub-questions…', 'Almost done…'] :
+                        /scaffold|custom scaffold/.test(r) ? [`Adding scaffolds…`, 'Weaving in supports…', 'Almost done…'] :
+                        /easier|simpl|reading level|lower|accessi/.test(r) ? ['Simplifying the language…', 'Adjusting the reading level…', 'Almost done…'] :
                         /longer|more detail|expand|add more|deeper/.test(r) ? ['Adding more depth…', 'Expanding the content…', 'Almost done…'] :
                         /different|new|change|redo|try again/.test(r) ? ['Trying a different approach…', 'Reworking the content…', 'Almost done…'] :
                         /vocab|word|term|definition/.test(r) ? ['Focusing on key vocabulary…', 'Updating the word choices…', 'Almost done…'] :
                         /format|layout|structure/.test(r) ? ['Restructuring the layout…', 'Adjusting the format…', 'Almost done…'] :
-                        [`Applying: "${qgUserReply.length > 40 ? qgUserReply.slice(0, 40) + '…' : qgUserReply}"`, 'Revising the content…', 'Almost done…'];
+                        [`Applying your request…`, 'Revising the content…', 'Almost done…'];
                       return (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: 8 }}>
                           <BriskLogo size={20} style={{ opacity: 0.7 }} />
@@ -5096,150 +5174,204 @@ export default function Home() {
 
                 {/* Bottom: question card or input bar */}
                 {currentCard ? (
-                  <div style={{ flexShrink: 0, padding: '6px 24px 16px' }}>
-                    <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 16px' }}>
+                  <div style={{ flexShrink: 0, padding: '8px 12px 10px' }}>
+                    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px' }}>{currentCard.text}</div>
                       <div style={{ fontSize: 12, lineHeight: '18px', color: '#475467', fontWeight: 400, marginTop: 2, marginBottom: 6 }}>
                         {quizGenPhase === 'q1' ? '1' : '2'} of 2
                       </div>
 
-                      {/* Multi-select (Q1) — checkbox squares */}
-                      {currentCard.type === 'multi-select' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          {currentCard.options.map((opt) => {
-                            const sel = quizGenQ1Sels.includes(opt);
-                            return (
-                              <button key={opt} onClick={() => setQuizGenQ1Sels(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])}
-                                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '8px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                                <div style={{ width: 18, height: 18, borderRadius: 2, border: sel ? 'none' : '1.5px solid #CACED1', background: sel ? '#06465C' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                  {sel && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                                </div>
-                                <span style={{ flex: 1 }}>{opt}</span>
-                              </button>
-                            );
-                          })}
-                          {/* Other option */}
-                          <button onClick={() => { setQgQ1OtherActive(true); }}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start', padding: '8px 0', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                            <div style={{ width: 18, height: 18, borderRadius: 2, border: (qgQ1OtherActive && qgQ1OtherText) ? 'none' : '1.5px solid #CACED1', background: (qgQ1OtherActive && qgQ1OtherText) ? '#1B6B6B' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              {(qgQ1OtherActive && qgQ1OtherText) && <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                            </div>
-                            {qgQ1OtherActive ? (
-                              <input
-                                autoFocus
-                                value={qgQ1OtherText}
-                                onChange={e => setQgQ1OtherText(e.target.value)}
-                                onClick={e => e.stopPropagation()}
-                                onKeyDown={e => {
-                                  if (e.key === 'Enter' && qgQ1OtherText.trim()) {
-                                    e.preventDefault();
-                                    const val = qgQ1OtherText.trim();
-                                    setQuizGenQ1Sels(prev => prev.includes(val) ? prev : [...prev, val]);
-                                    setQgQ1OtherActive(false);
-                                  }
-                                  if (e.key === 'Escape') { setQgQ1OtherActive(false); setQgQ1OtherText(''); }
-                                }}
-                                placeholder="Describe another challenge…"
-                                style={{ flex: 1, border: 'none', outline: 'none', borderBottom: `1px solid ${C.slate300}`, fontSize: 14, fontFamily: 'inherit', color: C.slate900, background: 'transparent', padding: '0 0 2px' }}
-                              />
-                            ) : (
-                              <span style={{ flex: 1, color: C.slate500 }}>Other</span>
-                            )}
-                          </button>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-                            <button onClick={() => { setQuizGenAnswers([]); setQuizGenPhase('q2'); }}
-                              style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate400, cursor: 'pointer' }}>Skip</button>
-                            <button onClick={() => {
-                              const sels = [...quizGenQ1Sels];
-                              if (qgQ1OtherActive && qgQ1OtherText.trim() && !sels.includes(qgQ1OtherText.trim())) sels.push(qgQ1OtherText.trim());
-                              const a = sels.length > 0 ? sels.join(', ') : '—';
-                              setQuizGenAnswers([{ q: currentCard.text, a }]);
-                              setQuizGenPhase('q2');
-                            }} style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate300}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: C.slate900, cursor: 'pointer' }}>Next</button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Single-select (Q2) — default first option, selection → Finish */}
-                      {currentCard.type === 'single-select' && (() => {
-                        const q2Sel = quizGenQ2 || currentCard.options[0];
-                        const q2IsOther = q2Sel === '__other__';
+                      {/* All cards use single-select style — Q1 → q2, Q2 → pre-confirm */}
+                      {currentCard && (() => {
+                        const isQ1 = quizGenPhase === 'q1';
+                        const curSel = isQ1 ? (quizGenQ1Sels[0] || currentCard.options[0]) : (quizGenQ2 || currentCard.options[0]);
+                        const isOther = curSel === '__other__';
+                        const otherActive = isQ1 ? qgQ1OtherActive : qgQ2OtherActive;
+                        const setOtherActive = isQ1 ? setQgQ1OtherActive : setQgQ2OtherActive;
+                        const otherText = isQ1 ? qgQ1OtherText : qgQ2OtherText;
+                        const setOtherText = isQ1 ? setQgQ1OtherText : setQgQ2OtherText;
+                        const handleSelect = (a) => {
+                          if (isQ1) {
+                            setQuizGenQ1Sels([a]);
+                            setQuizGenAnswers([{ q: currentCard.text, a }]);
+                            setQuizGenQ2Sels([]);
+                            setQuizGenPhase('q2');
+                          } else {
+                            setQuizGenQ2(a);
+                            setQgQ2CardId(currentCard.id || 'goal');
+                            setQuizGenAnswers(prev => [...prev.slice(0, 1), { q: currentCard.text, a }]);
+                            setQuizGenPhase('pre-confirm');
+                          }
+                        };
                         return (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {currentCard.options.map((opt) => {
-                              const isSel = q2Sel === opt;
+                            {currentCard.options.map((opt, optIdx) => {
+                              const isSel = curSel === opt;
+                              const isFirst = optIdx === 0;
                               return (
-                                <button key={opt} onClick={() => {
-                                  setQuizGenQ2(opt);
-                                  setQgQ2OtherActive(false);
-                                  setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: opt }]);
-                                  setCurrentStep(3);
-                                  setScreen('confirm');
-                                }}
+                                <button key={opt} onClick={() => { setOtherActive(false); handleSelect(opt); }}
                                   onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = '#F7F6F4'; }}
-                                  onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = 'transparent'; }}
+                                  onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = isSel ? '#F0EFED' : 'transparent'; }}
                                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: isSel ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
                                   <span>{opt}</span>
-                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: isSel ? 1 : 0, transition: 'opacity 0.1s', flexShrink: 0 }}>
-                                    <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: isSel || isFirst ? 1 : 0, transition: 'opacity 0.1s', flexShrink: 0 }}>
+                                    <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth={isSel ? '1.5' : '1.2'} strokeLinecap="round" strokeLinejoin="round" opacity={isSel ? 1 : 0.3}/>
                                   </svg>
                                 </button>
                               );
                             })}
                             {/* Other option */}
-                            <button onClick={() => { setQuizGenQ2('__other__'); setQgQ2OtherActive(true); }}
-                              onMouseEnter={e => { if (!q2IsOther) e.currentTarget.style.background = '#F7F6F4'; }}
-                              onMouseLeave={e => { if (!q2IsOther) e.currentTarget.style.background = 'transparent'; }}
-                              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: q2IsOther ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
-                              {qgQ2OtherActive ? (
-                                <input
-                                  autoFocus
-                                  value={qgQ2OtherText}
-                                  onChange={e => setQgQ2OtherText(e.target.value)}
-                                  onClick={e => e.stopPropagation()}
+                            <button onClick={() => { if (isQ1) setQuizGenQ1Sels(['__other__']); else setQuizGenQ2('__other__'); setOtherActive(true); }}
+                              onMouseEnter={e => { if (!isOther) e.currentTarget.style.background = '#F7F6F4'; }}
+                              onMouseLeave={e => { if (!isOther) e.currentTarget.style.background = 'transparent'; }}
+                              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: isOther ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                              {otherActive ? (
+                                <input autoFocus value={otherText} onChange={e => setOtherText(e.target.value)} onClick={e => e.stopPropagation()}
                                   onKeyDown={e => {
-                                    if (e.key === 'Enter' && qgQ2OtherText.trim()) {
-                                      e.preventDefault();
-                                      const val = qgQ2OtherText.trim();
-                                      setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: val }]);
-                                      setQuizGenPhase('answered');
-                                    }
-                                    if (e.key === 'Escape') { setQgQ2OtherActive(false); setQgQ2OtherText(''); setQuizGenQ2(currentCard.options[0]); }
+                                    if (e.key === 'Enter' && otherText.trim()) { e.preventDefault(); handleSelect(otherText.trim()); }
+                                    if (e.key === 'Escape') { setOtherActive(false); setOtherText(''); }
                                   }}
-                                  placeholder="Describe your goal…"
+                                  placeholder="Describe…"
                                   style={{ flex: 1, border: 'none', outline: 'none', borderBottom: `1px solid ${C.slate300}`, fontSize: 14, fontFamily: 'inherit', color: C.slate900, background: 'transparent', padding: '0 0 2px' }}
                                 />
                               ) : (
-                                <span style={{ color: q2IsOther ? C.slate900 : C.slate500 }}>Other</span>
+                                <span style={{ color: isOther ? C.slate900 : C.slate500 }}>Other</span>
                               )}
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: q2IsOther ? 1 : 0, transition: 'opacity 0.1s', flexShrink: 0 }}>
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: isOther ? 1 : 0, transition: 'opacity 0.1s', flexShrink: 0 }}>
                                 <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-                              <button onClick={() => { setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a: '—' }]); setCurrentStep(3); setScreen('confirm'); }}
-                                style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate400, cursor: 'pointer' }}>Skip</button>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
                               <button onClick={() => {
-                                const a = q2IsOther ? (qgQ2OtherText.trim() || '—') : q2Sel;
-                                setQuizGenAnswers(prev => [...prev, { q: currentCard.text, a }]);
-                                setCurrentStep(3);
-                                setScreen('confirm');
-                              }} style={{ height: 36, padding: '0 20px', borderRadius: 20, border: `1px solid ${C.slate300}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: C.slate900, cursor: 'pointer' }}>Finish</button>
+                                if (isQ1) { setCurrentStep(1); setScreen(1); }
+                                else { setQuizGenPhase('q1'); setQuizGenQ2Sels([]); }
+                              }} style={{ height: 36, padding: '0 16px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate900, cursor: 'pointer' }}>Back</button>
                             </div>
                           </div>
                         );
                       })()}
                     </div>
                   </div>
-                ) : (
-                  <BottomInputBar placeholder={sourcesReady ? "Share what you'd like to revise" : "Share more details"} value={input} onChange={setInput} onSubmit={() => {
-                    const val = input.trim();
-                    if (!val) return;
-                    setQgUserReply(val);
-                    setInput('');
-                    setQgIterationHistory(h => [...h, val]);
-                  }} disabled={false} />
-                )}
+                ) : quizGenPhase !== 'pre-confirm' ? (
+                  qgReadingLevelCardOpen ? (
+                    /* ── Reading level redirect card ── */
+                    <div className="fade-in" style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+                      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 -2px 16px rgba(0,0,0,0.08), 0 2px 16px rgba(0,0,0,0.09)', padding: '14px 14px 14px' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 10 }}>Lowering the reading level can reduce rigor for your students. We recommend trying one of the following scaffolds instead.</div>
+                        {[
+                          { id: 'stems', title: 'Sentence stems', desc: 'For students who struggle to start writing responses' },
+                          { id: 'wordbank', title: 'Word bank', desc: 'Key terms students can reference while answering' },
+                          { id: 'graphic', title: 'Graphic organizer', desc: 'Visual structure for organizing ideas before responding' },
+                          { id: 'chunked', title: 'Scaffolded questions', desc: 'Breaking complex questions into guided sub-questions' },
+                        ].map(opt => (
+                          <button key={opt.id} onClick={() => {
+                            setQgReadingLevelCardOpen(false);
+                            const msg = `Add ${opt.title.toLowerCase()} scaffold`;
+                            setQgIterationHistory(h => [...h, { type: 'qa', q: 'Lowering the reading level can reduce rigor for your students. We recommend trying one of the following scaffolds instead.', a: opt.title }]);
+                            setQgUserReply(msg);
+                          }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '8px 10px', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', textAlign: 'left', marginBottom: 2 }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: C.slate900, lineHeight: '20px' }}>{opt.title}</span>
+                            <span style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{opt.desc}</span>
+                          </button>
+                        ))}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                          <button onClick={() => {
+                            setQgReadingLevelCardOpen(false);
+                            setQgReadingLevelFollowUp(true);
+                          }} style={{ height: 32, padding: '0 14px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate500, cursor: 'pointer' }}>No thanks</button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : qgReadingLevelScopeCardOpen ? (
+                    /* ── Scope card: why lowering reading level ── */
+                    <div className="fade-in" style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+                      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 -2px 16px rgba(0,0,0,0.08), 0 2px 16px rgba(0,0,0,0.09)', padding: '14px 14px 14px' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 10 }}>Want to try one of these options instead?</div>
+                        {[
+                          { id: 'iep', title: 'IEP accommodation', desc: 'Leveling for a specific student with an IEP requirement' },
+                          { id: 'whole', title: 'Whole class reading proficiency gap', desc: 'Most students are reading below grade level' },
+                          { id: 'small', title: 'Small group reading proficiency gap', desc: 'A subset of students needs additional reading support' },
+                        ].map(opt => (
+                          <button key={opt.id} onClick={() => {
+                            setQgReadingLevelScopeCardOpen(false);
+                            setQgReadingLevelFollowUp(false);
+                            setQgIterationHistory(h => [...h, { type: 'qa', q: 'Want to try one of these options instead?', a: opt.title }]);
+                            setQgUserReply('Lower the reading level');
+                          }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '8px 10px', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', textAlign: 'left', marginBottom: 2 }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: C.slate900, lineHeight: '20px' }}>{opt.title}</span>
+                            <span style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{opt.desc}</span>
+                          </button>
+                        ))}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                          <button onClick={() => {
+                            setQgReadingLevelScopeCardOpen(false);
+                            setQgReadingLevelFollowUp(false);
+                            setQgUserReply('Lower the reading level');
+                          }} style={{ height: 32, padding: '0 14px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate500, cursor: 'pointer' }}>Just lower it</button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : qgScaffoldCardOpen ? (
+                    <div className="fade-in" style={{ flexShrink: 0, background: '#FAF9F6', padding: '8px 12px 10px' }}>
+                      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 -2px 16px rgba(0,0,0,0.08), 0 2px 16px rgba(0,0,0,0.09)', padding: '14px 14px 14px' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 10 }}>How would you like to scaffold this for your students?</div>
+                        {[
+                          { id: 'stems', title: 'Sentence stems', desc: 'For students who struggle to start writing responses' },
+                          { id: 'wordbank', title: 'Word bank', desc: 'Key terms students can reference while answering' },
+                          { id: 'graphic', title: 'Graphic organizer', desc: 'Visual structure for organizing ideas before responding' },
+                          { id: 'chunked', title: 'Scaffolded questions', desc: 'Breaking complex questions into guided sub-questions' },
+                        ].map(opt => (
+                          <button key={opt.id} onClick={() => {
+                            setQgScaffoldCardOpen(false);
+                            const msg = `Add ${opt.title.toLowerCase()} scaffold`;
+                            setQgIterationHistory(h => [...h, { type: 'qa', q: 'How would you like to scaffold this for your students?', a: opt.title }]);
+                            setQgUserReply(msg);
+                          }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '8px 10px', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', textAlign: 'left', marginBottom: 2 }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: C.slate900, lineHeight: '20px' }}>{opt.title}</span>
+                            <span style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>{opt.desc}</span>
+                          </button>
+                        ))}
+                        <button onClick={() => {
+                          setQgScaffoldCardOpen(false);
+                          const msg = 'Add a custom scaffold';
+                          setQgIterationHistory(h => [...h, { type: 'qa', q: 'How would you like to scaffold this for your students?', a: 'Other' }]);
+                          setQgUserReply(msg);
+                        }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '8px 10px', border: 'none', outline: 'none', borderRadius: 8, background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', textAlign: 'left', marginBottom: 6 }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <span style={{ fontSize: 14, fontWeight: 500, color: C.slate900, lineHeight: '20px' }}>Other</span>
+                          <span style={{ fontSize: 12, color: C.slate500, lineHeight: '18px' }}>Add your own scaffold approach</span>
+                        </button>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          <button onClick={() => setQgScaffoldCardOpen(false)} style={{ height: 32, padding: '0 14px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate500, cursor: 'pointer' }}>Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <BottomInputBar placeholder={sourcesReady ? "Share what you'd like to revise" : "Share more details"} value={input} onChange={setInput} noAdd onSubmit={() => {
+                      const val = input.trim();
+                      if (!val) return;
+                      if (/reading level|read.*level|lower.*level|easier.*read/.test(val.toLowerCase())) {
+                        setQgIterationHistory(h => [...h, val]);
+                        setQgReadingLevelCardOpen(true);
+                        setInput('');
+                        return;
+                      }
+                      if (qgReadingLevelFollowUp) {
+                        setQgIterationHistory(h => [...h, val]);
+                        setQgReadingLevelFollowUp(false);
+                        setQgReadingLevelScopeCardOpen(true);
+                        setInput('');
+                        return;
+                      }
+                      setQgUserReply(val);
+                      setInput('');
+                      setQgIterationHistory(h => [...h, val]);
+                    }} disabled={false} />
+                  )
+                ) : null}
               </>
             )}
 
@@ -5331,19 +5463,18 @@ export default function Home() {
 
         function SourceChip({ svg, name }) {
           return (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 6, background: '#fff', border: '1px solid #CACED1', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, paddingLeft: 8, paddingRight: 10, background: '#fff', border: '1px solid #CACED1', borderRadius: 8, flex: '0 0 auto', maxWidth: '100%' }}>
               <img src={svg} width={16} height={16} alt="" style={{ display: 'block', flexShrink: 0 }} />
               <span title={name} style={{ fontSize: 13, color: '#0E151C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160 }}>{name}</span>
-              <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 4 }}>
-                <img src="/icons/Close.svg" width={12} height={12} alt="Remove" style={{ display: 'block', opacity: 0.4 }} />
-              </button>
             </div>
           );
         }
 
         function handleConfirmGenerate() {
+          setCurrentStep(3);
+          setQgFormsLoading(false);
+          setQuizGenPhase('done');
           setScreen('quiz-gen');
-          setQuizGenPhase('answered');
         }
 
         function handleConfirmBack() {
@@ -5373,12 +5504,19 @@ export default function Home() {
             <div className="scroll-area" style={{ height: '100%', overflowY: 'auto', background: '#FAF9F6' }}>
               <div style={{ padding: '20px 24px 104px' }}>
 
+                {/* Summary */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: C.slate900, marginBottom: 8 }}>Summary</div>
+                  <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px' }}>
+                    We pulled this from <strong>Unit 2 in {cfCurriculumBaseName}</strong> to {cfChallengePhrase}{goal ? ` with the goal to ${goal.toLowerCase()}` : ''}.
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid #E5E4E2', marginBottom: 20 }} />
+
                 {/* Section 1: Curriculum */}
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 14, fontWeight: 500, color: C.slate900, marginBottom: 8 }}>Curriculum</div>
-                  <div style={{ fontSize: 14, color: C.slate700, lineHeight: '22px', marginBottom: 12 }}>
-                    We pulled this from <strong>Unit 2 in {cfCurriculumBaseName}</strong> to {cfChallengePhrase}.
-                  </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {cfCurriculumDocs.map(d => <SourceChip key={d.name} svg={d.svg} name={d.name} />)}
                   </div>
@@ -5424,60 +5562,29 @@ export default function Home() {
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 96, background: 'linear-gradient(to bottom, rgba(250,249,246,0) 0%, rgba(250,249,246,0.55) 45%, rgba(250,249,246,0.92) 100%)', pointerEvents: 'none' }} />
             </div>
 
-            {/* Bottom card — Ready to create? OR Adjust prompt card */}
-            {confirmAdjustOpen ? (
-              <div style={{ flexShrink: 0, padding: '6px 12px 16px', background: '#FAF9F6' }}>
-                <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: C.slate900 }}>Adjust {resourceLabel}</span>
-                    <button onClick={() => { setInput(''); setConfirmAdjustOpen(false); }} className="icon-btn"
-                      style={{ width: 28, height: 28, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: 0, flexShrink: 0 }}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="#475467" strokeWidth="1.4" strokeLinecap="round"/></svg>
-                    </button>
-                  </div>
-                  <textarea
-                    autoFocus
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && !e.shiftKey && input.trim()) {
-                        e.preventDefault();
-                        savePromptToHistory(input);
-                        setConfirmAdjustOpen(false);
-                        handleConfirmGenerate();
-                      }
-                    }}
-                    placeholder="Tell us what you need"
-                    rows={3}
-                    style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: C.slate900, background: 'transparent', fontFamily: 'inherit', lineHeight: '22px', resize: 'none', padding: 0, boxSizing: 'border-box' }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                    <button onClick={() => { if (input.trim()) { savePromptToHistory(input); setConfirmAdjustOpen(false); handleConfirmGenerate(); } }}
-                      disabled={!input.trim()}
-                      style={{ width: 36, height: 36, borderRadius: '50%', background: input.trim() ? '#06465C' : '#D1CFC9', border: 'none', cursor: input.trim() ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, transition: 'background 0.15s' }}>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </button>
-                  </div>
+            {/* Bottom card — Ready to create? */}
+            <div style={{ flexShrink: 0, padding: '0 12px 20px', background: '#FAF9F6' }}>
+              <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, padding: '14px 16px' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 2 }}>Ready to create your {resourceLabel.toLowerCase()}?</div>
+                <div style={{ fontSize: 13, color: '#74818E', lineHeight: '20px', marginBottom: 20 }}>Brisk will use the curriculum and guidance above.</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button onClick={() => { setCurrentStep(1); setScreen(1); setInput(''); setQuizGenPhase('q1'); setQuizGenAnswers([]); setQuizGenQ1Sels([]); setQuizGenQ2Sels([]); setQuizGenQ2(''); }}
+                    className="add-tertiary-btn"
+                    style={{ height: 36, padding: '0 14px', border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 13, color: C.slate900, cursor: 'pointer' }}>
+                    Start over
+                  </button>
+                  <div style={{ flex: 1 }} />
+                  <button onClick={() => { setReturnToConfirm(true); setCurrentStep(1); setScreen(1); setGlobalSettingsOpen(true); }}
+                    style={{ height: 36, padding: '0 16px', border: '1px solid #E5E4E2', borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: 'pointer' }}>
+                    Adjust Settings
+                  </button>
+                  <button onClick={handleConfirmGenerate}
+                    style={{ height: 36, padding: '0 16px', border: 'none', borderRadius: 20, background: '#0E151C', color: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
+                    Brisk It
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div style={{ flexShrink: 0, padding: '0 12px 20px', background: '#FAF9F6' }}>
-                <div style={{ background: '#fff', border: '1px solid #E5E4E2', borderRadius: 12, padding: '14px 16px' }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 2 }}>Looks good?</div>
-                  <div style={{ fontSize: 13, color: '#74818E', lineHeight: '20px', marginBottom: 20 }}>Brisk will use the curriculum and guidance above.</div>
-                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                    <button onClick={() => { setInput(''); setConfirmAdjustOpen(true); }}
-                      style={{ height: 36, padding: '0 16px', border: '1px solid #E5E4E2', borderRadius: 20, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate700, cursor: 'pointer' }}>
-                      Adjust
-                    </button>
-                    <button onClick={handleConfirmGenerate}
-                      style={{ height: 36, padding: '0 16px', border: 'none', borderRadius: 20, background: '#0E151C', color: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-                      Brisk It
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </>
         );
       })()}
@@ -5882,37 +5989,6 @@ export default function Home() {
           {/* CI Panel */}
           {panelContent}
         </>
-      )}
-
-      {/* ── Global Add Menu Dropdown — outside panel to avoid transform stacking context ── */}
-      {addMenuOpen && (
-        <div onMouseLeave={() => setAddMenuOpen(false)} style={{ position: 'fixed', top: addMenuPos.top, left: addMenuPos.left, width: 240, background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)', zIndex: 10001, overflow: 'hidden' }}>
-          {!pageChipVisible && !!pageContext && (
-            <>
-              <button className="menu-item" onClick={() => { setPageChipVisible(true); setAddMenuOpen(false); }}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}><rect width="18" height="18" rx="3" fill="#4285F4"/><rect x="4.5" y="5.5" width="9" height="1.2" rx="0.6" fill="white"/><rect x="4.5" y="8.4" width="9" height="1.2" rx="0.6" fill="white"/><rect x="4.5" y="11.3" width="5.5" height="1.2" rx="0.6" fill="white"/></svg>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 400, lineHeight: '22px', color: '#0E151C' }}>Add Page Context</div>
-                  <div style={{ fontSize: 12, color: '#475467', lineHeight: '17px', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>{pageContext?.title || 'Jennifer Wong - Point of View in Summer of M...'}</div>
-                </div>
-              </button>
-              <div style={{ height: 1, background: '#E5E4E2' }} />
-            </>
-          )}
-          {[
-            { icon: <img src="/icons/Attach.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'Add Files or Photos', dividerAfter: true },
-            { icon: <img src="/icons/Time.svg" width={20} height={20} alt="" style={{ display: 'block', flexShrink: 0 }} />, label: 'View Prompt History' },
-          ].map(item => (
-            <div key={item.label}>
-              <button className="menu-item" onClick={() => setAddMenuOpen(false)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, lineHeight: '22px', color: '#0E151C', textAlign: 'left' }}>
-                {item.icon}{item.label}
-              </button>
-              {item.dividerAfter && <div style={{ height: 1, background: '#E5E4E2' }} />}
-            </div>
-          ))}
-        </div>
       )}
 
       {/* ── Global Class Picker Dropdown ── */}
