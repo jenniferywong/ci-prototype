@@ -2130,7 +2130,6 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
             <ModalCloseBtn onClick={onClose} />
           </div>
         </div>
-        <ResourceIntentStepper step={currentStep} />
       </div>
 
       {/* Prompt box — fills remaining space */}
@@ -2573,6 +2572,7 @@ export default function Home() {
   const [qgQ1OtherActive, setQgQ1OtherActive] = useState(false);
   const [qgQ2OtherText, setQgQ2OtherText] = useState('');
   const [qgQ2OtherActive, setQgQ2OtherActive] = useState(false);
+  const [qgCardFreeText, setQgCardFreeText] = useState('');
   const [qgQ2CardId, setQgQ2CardId] = useState('goal');
   const [quizGenQ2Sels, setQuizGenQ2Sels] = useState([]);
   const [qgScaffoldCardOpen, setQgScaffoldCardOpen] = useState(false);
@@ -2956,6 +2956,7 @@ export default function Home() {
     setQgQ1OtherActive(false);
     setQgQ2OtherText('');
     setQgQ2OtherActive(false);
+    setQgCardFreeText('');
     setQgQ2CardId('goal');
     setQuizGenQ2Sels([]);
     setQgScaffoldCardOpen(false);
@@ -5003,7 +5004,6 @@ export default function Home() {
                   <ModalCloseBtn onClick={handleClose} />
                 </div>
               </div>
-              {!(quizGenPhase === 'done' && sourcesReady) && <ResourceIntentStepper step={currentStep} />}
               {/* Tabs — only shown during iteration/done phase */}
               {quizGenPhase === 'done' && sourcesReady && (
                 <div style={{ display: 'flex', borderBottom: `1px solid ${C.slate200}` }}>
@@ -5176,10 +5176,7 @@ export default function Home() {
                 {currentCard ? (
                   <div style={{ flexShrink: 0, padding: '8px 12px 10px' }}>
                     <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px' }}>{currentCard.text}</div>
-                      <div style={{ fontSize: 12, lineHeight: '18px', color: '#475467', fontWeight: 400, marginTop: 2, marginBottom: 6 }}>
-                        {quizGenPhase === 'q1' ? '1' : '2'} of 2
-                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 6 }}>{currentCard.text}</div>
 
                       {/* All cards use single-select style — Q1 → q2, Q2 → pre-confirm */}
                       {currentCard && (() => {
@@ -5241,11 +5238,29 @@ export default function Home() {
                                 <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                              <button onClick={() => {
-                                if (isQ1) { setCurrentStep(1); setScreen(1); }
-                                else { setQuizGenPhase('q1'); setQuizGenQ2Sels([]); }
-                              }} style={{ height: 36, padding: '0 16px', borderRadius: 20, border: `1px solid ${C.slate200}`, background: '#fff', fontFamily: 'inherit', fontSize: 13, color: C.slate900, cursor: 'pointer' }}>Back</button>
+                            {/* Free-text chat input below options */}
+                            <div style={{ marginTop: 10, borderTop: `1px solid ${C.slate100}`, paddingTop: 8 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F7F6F4', borderRadius: 999, padding: '0 10px 0 14px', height: 44 }}>
+                                <input
+                                  value={qgCardFreeText}
+                                  onChange={e => setQgCardFreeText(e.target.value)}
+                                  onKeyDown={e => {
+                                    if (e.key === 'Enter' && qgCardFreeText.trim()) {
+                                      e.preventDefault();
+                                      handleSelect(qgCardFreeText.trim());
+                                      setQgCardFreeText('');
+                                    }
+                                  }}
+                                  placeholder="Share more optional details"
+                                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: C.slate900, background: 'transparent', fontFamily: 'inherit' }}
+                                />
+                                {qgCardFreeText.trim() && (
+                                  <button onClick={() => { handleSelect(qgCardFreeText.trim()); setQgCardFreeText(''); }}
+                                    style={{ width: 30, height: 30, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
+                                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
@@ -5496,7 +5511,6 @@ export default function Home() {
                   <ModalCloseBtn onClick={handleClose} />
                 </div>
               </div>
-              <ResourceIntentStepper step={currentStep} />
             </div>
 
             {/* Body — receipt-style personalized summary */}
