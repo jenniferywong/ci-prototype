@@ -2471,7 +2471,24 @@ function detectClarification(text) {
     options: ['Gauge prior knowledge before teaching', 'Identify gaps to inform lesson pacing', 'Group students by readiness level', 'Set a baseline to compare against later'],
   };
 
-  return null;
+  // Review / test prep
+  if (/\breview\b|\btest prep\b|\bstate test\b|\bstandard.*test\b|\bpreparing\b/.test(t)) return {
+    q: 'What format works best for test prep?',
+    options: ['Mirror the actual test format', 'Focus on the hardest concepts only', 'Mix of recall and application', 'Student-paced practice'],
+  };
+
+  // Specific topic mentioned (about X / on X / for X)
+  const topicM = /\b(about|on|covering|for)\s+([a-z][a-z ]{3,30})/i.exec(text);
+  if (topicM) return {
+    q: `You said "${topicM[0]}" — what's the hardest part of this for students?`,
+    options: ['Understanding the core concept', 'Applying it to new situations', 'The vocabulary and terminology', 'Connecting it to what they already know'],
+  };
+
+  // Generic fallback — always ask if something was typed
+  return {
+    q: 'One quick thing — how will students use this?',
+    options: ['In class with teacher support', 'Independently / homework', 'Small group or intervention', 'As a practice run before a bigger test'],
+  };
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2627,6 +2644,7 @@ export default function Home() {
   const [qgQ2OtherActive, setQgQ2OtherActive] = useState(false);
   const [qgCardFreeText, setQgCardFreeText] = useState('');
   const [qgClarificationCard, setQgClarificationCard] = useState(null); // {q, options, pendingText, isQ1}
+  const [qgPendingBubble, setQgPendingBubble] = useState(''); // user's free text shown in chat while clarification is active
   const [qgQ2CardId, setQgQ2CardId] = useState('goal');
   const [quizGenQ2Sels, setQuizGenQ2Sels] = useState([]);
   const [qgScaffoldCardOpen, setQgScaffoldCardOpen] = useState(false);
@@ -3012,6 +3030,7 @@ export default function Home() {
     setQgQ2OtherActive(false);
     setQgCardFreeText('');
     setQgClarificationCard(null);
+    setQgPendingBubble('');
     setQgQ2CardId('goal');
     setQuizGenQ2Sels([]);
     setQgScaffoldCardOpen(false);
@@ -5090,8 +5109,8 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Q&A bubbles — only shown after the user finishes both follow-up questions */}
-                    {quizGenPhase !== 'q1' && quizGenPhase !== 'q2' && quizGenAnswers.map((pair, i) => (
+                    {/* Q&A bubbles — shown after Q1 is answered (so Q2 card shows with Q1 history above) */}
+                    {quizGenPhase !== 'q1' && quizGenAnswers.map((pair, i) => (
                       <div key={i} className="fade-in" style={{ marginBottom: 10, marginLeft: 32 }}>
                         <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', fontSize: 14, lineHeight: '22px', color: C.slate900 }}>
                           <div><span style={{ color: C.slate500 }}>Q:</span> {pair.q}</div>
@@ -5099,6 +5118,15 @@ export default function Home() {
                         </div>
                       </div>
                     ))}
+
+                    {/* Pending free-text bubble — shown while clarification card is open */}
+                    {qgPendingBubble && qgClarificationCard && (
+                      <div className="fade-in" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', maxWidth: '80%', fontSize: 14, color: C.slate900, lineHeight: '21px' }}>
+                          {qgPendingBubble}
+                        </div>
+                      </div>
+                    )}
 
                     {/* ── LATEST CONTENT (newest at bottom) ── */}
 
@@ -5236,6 +5264,7 @@ export default function Home() {
                       const commitClarification = (answer) => {
                         const combined = `${clarify.pendingText} — ${answer}`;
                         setQgClarificationCard(null);
+                        setQgPendingBubble('');
                         setQgCardFreeText('');
                         if (clarify.isQ1) {
                           setQuizGenQ1Sels([combined]);
@@ -5311,17 +5340,14 @@ export default function Home() {
                         };
                         const handleFreeTextSubmit = (text) => {
                           const clarification = detectClarification(text);
-                          if (clarification) {
-                            setQgClarificationCard({
-                              ...clarification,
-                              pendingText: text,
-                              isQ1,
-                              originalQ: currentCard.text,
-                              cardId: currentCard.id || 'goal',
-                            });
-                          } else {
-                            handleSelect(text);
-                          }
+                          setQgPendingBubble(text);
+                          setQgClarificationCard({
+                            ...clarification,
+                            pendingText: text,
+                            isQ1,
+                            originalQ: currentCard.text,
+                            cardId: currentCard.id || 'goal',
+                          });
                         };
                         return (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -5641,6 +5667,20 @@ export default function Home() {
             <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
             <div className="scroll-area" style={{ height: '100%', overflowY: 'auto', background: '#FAF9F6' }}>
               <div style={{ padding: '20px 24px 104px' }}>
+
+                {/* Q&A conversation history — scrollable thread above summary */}
+                {quizGenAnswers.length > 0 && (
+                  <div style={{ marginBottom: 20 }}>
+                    {quizGenAnswers.map((pair, i) => (
+                      <div key={i} className="fade-in" style={{ marginBottom: 10 }}>
+                        <div style={{ background: '#E9E8E6', borderRadius: 12, padding: '10px 14px', fontSize: 14, lineHeight: '22px', color: C.slate900 }}>
+                          <div><span style={{ color: C.slate500 }}>Q:</span> {pair.q}</div>
+                          <div style={{ marginTop: 4 }}><span style={{ color: C.slate500 }}>A:</span> {pair.a}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Summary */}
                 <div style={{ marginBottom: 20 }}>
