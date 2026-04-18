@@ -2422,6 +2422,59 @@ function ToolCreationScreen({ toolName, toolIcon, toolType = 'quiz', promptPlace
 }
 
 // ══════════════════════════════════════════════════════════════
+// CLARIFICATION DETECTION — anchors on teacher's free-text input
+// ══════════════════════════════════════════════════════════════
+function detectClarification(text) {
+  const t = text.toLowerCase();
+
+  // Chapter / unit assessment
+  const chapterM = /chapter\s+(\d+|[a-z]+)|unit\s+(test|assessment|exam|quiz)|section\s+\d+/i.exec(text);
+  if (chapterM) return {
+    q: `You mentioned a ${chapterM[0]} — where are students in this unit?`,
+    options: ['Just starting — this is a pre-assessment', 'About halfway through', 'Approaching the end / test prep', 'Post-unit review for mastery'],
+  };
+
+  // Summative / final
+  if (/\b(summative|final exam|end.of.unit|end of unit|midterm|mid-term)\b/.test(t)) return {
+    q: 'How will you use these results?',
+    options: ['Final grade for the unit', 'Guide re-teaching decisions', 'Student self-reflection on mastery', 'Inform next unit planning'],
+  };
+
+  // Novel / reading text
+  const novelM = /\b(novel|book|short story|reading|passage|text)\b/i.exec(text);
+  if (novelM) return {
+    q: `You mentioned a ${novelM[0].toLowerCase()} — what reading skill are you most focused on?`,
+    options: ['Literal comprehension', 'Inference and analysis', 'Author\'s craft and vocabulary', 'Theme and central idea'],
+  };
+
+  // ELL / English learners
+  if (/\bell\b|english learner|multilingual|language learner/.test(t)) return {
+    q: 'What language support do these students need most?',
+    options: ['Simplified vocabulary and sentence structure', 'Word bank with key terms', 'Visual supports or graphic organizers', 'Sentence frames for written responses'],
+  };
+
+  // Struggling / below grade
+  if (/\bstruggling\b|\blow.performing\b|\bbehind\b|\bbelow grade\b|\bbelow-grade\b/.test(t)) return {
+    q: 'Is this for the whole class or a specific group?',
+    options: ['Whole class — most students need support', 'A small group of 3–8 students', 'Individual students with specific needs', 'Students who missed recent instruction'],
+  };
+
+  // Lab / experiment
+  if (/\blab\b|\bexperiment\b|\binvestigation\b/.test(t)) return {
+    q: 'What part of the lab are you assessing?',
+    options: ['Scientific reasoning and hypothesis', 'Procedure and data collection', 'Analysis and conclusions', 'Vocabulary and concepts from the lab'],
+  };
+
+  // Pre/post assessment
+  if (/\bpre.?test\b|\bpre.?assess|\bbefore the unit\b|\bprior knowledge\b/.test(t)) return {
+    q: 'What do you want to learn from this pre-assessment?',
+    options: ['Gauge prior knowledge before teaching', 'Identify gaps to inform lesson pacing', 'Group students by readiness level', 'Set a baseline to compare against later'],
+  };
+
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════
 // MAIN
 // ══════════════════════════════════════════════════════════════
 const DEFAULT_PREFS = { language: 'English', grade: '8th', questionType: 'Multiple choice', numQuestions: 10, platform: 'Forms', includeSources: false, numSlides: 10, includeImages: true, standards: 'None' };
@@ -2573,6 +2626,7 @@ export default function Home() {
   const [qgQ2OtherText, setQgQ2OtherText] = useState('');
   const [qgQ2OtherActive, setQgQ2OtherActive] = useState(false);
   const [qgCardFreeText, setQgCardFreeText] = useState('');
+  const [qgClarificationCard, setQgClarificationCard] = useState(null); // {q, options, pendingText, isQ1}
   const [qgQ2CardId, setQgQ2CardId] = useState('goal');
   const [quizGenQ2Sels, setQuizGenQ2Sels] = useState([]);
   const [qgScaffoldCardOpen, setQgScaffoldCardOpen] = useState(false);
@@ -2957,6 +3011,7 @@ export default function Home() {
     setQgQ2OtherText('');
     setQgQ2OtherActive(false);
     setQgCardFreeText('');
+    setQgClarificationCard(null);
     setQgQ2CardId('goal');
     setQuizGenQ2Sels([]);
     setQgScaffoldCardOpen(false);
@@ -5175,6 +5230,60 @@ export default function Home() {
                 {/* Bottom: question card or input bar */}
                 {currentCard ? (
                   <div style={{ flexShrink: 0, padding: '8px 12px 10px' }}>
+                    {/* ── Clarification card (replaces normal card when active) ── */}
+                    {qgClarificationCard ? (() => {
+                      const clarify = qgClarificationCard;
+                      const commitClarification = (answer) => {
+                        const combined = `${clarify.pendingText} — ${answer}`;
+                        setQgClarificationCard(null);
+                        setQgCardFreeText('');
+                        if (clarify.isQ1) {
+                          setQuizGenQ1Sels([combined]);
+                          setQuizGenAnswers([{ q: clarify.originalQ, a: combined }]);
+                          setQuizGenQ2Sels([]);
+                          setQuizGenPhase('q2');
+                        } else {
+                          setQuizGenQ2(combined);
+                          setQgQ2CardId(clarify.cardId || 'goal');
+                          setQuizGenAnswers(prev => [...prev.slice(0, 1), { q: clarify.originalQ, a: combined }]);
+                          setQuizGenPhase('pre-confirm');
+                        }
+                      };
+                      return (
+                        <div className="fade-in" style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
+                          <div style={{ fontSize: 13, color: C.slate500, marginBottom: 4 }}>One more thing</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 6 }}>{clarify.q}</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {clarify.options.map((opt, i) => (
+                              <button key={opt} onClick={() => commitClarification(opt)}
+                                onMouseEnter={e => e.currentTarget.style.background = '#F7F6F4'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 10px', border: 'none', outline: 'none', borderRadius: 8, background: i === 0 ? '#F0EFED' : 'transparent', fontFamily: 'inherit', fontSize: 14, fontWeight: 400, color: C.slate900, cursor: 'pointer', textAlign: 'left' }}>
+                                <span>{opt}</span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: i === 0 ? 1 : 0, transition: 'opacity 0.1s', flexShrink: 0 }}>
+                                  <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
+                                </svg>
+                              </button>
+                            ))}
+                          </div>
+                          <div style={{ marginTop: 10, borderTop: `1px solid ${C.slate100}`, paddingTop: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F7F6F4', borderRadius: 999, padding: '0 10px 0 14px', height: 44 }}>
+                              <input value={qgCardFreeText} onChange={e => setQgCardFreeText(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter' && qgCardFreeText.trim()) { e.preventDefault(); commitClarification(qgCardFreeText.trim()); } }}
+                                placeholder="Share more optional details"
+                                style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: C.slate900, background: 'transparent', fontFamily: 'inherit' }}
+                              />
+                              {qgCardFreeText.trim() && (
+                                <button onClick={() => commitClarification(qgCardFreeText.trim())}
+                                  style={{ width: 30, height: 30, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
+                                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })() : (
                     <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)', padding: '12px 12px 14px' }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.slate900, lineHeight: '22px', marginBottom: 6 }}>{currentCard.text}</div>
 
@@ -5198,6 +5307,20 @@ export default function Home() {
                             setQgQ2CardId(currentCard.id || 'goal');
                             setQuizGenAnswers(prev => [...prev.slice(0, 1), { q: currentCard.text, a }]);
                             setQuizGenPhase('pre-confirm');
+                          }
+                        };
+                        const handleFreeTextSubmit = (text) => {
+                          const clarification = detectClarification(text);
+                          if (clarification) {
+                            setQgClarificationCard({
+                              ...clarification,
+                              pendingText: text,
+                              isQ1,
+                              originalQ: currentCard.text,
+                              cardId: currentCard.id || 'goal',
+                            });
+                          } else {
+                            handleSelect(text);
                           }
                         };
                         return (
@@ -5225,7 +5348,7 @@ export default function Home() {
                               {otherActive ? (
                                 <input autoFocus value={otherText} onChange={e => setOtherText(e.target.value)} onClick={e => e.stopPropagation()}
                                   onKeyDown={e => {
-                                    if (e.key === 'Enter' && otherText.trim()) { e.preventDefault(); handleSelect(otherText.trim()); }
+                                    if (e.key === 'Enter' && otherText.trim()) { e.preventDefault(); handleFreeTextSubmit(otherText.trim()); }
                                     if (e.key === 'Escape') { setOtherActive(false); setOtherText(''); }
                                   }}
                                   placeholder="Describe…"
@@ -5238,7 +5361,7 @@ export default function Home() {
                                 <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="#0E151C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
-                            {/* Free-text chat input below options */}
+                            {/* Free-text chat input — triggers clarification if warranted */}
                             <div style={{ marginTop: 10, borderTop: `1px solid ${C.slate100}`, paddingTop: 8 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F7F6F4', borderRadius: 999, padding: '0 10px 0 14px', height: 44 }}>
                                 <input
@@ -5247,7 +5370,7 @@ export default function Home() {
                                   onKeyDown={e => {
                                     if (e.key === 'Enter' && qgCardFreeText.trim()) {
                                       e.preventDefault();
-                                      handleSelect(qgCardFreeText.trim());
+                                      handleFreeTextSubmit(qgCardFreeText.trim());
                                       setQgCardFreeText('');
                                     }
                                   }}
@@ -5255,7 +5378,7 @@ export default function Home() {
                                   style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, color: C.slate900, background: 'transparent', fontFamily: 'inherit' }}
                                 />
                                 {qgCardFreeText.trim() && (
-                                  <button onClick={() => { handleSelect(qgCardFreeText.trim()); setQgCardFreeText(''); }}
+                                  <button onClick={() => { handleFreeTextSubmit(qgCardFreeText.trim()); setQgCardFreeText(''); }}
                                     style={{ width: 30, height: 30, borderRadius: '50%', background: '#06465C', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
                                     <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3.5 6.5M7 3L10.5 6.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                                   </button>
@@ -5266,6 +5389,7 @@ export default function Home() {
                         );
                       })()}
                     </div>
+                    )}
                   </div>
                 ) : quizGenPhase !== 'pre-confirm' ? (
                   qgReadingLevelCardOpen ? (
